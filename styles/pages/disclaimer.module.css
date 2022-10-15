@@ -1,0 +1,53 @@
+.disclaimer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.disclaimer h1 {
+  font-size: xx-large;
+  font-weight: bold;
+  text-decoration: underline;
+  color: red;
+  padding-bottom: 2rem;
+}
+
+.disclaimer li {
+  list-style-type: disc;
+  font-size: medium;
+}
+
+.disclaimer li a {
+  text-decoration: underline;
+}
+
+.disclaimer li a:hover {
+  color: #ff00af;
+  text-decoration-color: #ff00af;
+}
+
+.risks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.risks h1 {
+  font-size: xx-large;
+  text-decoration: underline;
+  padding: 2rem 0;
+}
+
+.risks p {
+  font-size: medium;
+}
+
+.risks li {
+  list-style-type: disc;
+  font-size: medium;
+}
+
+.risks strong {
+  color: red;
+  padding: 1rem 0;
+}

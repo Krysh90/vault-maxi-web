@@ -11,10 +11,33 @@
 
 .footer {
   flex: 0 1 40px;
+  flex-direction: row;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #222;
+}
+
+.footer a {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 2rem;
+}
+
+.footer a p {
+  padding-left: 10px;
+  font-size: medium;
+}
+
+.twitter:hover {
+  color: #00acee;
+  transition: 0.1s ease;
+}
+
+.discord:hover {
+  color: #5865f2;
+  transition: 0.1s ease;
 }
 
 .main {
@@ -23,4 +46,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+@media (max-width: 768px) {
+  .discord a p {
+    display: none;
+  }
 }

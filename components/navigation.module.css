@@ -19,6 +19,7 @@
 }
 
 .logo {
+  font-weight: bold;
   font-size: 26px;
   padding-left: 0.5rem;
   color: #ff00af;

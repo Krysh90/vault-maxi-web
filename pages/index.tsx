@@ -1,12 +1,18 @@
 import type { NextPage } from 'next'
 import Layout from '../components/layout'
-
-// m-4 p-6 text-left rounded-lg border border-solid border-zinc-900 max-w-xs hover:text-pink-300 hover:border-pink-300 transition-colors ease-in-out delay-150
+import styles from '../styles/pages/index.module.css'
 
 const Home: NextPage = () => {
   return (
-    <Layout>
-      <h1 className="text-3xl font-bold underline">Welcome to Vault-maxi</h1>
+    <Layout page="Home">
+      <div className={styles.about}>
+        <h1>What is Vault Maxi?</h1>
+        <ul>
+          <li>A vault management bot hosted either via AWS or your own full node</li>
+          <li>Keeps your vault collateral ratio within a configured range</li>
+          <li>Maximizes your vaults rewards by using delta-neutral strategies</li>
+        </ul>
+      </div>
     </Layout>
   )
 }
