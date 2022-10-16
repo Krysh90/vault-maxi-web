@@ -24,7 +24,7 @@ export default function Layout({ page, children }: LayoutProps) {
       <div className={styles.container}>
         <main className={styles.main}>{children}</main>
       </div>
-      <footer className={styles.footer}>
+      {/* <footer className={styles.footer}>
         <FooterLogo
           style={styles.twitter}
           href="https://twitter.com/mkuegi"
@@ -39,14 +39,7 @@ export default function Layout({ page, children }: LayoutProps) {
           srcHovered="/twitter_hover.svg"
           title="Krysh"
         />
-        <FooterLogo
-          style={styles.discord}
-          href="https://discord.gg/DBUp4cqzBb"
-          src="/discord.svg"
-          srcHovered="/discord_hover.svg"
-          title="Community server"
-        />
-      </footer>
+      </footer> */}
     </div>
   )
 }

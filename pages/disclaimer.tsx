@@ -1,5 +1,5 @@
 import { NextPage } from 'next'
-import Layout from '../components/layout'
+import Layout from '../components/core/layout'
 import styles from '../styles/pages/disclaimer.module.css'
 
 const Disclaimer: NextPage = () => {

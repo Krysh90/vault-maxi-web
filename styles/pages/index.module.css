@@ -6,6 +6,7 @@
 
 .about h1 {
   font-size: xx-large;
+  color: #ff00af;
 }
 
 .about ul {
@@ -16,14 +17,6 @@
   font-size: medium;
 }
 
-.about a {
-  padding: 1rem;
-}
-
-.about a:hover {
-  color: #ff00af;
-}
-
 .explanation {
   display: flex;
   flex-direction: column;
@@ -32,6 +25,7 @@
 
 .explanation h1 {
   font-size: xx-large;
+  color: #ff00af;
   padding: 1rem 0;
 }
 
@@ -39,10 +33,8 @@
   font-size: medium;
 }
 
-.explanation a {
-  padding: 1rem;
-}
-
-.explanation a:hover {
+.explanation li em {
+  font-style: normal;
+  font-weight: bold;
   color: #ff00af;
 }

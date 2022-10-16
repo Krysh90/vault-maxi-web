@@ -1,5 +1,6 @@
 import type { NextPage } from 'next'
-import Layout from '../components/layout'
+import Layout from '../components/core/layout'
+import Support from '../components/home/support'
 import styles from '../styles/pages/index.module.css'
 
 const Home: NextPage = () => {
@@ -10,15 +11,15 @@ const Home: NextPage = () => {
         <ul>
           <li>A vault management bot hosted either via AWS or your own full node</li>
           <li>Keeps your vault collateral ratio within a configured range</li>
-          <li>Maximizes your vaults rewards by using delta-neutral strategies</li>
+          <li>
+            Maximizes your vaults rewards by using delta-neutral strategies
+            <ul>
+              <li>Double mint: both dToken and dUSD are taken as loans</li>
+              <li>Single mint: dToken is taken as loan and dUSD is taken from collateral</li>
+              <li>OR dUSD is taken as loan and DFI is taken from collateral</li>
+            </ul>
+          </li>
         </ul>
-        <a
-          target="_blank"
-          href="https://www.youtube.com/playlist?list=PLgSw0rik-znfQa3wVO-EJ_6Of7RnWZm3_"
-          rel="noopener noreferrer"
-        >
-          Vault Maxi video series &rarr;
-        </a>
       </div>
       <div className={styles.explanation}>
         <h1>How does it work?</h1>
@@ -26,7 +27,7 @@ const Home: NextPage = () => {
           <li>
             The DeFiChain VaultMaxi script runs on AWS (Amazon Web Services) as a so-called Lambda function. AWS Lambda
             is a compute service that lets you run code without provisioning or managing servers. AWS Lambda can be used
-            for our purpose as a free service.
+            for our purpose as a <em>free</em> service.
           </li>
           <li>
             The instructions in this document explain how the script can be set up to run as a Lambda function, and how
@@ -42,14 +43,8 @@ const Home: NextPage = () => {
             setting up a Telegram bot are provided in our guide.
           </li>
         </ul>
-        <a
-          target="_blank"
-          href="https://docs.google.com/document/d/1sb9VgeVHGYZpyLWQx8VsxsoeHO4JRz3fACj5_JjoVNs"
-          rel="noopener noreferrer"
-        >
-          Vault Maxi guide &rarr;
-        </a>
       </div>
+      <Support />
     </Layout>
   )
 }

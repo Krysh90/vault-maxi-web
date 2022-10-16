@@ -7,7 +7,7 @@
 .disclaimer h1 {
   font-size: xx-large;
   font-weight: bold;
-  color: red;
+  color: #ff00af;
   padding-bottom: 2rem;
 }
 
@@ -29,6 +29,7 @@
 .risks h1 {
   font-size: xx-large;
   padding: 2rem 0;
+  color: #ff00af;
 }
 
 .risks p {
@@ -41,6 +42,6 @@
 }
 
 .risks strong {
-  color: red;
+  color: #ff00af;
   padding: 1rem 0;
 }
