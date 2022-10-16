@@ -6,7 +6,6 @@
 
 .about h1 {
   font-size: xx-large;
-  text-decoration: underline;
 }
 
 .about ul {
@@ -15,4 +14,35 @@
 
 .about li {
   font-size: medium;
+}
+
+.about a {
+  padding: 1rem;
+}
+
+.about a:hover {
+  color: #ff00af;
+}
+
+.explanation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.explanation h1 {
+  font-size: xx-large;
+  padding: 1rem 0;
+}
+
+.explanation li {
+  font-size: medium;
+}
+
+.explanation a {
+  padding: 1rem;
+}
+
+.explanation a:hover {
+  color: #ff00af;
 }

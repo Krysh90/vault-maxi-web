@@ -1,12 +1,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import React, { useState } from 'react'
 import styles from './navigation.module.css'
 
 export default function Navigation() {
-  useEffect(() => {
-    console.log(styles)
-  }, [])
+  const [isChecked, setChecked] = useState(false)
 
   return (
     <nav className={styles.container}>
@@ -18,9 +16,9 @@ export default function Navigation() {
       </Link>
       <ul className={styles.nav}>
         <label htmlFor="checkbox_toggle" className={styles.hamburger}>
-          &#9776;
+          {isChecked ? <>&#215;</> : <>&#9776;</>}
         </label>
-        <input type="checkbox" id="checkbox_toggle" className={styles.input} />
+        <input type="checkbox" id="checkbox_toggle" className={styles.input} onClick={() => setChecked(!isChecked)} />
         <div className={styles.menu}>
           <li>
             <Link href="/disclaimer">Disclaimer</Link>

@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import FooterLogo from './footer-logo'
 import styles from './layout.module.css'
 import Navigation from './navigation'

@@ -7,7 +7,6 @@
 .disclaimer h1 {
   font-size: xx-large;
   font-weight: bold;
-  text-decoration: underline;
   color: red;
   padding-bottom: 2rem;
 }
@@ -17,13 +16,8 @@
   font-size: medium;
 }
 
-.disclaimer li a {
-  text-decoration: underline;
-}
-
 .disclaimer li a:hover {
   color: #ff00af;
-  text-decoration-color: #ff00af;
 }
 
 .risks {
@@ -34,7 +28,6 @@
 
 .risks h1 {
   font-size: xx-large;
-  text-decoration: underline;
   padding: 2rem 0;
 }
 
