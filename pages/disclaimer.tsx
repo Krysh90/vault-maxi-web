@@ -41,9 +41,9 @@ const Disclaimer: NextPage = () => {
         <ul>
           <li>Vaults on defichain and their liquidation</li>
           <li>Impermanent Loss</li>
-          <li>Counterparty risk in the ecosystem</li>
+          <li>Counter-party risk in the ecosystem</li>
           <li>Code bugs (in Vault Maxi or defichain itself)</li>
-          <li>Ocean API downtime / serveroutage</li>
+          <li>Ocean API downtime / server-outage</li>
           <li>Ocean API timeouts</li>
           <li>loss of funds due to hacks of your account</li>
           <li>loss of funds when you upload custom build zips from a scammer </li>

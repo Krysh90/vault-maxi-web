@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import FooterLogo from './footer-logo'
+import Support from '../home/support'
 import styles from './layout.module.css'
 import Navigation from './navigation'
 
@@ -22,7 +22,10 @@ export default function Layout({ page, children }: LayoutProps) {
       </Head>
       <Navigation />
       <div className={styles.container}>
-        <main className={styles.main}>{children}</main>
+        <main className={styles.main}>
+          {children}
+          <Support />
+        </main>
       </div>
       {/* <footer className={styles.footer}>
         <FooterLogo

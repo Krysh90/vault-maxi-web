@@ -1,6 +1,5 @@
 import type { NextPage } from 'next'
 import Layout from '../components/core/layout'
-import Support from '../components/home/support'
 import styles from '../styles/pages/index.module.css'
 
 const Home: NextPage = () => {
@@ -44,7 +43,6 @@ const Home: NextPage = () => {
           </li>
         </ul>
       </div>
-      <Support />
     </Layout>
   )
 }
