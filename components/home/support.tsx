@@ -3,7 +3,7 @@ import styles from './support.module.css'
 export default function Support() {
   return (
     <div className={styles.container}>
-      <h1>Need support or have questions?</h1>
+      <h3>Need support or have questions?</h3>
       <ul>
         <li className={styles.discord}>
           Join our{' '}

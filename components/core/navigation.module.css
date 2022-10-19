@@ -4,12 +4,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
-  background-color: #222;
-  color: #fff;
-}
-
-.nav a {
-  color: #fff;
+  background-color: #ddd;
+  color: #000;
 }
 
 .container-logo {
@@ -55,11 +51,12 @@
   .menu {
     display: none;
     position: absolute;
-    background-color: #222;
+    background-color: #ddd;
+    top: 60px;
     right: 0;
     left: 0;
     text-align: center;
-    padding: 16px 0;
+    padding: 10px 0;
   }
   .menu li:hover {
     display: inline-block;
@@ -75,5 +72,16 @@
   }
   .hamburger {
     display: block;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .container {
+    background-color: #222;
+    color: #fff;
+  }
+
+  .menu {
+    background-color: #222;
   }
 }

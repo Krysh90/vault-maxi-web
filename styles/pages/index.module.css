@@ -15,6 +15,30 @@
 
 .about li {
   font-size: medium;
+  list-style-type: disc;
+}
+
+.about li ul {
+  padding-top: 0px;
+  padding-left: 10px;
+}
+
+.about li ul li {
+  list-style-type: none;
+}
+
+.about li ul li:last-child {
+  padding-left: 20px;
+}
+
+.about em {
+  color: #ff00af;
+  font-style: normal;
+  font-weight: bold;
+}
+
+.about a:hover {
+  color: #ff00af;
 }
 
 .explanation {
@@ -23,7 +47,7 @@
   align-items: center;
 }
 
-.explanation h1 {
+.explanation h2 {
   font-size: xx-large;
   color: #ff00af;
   padding: 1rem 0;

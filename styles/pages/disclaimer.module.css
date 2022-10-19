@@ -23,10 +23,11 @@
 .risks {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .risks h1 {
+  align-self: center;
   font-size: xx-large;
   padding: 2rem 0;
   color: #ff00af;

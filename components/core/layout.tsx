@@ -16,6 +16,8 @@ export default function Layout({ page, children }: LayoutProps) {
       <Head>
         <title>{page ? `${siteTitle} - ${page}` : siteTitle}</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta lang="en" />
+        <meta charSet="UTF-8" />
         <meta name="description" content="Learn how vault-maxi works and what it can do for you" />
         <meta name="og:title" content={siteTitle} />
         <meta name="twitter:card" content="summary_large_image" />

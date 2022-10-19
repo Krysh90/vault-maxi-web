@@ -13,15 +13,25 @@ const Home: NextPage = () => {
           <li>
             Maximizes your vaults rewards by using delta-neutral strategies
             <ul>
-              <li>Double mint: both dToken and dUSD are taken as loans</li>
-              <li>Single mint: dToken is taken as loan and dUSD is taken from collateral</li>
+              <li>
+                <em>Double mint</em>: both dToken and dUSD are taken as loans
+              </li>
+              <li>
+                <em>Single mint</em>: dToken is taken as loan and dUSD is taken from collateral
+              </li>
               <li>OR dUSD is taken as loan and DFI is taken from collateral</li>
             </ul>
+          </li>
+          <li>
+            Open source since the beginning on{' '}
+            <a target="_blank" href="https://github.com/kuegi/defichain_maxi" rel="noopener noreferrer">
+              GitHub &rarr;
+            </a>
           </li>
         </ul>
       </div>
       <div className={styles.explanation}>
-        <h1>How does it work?</h1>
+        <h2>How does it work?</h2>
         <ul>
           <li>
             The DeFiChain VaultMaxi script runs on AWS (Amazon Web Services) as a so-called Lambda function. AWS Lambda
