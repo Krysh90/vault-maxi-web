@@ -4,7 +4,7 @@ import Layout from '../components/core/layout'
 const LMReinvest: NextPage = () => {
   return (
     <Layout page="LM reinvest">
-      <h1>A detailed description of lm reinvest</h1>
+      <h1>Currently under construction. Please check back later.</h1>
     </Layout>
   )
 }

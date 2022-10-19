@@ -4,7 +4,7 @@ import Layout from '../components/core/layout'
 const Faq: NextPage = () => {
   return (
     <Layout page="FAQ">
-      <h1>A list of all FAQs we receive</h1>
+      <h1>Currently under construction. Please check back later.</h1>
     </Layout>
   )
 }

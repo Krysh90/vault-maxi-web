@@ -4,7 +4,7 @@ import Layout from '../components/core/layout'
 const VaultMaxi: NextPage = () => {
   return (
     <Layout page="Bot">
-      <h1>A detailed description of vault maxi</h1>
+      <h1>Currently under construction. Please check back later.</h1>
     </Layout>
   )
 }

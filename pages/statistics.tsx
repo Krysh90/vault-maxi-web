@@ -4,10 +4,7 @@ import Layout from '../components/core/layout'
 const Statistics: NextPage = () => {
   return (
     <Layout page="Statistics">
-      <h1>
-        Here show all blockchain analysis we currently do to find out how many vault-maxi and other vault-management
-        bots are used
-      </h1>
+      <h1>Currently under construction. Please check back later.</h1>
     </Layout>
   )
 }
