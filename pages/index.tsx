@@ -1,12 +1,26 @@
 import type { NextPage } from 'next'
+import Image from 'next/image'
 import Layout from '../components/core/layout'
 import styles from '../styles/pages/index.module.css'
 
 const Home: NextPage = () => {
   return (
     <Layout page="Home">
+      <div className={styles.claim}>
+        <h1>
+          <em>MAXI</em>MIZE
+          <br />
+          YOUR <em>VAULT</em>
+        </h1>
+        <Image
+          src="/overview-dark.svg"
+          width={440}
+          height={130}
+          alt="Overview of vault-maxi; vault plus aws lambda equals vault-maxi"
+        />
+      </div>
       <div className={styles.about}>
-        <h1>What is Vault Maxi?</h1>
+        <h2>What is Vault Maxi?</h2>
         <ul>
           <li>A vault management bot hosted either via AWS or your own full node</li>
           <li>Keeps your vault collateral ratio within a configured range</li>

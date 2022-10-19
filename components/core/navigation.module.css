@@ -4,8 +4,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
-  background-color: #ddd;
-  color: #000;
+  background-color: #222;
+  color: #fff;
 }
 
 .container-logo {
@@ -51,7 +51,7 @@
   .menu {
     display: none;
     position: absolute;
-    background-color: #ddd;
+    background-color: #222;
     top: 60px;
     right: 0;
     left: 0;
@@ -72,16 +72,5 @@
   }
   .hamburger {
     display: block;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .container {
-    background-color: #222;
-    color: #fff;
-  }
-
-  .menu {
-    background-color: #222;
   }
 }

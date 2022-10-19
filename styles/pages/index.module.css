@@ -1,10 +1,36 @@
+.claim {
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10vh;
+}
+
+.claim h1 {
+  font-size: xx-large;
+  font-size: max(8vw, 46px);
+  line-height: max(7vw, 42px);
+}
+
+.claim h1 em {
+  color: #ff00af;
+  font-style: normal;
+  font-weight: bold;
+}
+
+.claim img {
+  max-width: 10vw;
+}
+
 .about {
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 80vw;
 }
 
-.about h1 {
+.about h2 {
   font-size: xx-large;
   color: #ff00af;
 }
@@ -45,6 +71,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 80vw;
 }
 
 .explanation h2 {
