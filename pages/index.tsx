@@ -46,7 +46,7 @@ const Home: NextPage = () => {
       </div>
       <Team />
       <div className={styles.disclaimer}>
-        <h1>Disclaimer</h1>
+        <h2>Disclaimer</h2>
         <ul>
           <li>
             Do not use this tool if you don&rsquo;t understand vaults on defichain. If you set the wrong parameter, you
@@ -73,7 +73,7 @@ const Home: NextPage = () => {
         </ul>
       </div>
       <div className={styles.risks}>
-        <h1>Risks involved</h1>
+        <h2>Risks involved</h2>
         <p>
           The risks involved contain (but are not limited to) the following list. Do NOT use the tool if you do not
           understand their impact:

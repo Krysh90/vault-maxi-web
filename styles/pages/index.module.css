@@ -70,7 +70,7 @@
   max-width: 80vw;
 }
 
-.disclaimer h1 {
+.disclaimer h2 {
   font-size: xx-large;
   color: #ff00af;
   padding-top: 10vh;
@@ -93,7 +93,7 @@
   max-width: 80vw;
 }
 
-.risks h1 {
+.risks h2 {
   align-self: center;
   font-size: xx-large;
   padding-top: 10vh;
