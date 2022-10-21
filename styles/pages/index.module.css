@@ -9,8 +9,12 @@
 
 .claim h1 {
   font-size: xx-large;
-  font-size: max(8vw, 46px);
+  font-size: max(7.5vw, 44px);
   line-height: max(7vw, 42px);
+}
+
+.claim h1 p:first-of-type {
+  font-size: max(9.4vw, 56px);
 }
 
 .claim h1 em {
@@ -21,6 +25,18 @@
 
 .claim img {
   max-width: 10vw;
+}
+
+.hint {
+  color: #ddd;
+  position: absolute;
+  bottom: 0%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: x-large;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .about {

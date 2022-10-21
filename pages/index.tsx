@@ -1,17 +1,36 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import Layout from '../components/core/layout'
 import Team from '../components/home/team'
 import styles from '../styles/pages/index.module.css'
 
 const Home: NextPage = () => {
+  const [hasScrolled, setHasScrolled] = useState(false)
+
+  useEffect(() => {
+    window.addEventListener('scroll', listenToScroll)
+    return () => window.removeEventListener('scroll', listenToScroll)
+  }, [])
+
+  const listenToScroll = () => {
+    let heightToHideFrom = 30
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop
+    if (winScroll > heightToHideFrom) {
+      setHasScrolled(true)
+    }
+  }
+
   return (
     <Layout page="Home">
       <div className={styles.claim}>
-        <h1>
-          <em>MAXI</em>MIZE
-          <br />
-          YOUR <em>VAULT</em>
+        <h1 style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+          <p>
+            <em>MAXI</em>MIZE
+          </p>
+          <p>
+            YOUR <em>VAULT</em>
+          </p>
         </h1>
         <Image
           src="/overview.svg"
@@ -20,11 +39,18 @@ const Home: NextPage = () => {
           alt="Overview of vault-maxi; vault plus aws lambda equals vault-maxi"
         />
       </div>
+      {!hasScrolled && (
+        <div className={styles.hint}>
+          <p>Read more</p>
+          <p>&darr;</p>
+        </div>
+      )}
       <div className={styles.about}>
         <h2>What is Vault Maxi?</h2>
         <ul>
           <li>A vault management bot hosted either via AWS or your own full node</li>
           <li>Keeps your vault collateral ratio within a configured range</li>
+          <li>Automatically reinvests rewards into your vault</li>
           <li>
             Maximizes your vaults rewards by using delta-neutral strategies
             <ul>
