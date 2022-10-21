@@ -8,7 +8,7 @@ export default function Support() {
         <li className={styles.discord}>
           Join our{' '}
           <a target="_blank" href="https://discord.gg/DBUp4cqzBb" rel="noopener noreferrer">
-            community server &rarr;
+            community &rarr;
           </a>
         </li>
         <li>
@@ -29,6 +29,12 @@ export default function Support() {
             rel="noopener noreferrer"
           >
             video series &rarr;
+          </a>
+        </li>
+        <li>
+          Report a{' '}
+          <a target="_blank" href="https://github.com/kuegi/defichain_maxi" rel="noopener noreferrer">
+            bug &rarr;
           </a>
         </li>
       </ul>

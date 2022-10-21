@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import Support from '../home/support'
+import Support from './support'
 import styles from './layout.module.css'
 import Navigation from './navigation'
 
@@ -28,22 +28,6 @@ export default function Layout({ page, children }: LayoutProps) {
           <Support />
         </main>
       </div>
-      {/* <footer className={styles.footer}>
-        <FooterLogo
-          style={styles.twitter}
-          href="https://twitter.com/mkuegi"
-          src="/twitter.svg"
-          srcHovered="/twitter_hover.svg"
-          title="Kügi"
-        />
-        <FooterLogo
-          style={styles.twitter}
-          href="https://twitter.com/krysh90"
-          src="/twitter.svg"
-          srcHovered="/twitter_hover.svg"
-          title="Krysh"
-        />
-      </footer> */}
     </div>
   )
 }

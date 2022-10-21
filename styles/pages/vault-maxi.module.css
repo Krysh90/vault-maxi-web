@@ -1,0 +1,22 @@
+.explanation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 80vw;
+}
+
+.explanation h2 {
+  font-size: xx-large;
+  color: #ff00af;
+  padding: 1rem 0;
+}
+
+.explanation li {
+  font-size: medium;
+}
+
+.explanation li em {
+  font-style: normal;
+  font-weight: bold;
+  color: #ff00af;
+}

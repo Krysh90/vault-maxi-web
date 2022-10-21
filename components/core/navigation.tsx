@@ -21,13 +21,16 @@ export default function Navigation() {
         <input type="checkbox" id="checkbox_toggle" className={styles.input} onClick={() => setChecked(!isChecked)} />
         <div className={styles.menu}>
           <li>
-            <Link href="/disclaimer">Disclaimer</Link>
+            <a
+              target="_blank"
+              href="https://docs.google.com/document/d/1sb9VgeVHGYZpyLWQx8VsxsoeHO4JRz3fACj5_JjoVNs"
+              rel="noopener noreferrer"
+            >
+              Guide
+            </a>
           </li>
           <li>
-            <Link href="/vault-maxi">Bot</Link>
-          </li>
-          <li>
-            <Link href="/lm-reinvest">LM reinvest</Link>
+            <Link href="/features">Features</Link>
           </li>
           <li>
             <Link href="/statistics">Statistics</Link>

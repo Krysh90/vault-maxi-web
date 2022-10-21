@@ -33,6 +33,10 @@
   transition: 0.3s ease;
 }
 
+.menu li:hover:first-of-type {
+  background-color: #4688f4;
+}
+
 .menu li {
   padding: 5px 14px;
 }

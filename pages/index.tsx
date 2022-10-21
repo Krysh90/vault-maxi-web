@@ -1,6 +1,7 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import Layout from '../components/core/layout'
+import Team from '../components/home/team'
 import styles from '../styles/pages/index.module.css'
 
 const Home: NextPage = () => {
@@ -13,7 +14,7 @@ const Home: NextPage = () => {
           YOUR <em>VAULT</em>
         </h1>
         <Image
-          src="/overview-dark.svg"
+          src="/overview.svg"
           width={440}
           height={130}
           alt="Overview of vault-maxi; vault plus aws lambda equals vault-maxi"
@@ -31,9 +32,8 @@ const Home: NextPage = () => {
                 <em>Double mint</em>: both dToken and dUSD are taken as loans
               </li>
               <li>
-                <em>Single mint</em>: dToken is taken as loan and dUSD is taken from collateral
+                <em>Single mint</em>: dToken (or dUSD) is taken as loan and dUSD (or DFI) is taken from collateral
               </li>
-              <li>OR dUSD is taken as loan and DFI is taken from collateral</li>
             </ul>
           </li>
           <li>
@@ -44,28 +44,57 @@ const Home: NextPage = () => {
           </li>
         </ul>
       </div>
-      <div className={styles.explanation}>
-        <h2>How does it work?</h2>
+      <Team />
+      <div className={styles.disclaimer}>
+        <h1>Disclaimer</h1>
         <ul>
           <li>
-            The DeFiChain VaultMaxi script runs on AWS (Amazon Web Services) as a so-called Lambda function. AWS Lambda
-            is a compute service that lets you run code without provisioning or managing servers. AWS Lambda can be used
-            for our purpose as a <em>free</em> service.
+            Do not use this tool if you don&rsquo;t understand vaults on defichain. If you set the wrong parameter, you
+            risk liquidating your vault and losing the whole collateral.
           </li>
           <li>
-            The instructions in this document explain how the script can be set up to run as a Lambda function, and how
-            it can be configured to monitor a specific vault.
+            <strong>
+              This is not financial advice and anyone using this tool is doing so at their own risk. Never invest more
+              than you are ok to lose. We are using it ourselves but can&rsquo;t guarantee that it’s working flawlessly
+              in every edge case. We are not responsible for any lost funds.
+            </strong>
           </li>
           <li>
-            Once set up, the script is triggered with an interval of 15 minutes. During each execution it takes the
-            actions that are required to keep the configured vault in optimal condition.
+            For additional safety we recommend using{' '}
+            <a target="_blank" href="https://defichain-dobby.com/" rel="noopener noreferrer">
+              defichain dobby
+            </a>{' '}
+            to monitor your vault.
           </li>
           <li>
-            Optionally, the script can send information about the actions it has executed to a Telegram bot. In this
-            way, you can easily keep track of the actions that the script has executed on your vault. Instructions for
-            setting up a Telegram bot are provided in our guide.
+            Follow the best practices for your AWS account which include using MFA and not using your root account to
+            monitor the lambda.
           </li>
         </ul>
+      </div>
+      <div className={styles.risks}>
+        <h1>Risks involved</h1>
+        <p>
+          The risks involved contain (but are not limited to) the following list. Do NOT use the tool if you do not
+          understand their impact:
+        </p>
+        <ul>
+          <li>Vaults on defichain and their liquidation</li>
+          <li>Impermanent Loss</li>
+          <li>Counter-party risk in the ecosystem</li>
+          <li>Code bugs (in Vault Maxi or defichain itself)</li>
+          <li>Ocean API downtime / server-outage</li>
+          <li>Ocean API timeouts</li>
+          <li>loss of funds due to hacks of your account</li>
+          <li>loss of funds when you upload custom build zips from a scammer </li>
+          <li>AWS closing your account, effectively stopping vault-maxi from working</li>
+        </ul>
+        <strong>
+          Always keep in mind that the code has full access to your wallet (not only this address, but the full wallet
+          derived from your seed phrase). NEVER upload custom zips from anyone. We will NEVER send anyone a custom build
+          zip to upload. Anyone who offers you one is a SCAMMER and tries to steal your funds. Please report them
+          immediately.
+        </strong>
       </div>
     </Layout>
   )

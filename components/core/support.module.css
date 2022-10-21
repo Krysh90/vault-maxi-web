@@ -4,7 +4,8 @@
   align-items: flex-start;
   background-color: #333;
   border-radius: 8px;
-  margin-top: 3rem;
+  margin-top: 10vh;
+  margin-bottom: 10vh;
   padding: 1rem 1.5rem;
   gap: 1rem;
 }

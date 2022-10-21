@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10vh;
+  gap: 20vh;
 }
 
 .claim h1 {
@@ -53,10 +53,6 @@
   list-style-type: none;
 }
 
-.about li ul li:last-child {
-  padding-left: 20px;
-}
-
 .about em {
   color: #ff00af;
   font-style: normal;
@@ -67,25 +63,54 @@
   color: #ff00af;
 }
 
-.explanation {
+.disclaimer {
   display: flex;
   flex-direction: column;
   align-items: center;
   max-width: 80vw;
 }
 
-.explanation h2 {
+.disclaimer h1 {
   font-size: xx-large;
   color: #ff00af;
-  padding: 1rem 0;
+  padding-top: 10vh;
+  padding-bottom: 1rem;
 }
 
-.explanation li {
+.disclaimer li {
+  list-style-type: disc;
   font-size: medium;
 }
 
-.explanation li em {
-  font-style: normal;
-  font-weight: bold;
+.disclaimer li a:hover {
   color: #ff00af;
+}
+
+.risks {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 80vw;
+}
+
+.risks h1 {
+  align-self: center;
+  font-size: xx-large;
+  padding-top: 10vh;
+  padding-bottom: 1rem;
+  color: #ff00af;
+}
+
+.risks p {
+  font-size: medium;
+}
+
+.risks li {
+  list-style-type: disc;
+  font-size: medium;
+}
+
+.risks strong {
+  color: #ff00af;
+  padding-top: 1rem;
 }

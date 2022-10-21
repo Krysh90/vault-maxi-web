@@ -1,0 +1,49 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10vh;
+  gap: 1rem;
+}
+
+.container h2 {
+  font-size: xx-large;
+  color: #ff00af;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #333;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+}
+
+.card h3 {
+  font-size: x-large;
+  color: #ff00af;
+}
+
+.card img {
+  align-self: flex-end;
+  border-radius: 150px;
+}
+
+.cardContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 5vw;
+}
+
+.descriptionContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.handles {
+  display: flex;
+  flex-direction: row;
+  margin-top: auto;
+  gap: 1rem;
+}
