@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Layout from '../components/core/layout'
 import Team from '../components/home/team'
 import styles from '../styles/pages/index.module.css'
+import overview from '../public/overview.svg'
 
 const Home: NextPage = () => {
   const [hasScrolled, setHasScrolled] = useState(false)
@@ -32,12 +33,7 @@ const Home: NextPage = () => {
             YOUR <em>VAULT</em>
           </p>
         </h1>
-        <Image
-          src="/overview.svg"
-          width={440}
-          height={130}
-          alt="Overview of vault-maxi; vault plus aws lambda equals vault-maxi"
-        />
+        <Image src={overview} alt="Overview of vault-maxi; vault plus aws lambda equals vault-maxi" />
       </div>
       {!hasScrolled && (
         <div className={styles.hint}>

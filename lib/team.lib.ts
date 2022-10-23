@@ -1,11 +1,13 @@
 import { HandleType } from '../dtos/team.dto'
+import twitter from '../public/twitter.svg'
+import github from '../public/github.png'
 
-export function imageOf(handleType: HandleType): string {
+export function imageOf(handleType: HandleType): any {
   switch (handleType) {
     case HandleType.TWITTER:
-      return '/twitter.svg'
+      return twitter
     case HandleType.GITHUB:
-      return '/github.png'
+      return github
   }
 }
 

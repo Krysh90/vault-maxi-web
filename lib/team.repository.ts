@@ -1,4 +1,6 @@
 import { HandleType, TeamDto } from '../dtos/team.dto'
+import imgKuegi from '../public/team/kuegi.jpeg'
+import imgKrysh from '../public/team/krysh.jpeg'
 
 export class TeamRepository {
   static all(): TeamDto[] {
@@ -8,7 +10,7 @@ export class TeamRepository {
 
 const kuegi: TeamDto = {
   name: 'Kuegi',
-  image: '/team/kuegi.jpeg',
+  image: imgKuegi,
   imageAlt: 'Profile picture of Kuegi',
   description: ['Developer', 'Defichain bot creator'],
   handles: [
@@ -25,7 +27,7 @@ const kuegi: TeamDto = {
 
 const krysh: TeamDto = {
   name: 'Krysh',
-  image: '/team/krysh.jpeg',
+  image: imgKrysh,
   imageAlt: 'Profile picture of Krysh',
   description: ['Developer @ DFX', 'Defichain bot creator'],
   handles: [

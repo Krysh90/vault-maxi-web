@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import styles from './navigation.module.css'
+import vaultMaxi from '../../public/vault-maxi.png'
 
 export default function Navigation() {
   const [isChecked, setChecked] = useState(false)
@@ -10,7 +11,7 @@ export default function Navigation() {
     <nav className={styles.container}>
       <Link href="/">
         <a className={styles['container-logo']}>
-          <Image src="/vault-maxi.png" width={40} height={40} alt="clickable image" />
+          <Image src={vaultMaxi} width={40} height={40} alt="clickable image" />
           <p className={styles.logo}>Vault Maxi</p>
         </a>
       </Link>

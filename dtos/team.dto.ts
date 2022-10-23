@@ -1,6 +1,8 @@
+import { StaticImageData } from 'next/image'
+
 export interface TeamDto {
   name: string
-  image: string
+  image: StaticImageData
   imageAlt: string
   description: string[]
   handles: HandleDto[]
