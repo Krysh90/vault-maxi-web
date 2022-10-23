@@ -17,10 +17,29 @@ a {
   box-sizing: border-box;
 }
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 li {
   list-style: none;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+h2 {
+  font-size: xx-large;
+  color: #ff00af;
+}
+
+h3 {
+  font-size: x-large;
+  color: #ff00af;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #333;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+}

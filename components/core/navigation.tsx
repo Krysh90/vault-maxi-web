@@ -34,6 +34,9 @@ export default function Navigation() {
             <Link href="/features">Features</Link>
           </li>
           <li>
+            <Link href="/tools">Tools</Link>
+          </li>
+          <li>
             <Link href="/statistics">Statistics</Link>
           </li>
           <li>

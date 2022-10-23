@@ -46,11 +46,6 @@
   max-width: 80vw;
 }
 
-.about h2 {
-  font-size: xx-large;
-  color: #ff00af;
-}
-
 .about ul {
   padding-top: 1rem;
 }
@@ -75,10 +70,6 @@
   font-weight: bold;
 }
 
-.about a:hover {
-  color: #ff00af;
-}
-
 .disclaimer {
   display: flex;
   flex-direction: column;
@@ -87,8 +78,6 @@
 }
 
 .disclaimer h2 {
-  font-size: xx-large;
-  color: #ff00af;
   padding-top: 10vh;
   padding-bottom: 1rem;
 }
@@ -96,10 +85,6 @@
 .disclaimer li {
   list-style-type: disc;
   font-size: medium;
-}
-
-.disclaimer li a:hover {
-  color: #ff00af;
 }
 
 .risks {
@@ -111,10 +96,8 @@
 
 .risks h2 {
   align-self: center;
-  font-size: xx-large;
   padding-top: 10vh;
   padding-bottom: 1rem;
-  color: #ff00af;
 }
 
 .risks p {
