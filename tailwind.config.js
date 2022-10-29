@@ -5,4 +5,14 @@ module.exports = {
     // For the best performance and to avoid false positives,
     // be as specific as possible with your content configuration.
   ],
+  theme: {
+    colors: {
+      main: '#ff00af',
+      text: '#fff',
+      navigation: '#222',
+      light: '#333',
+      discord: '#5865f2',
+      gdoc: '#4688f4',
+    }
+  }
 };

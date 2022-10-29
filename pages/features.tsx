@@ -4,8 +4,8 @@ import FeatureOverview from '../components/feature/feature-overview'
 
 const Features: NextPage = () => {
   return (
-    <Layout page="Features">
-      <h1 style={{ fontSize: 'xx-large', color: '#ff00af' }}>Features</h1>
+    <Layout page="Features" full>
+      <h1 className="text-4xl text-main">Features</h1>
       <FeatureOverview />
     </Layout>
   )

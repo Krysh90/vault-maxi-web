@@ -1,18 +1,18 @@
 import Head from 'next/head'
 import Support from './support'
-import styles from './layout.module.css'
 import Navigation from './navigation'
 
 export const siteTitle = 'Vault Maxi'
 
 interface LayoutProps {
   page?: string
+  full?: boolean
   children: any
 }
 
-export default function Layout({ page, children }: LayoutProps) {
+export default function Layout({ page, full, children }: LayoutProps) {
   return (
-    <div className={styles.page}>
+    <div className="flex flex-col h-screen">
       <Head>
         <title>{page ? `${siteTitle} - ${page}` : siteTitle}</title>
         <link rel="icon" href="/favicon.ico" />
@@ -22,8 +22,10 @@ export default function Layout({ page, children }: LayoutProps) {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
       <Navigation />
-      <div className={styles.container}>
-        <main className={styles.main}>
+      <div className="flex justify-center px-8">
+        <main
+          className={`flex flex-col justify-center items-center py-8 ${full ? 'max-w-screen-2xl' : 'max-w-screen-md'}`}
+        >
           {children}
           <Support />
         </main>

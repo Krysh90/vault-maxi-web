@@ -1,13 +1,12 @@
 import Image from 'next/future/image'
 import Link from 'next/link'
 import { FeatureRepository } from '../../lib/feature.repository'
-import styles from './feature-overview.module.css'
 
 export default function FeatureOverview() {
   return (
-    <div className={styles.container}>
+    <div className="flex flex-col items-center pt-4 gap-4 lg:flex-row lg:flex-wrap lg:justify-center">
       {FeatureRepository.all().map((member, index) => (
-        <div key={index} className="flex flex-col w-full items-start bg-[#333] rounded-lg px-4 py-6">
+        <div key={index} className="flex flex-col w-full items-start bg-light rounded-lg px-4 py-6 lg:w-96 lg:h-56">
           {member.image && (
             <div className="relative m-auto w-full">
               <Image
@@ -24,7 +23,7 @@ export default function FeatureOverview() {
           <div className="flex flex-col pt-4">
             {member.links.map((link, linkIndex) => (
               <Link key={linkIndex} href={link.url}>
-                <a>{link.display} &rarr;</a>
+                <a className="hover:text-main ease-in duration-100">{link.display} &rarr;</a>
               </Link>
             ))}
           </div>
