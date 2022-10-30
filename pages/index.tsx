@@ -27,10 +27,16 @@ const Home: NextPage = () => {
       <div className={styles.claim}>
         <h1 style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
           <p>
-            <em>MAXI</em>MIZE
+            <em>
+              <strong>MAXI</strong>
+            </em>
+            MIZE
           </p>
           <p>
-            YOUR <em>VAULT</em>
+            YOUR{' '}
+            <em>
+              <strong>VAULT</strong>
+            </em>
           </p>
         </h1>
         <Image src={overview} alt="Overview of vault-maxi; vault plus brain equals vault-maxi" />
