@@ -17,12 +17,6 @@
   font-size: max(9.4vw, 56px);
 }
 
-.claim h1 em {
-  color: #ff00af;
-  font-style: normal;
-  font-weight: bold;
-}
-
 .claim img {
   max-width: 10vw;
 }
@@ -62,12 +56,6 @@
 
 .about li ul li {
   list-style-type: none;
-}
-
-.about em {
-  color: #ff00af;
-  font-style: normal;
-  font-weight: bold;
 }
 
 .disclaimer {

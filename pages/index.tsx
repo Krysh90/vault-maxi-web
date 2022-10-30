@@ -33,7 +33,7 @@ const Home: NextPage = () => {
             YOUR <em>VAULT</em>
           </p>
         </h1>
-        <Image src={overview} alt="Overview of vault-maxi; vault plus aws lambda equals vault-maxi" />
+        <Image src={overview} alt="Overview of vault-maxi; vault plus brain equals vault-maxi" />
       </div>
       {!hasScrolled && (
         <div className={styles.hint}>

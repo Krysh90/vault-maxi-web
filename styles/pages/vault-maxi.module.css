@@ -14,9 +14,3 @@
 .explanation li {
   font-size: medium;
 }
-
-.explanation li em {
-  font-style: normal;
-  font-weight: bold;
-  color: #ff00af;
-}

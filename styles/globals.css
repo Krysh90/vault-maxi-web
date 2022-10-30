@@ -35,6 +35,18 @@ h3 {
   color: #ff00af;
 }
 
+h4 {
+  font-size: medium;
+  color: #ff00af;
+  margin-top: 0.5rem;
+}
+
+em {
+  color: #ff00af;
+  font-style: normal;
+  font-weight: bold;
+}
+
 .card {
   display: flex;
   flex-direction: column;
