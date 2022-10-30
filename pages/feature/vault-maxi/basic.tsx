@@ -1,15 +1,15 @@
 import { NextPage } from 'next'
 import Image from 'next/future/image'
+import Link from 'next/link'
 import Layout from '../../../components/core/layout'
+import PageHeader from '../../../components/core/page-header'
 import overview from '../../../public/basic.svg'
 
 const VaultMaxiBasic: NextPage = () => {
   return (
-    <Layout page="Vault Maxi - Basic">
-      <h1 className="text-4xl text-main">Basic overview</h1>
-      <div className="flex flex-col w-full pt-4 gap-4 items-center">
+    <Layout page="Basic">
+      <PageHeader pageHeader="Basic overview">
         <Image src={overview} alt="Overview of vault-maxi; vault plus aws lambda equals vault-maxi" />
-        <p className="text-hint">We start from right to left</p>
         <h3>DeFiChain</h3>
         <div>
           <p>This represents your DeFiChain wallet consisting of an address and a vault.</p>
@@ -72,12 +72,13 @@ const VaultMaxiBasic: NextPage = () => {
             You are able to define a collateral ratio range for your vault. For example <em>190%</em> to <em>210%</em>.
             Vault Maxi will keep your vault within this range.
           </p>
-          <p>If we keep it as simple as possible Vault Maxi is able to do following list of actions</p>
+          <p>If we keep it as simple as possible Vault Maxi is able to do following list of functionalities</p>
           <ul className="ml-8">
             <li className="list-disc">decrease exposure</li>
             <li className="list-disc">increase exposure</li>
             <li className="list-disc">reinvest</li>
             <li className="list-disc">communication</li>
+            <li className="list-disc">strategies</li>
           </ul>
         </div>
         <p className="text-hint">
@@ -114,7 +115,26 @@ const VaultMaxiBasic: NextPage = () => {
             retrieve a message on each execution every 15 minutes too.
           </p>
         </div>
-      </div>
+        <div>
+          <h4>Strategies</h4>
+          <p>
+            Vault Maxi has two different mint strategies. There is not a strategy X is better than Y, everything depends
+            on your current position and how you want to position within the DeFiChain ecosystem:
+          </p>
+          <ul>
+            <li>
+              <Link href="/feature/vault-maxi/double-mint">
+                <a className="hover:text-main ease-in duration-100">Double mint strategy &rarr;</a>
+              </Link>
+            </li>
+            <li>
+              <Link href="/feature/vault-maxi/single-mint">
+                <a className="hover:text-main ease-in duration-100">Single mint strategy &rarr;</a>
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </PageHeader>
     </Layout>
   )
 }
