@@ -1,9 +1,8 @@
 import { NextPage } from 'next'
 import Image from 'next/future/image'
-import Link from 'next/link'
 import Layout from '../../../components/core/layout'
 import PageHeader from '../../../components/core/page-header'
-import overview from '../../../public/double-mint.svg'
+import overview from '../../../public/vault-maxi/double-mint.svg'
 
 const VaultMaxiDoubleMint: NextPage = () => {
   return (

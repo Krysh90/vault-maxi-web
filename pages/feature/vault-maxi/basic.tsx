@@ -3,7 +3,7 @@ import Image from 'next/future/image'
 import Link from 'next/link'
 import Layout from '../../../components/core/layout'
 import PageHeader from '../../../components/core/page-header'
-import overview from '../../../public/basic.svg'
+import overview from '../../../public/vault-maxi/basic.svg'
 
 const VaultMaxiBasic: NextPage = () => {
   return (
