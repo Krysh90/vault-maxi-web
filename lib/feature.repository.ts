@@ -28,9 +28,9 @@ const commandCenter: FeatureDto = {
 }
 
 const reinvest: FeatureDto = {
-  name: 'LM Reinvest',
+  name: 'Reinvest',
   image: undefined,
   imageAlt: '',
   description: 'Reinvests DFI rewards into a defined liquidity mining pool',
-  links: [{ url: '/feature/lm-reinvest', display: 'Read more' }],
+  links: [{ url: '/feature/reinvest', display: 'Read more' }],
 }
