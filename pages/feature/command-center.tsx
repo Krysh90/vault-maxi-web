@@ -30,8 +30,8 @@ const CommandCenter: NextPage = () => {
         <div>
           <h4>Functionality</h4>
           <p>
-            On each run it asks Telegram if there is a new message, if new messages are not read it. It will read the
-            messages and look for specific commands.
+            On each run it asks Telegram if there are new messages. It will read the messages and look for specific
+            commands.
           </p>
         </div>
         <div>
