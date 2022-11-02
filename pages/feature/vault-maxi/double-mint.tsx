@@ -12,8 +12,8 @@ const VaultMaxiDoubleMint: NextPage = () => {
         <div>
           <p>
             To start Vault Maxi you will need to have a vault filled with collateral. Double mint strategy will mint
-            both token for your configured liquidity mining pair. For example <em>TSLA-DUSD</em>. Both <em>TSLA</em> and{' '}
-            <em>DUSD</em> are minted and put into the liquidity mining pool.
+            both token for your configured liquidity mining pair. For example <em>dTSLA-DUSD</em>. Both <em>dTSLA</em>{' '}
+            and <em>DUSD</em> are minted and put into the liquidity mining pool.
           </p>
           <p>
             Important to note is that you will need to have at least 50% <em>DFI</em>, otherwise you will receive a

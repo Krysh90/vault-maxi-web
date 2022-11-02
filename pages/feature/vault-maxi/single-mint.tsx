@@ -13,8 +13,8 @@ const VaultMaxiSingleMint: NextPage = () => {
           <p>
             To start Vault Maxi you will need to have a vault filled with collateral. Single mint strategy will mint
             only one token for your configured liquidity mining pair and takes the other one from your collateral. For
-            example <em>TSLA-DUSD</em>. Only <em>TSLA</em> is minted and <em>DUSD</em> is taken from collateral put into
-            the liquidity mining pool. You need to change your main collateral setting to <em>DUSD</em>.
+            example <em>dTSLA-DUSD</em>. Only <em>dTSLA</em> is minted and <em>DUSD</em> is taken from collateral put
+            into the liquidity mining pool. You need to change your main collateral setting to <em>DUSD</em>.
           </p>
           <p>
             With this strategy you can use Vault Maxi to invest in <em>DUSD-DFI</em> by setting main collateral to{' '}
