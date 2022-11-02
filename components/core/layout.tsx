@@ -7,10 +7,11 @@ export const siteTitle = 'Vault Maxi'
 interface LayoutProps {
   page?: string
   full?: boolean
+  withoutSupport?: boolean
   children: any
 }
 
-export default function Layout({ page, full, children }: LayoutProps) {
+export default function Layout({ page, full, withoutSupport, children }: LayoutProps) {
   return (
     <div className="flex flex-col h-screen">
       <Head>
@@ -27,7 +28,7 @@ export default function Layout({ page, full, children }: LayoutProps) {
           className={`flex flex-col justify-center items-center py-8 ${full ? 'max-w-screen-2xl' : 'max-w-screen-md'}`}
         >
           {children}
-          <Support />
+          {!withoutSupport && <Support />}
         </main>
       </div>
     </div>

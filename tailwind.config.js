@@ -10,6 +10,7 @@ module.exports = {
       main: '#ff00af',
       text: '#fff',
       navigation: '#222',
+      dark: '#222',
       light: '#333',
       code: '#ccc',
       hint: '#ddd',
