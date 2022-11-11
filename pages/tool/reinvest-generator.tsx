@@ -6,18 +6,13 @@ import ReinvestEntries from '../../components/tool/reinvest-entries'
 import { ReinvestTarget } from '../../dtos/reinvest-target.dto'
 import { toChartEntry } from '../../lib/reinvest-generator.lib'
 
-const defaultTarget: ReinvestTarget = {
-  value: 100,
-  name: 'DFI',
-}
-
 const ReinvestGenerator: NextPage = () => {
-  const [entries, setEntries] = useState<ReinvestTarget[]>([defaultTarget])
+  const [entries, setEntries] = useState<ReinvestTarget[]>([])
 
   return (
-    <Layout page="Tool - Reinvest generator" full withoutSupport>
+    <Layout page="Tool - Reinvest generator" maxWidth withoutSupport>
       <h1 className="text-4xl text-main">Reinvest generator</h1>
-      <div className="flex flex-col md:flex-row p-8 gap-8 flex-grow">
+      <div className="flex flex-col md:flex-row p-8 gap-8 flex-grow justify-center w-full">
         <Chart items={entries.map(toChartEntry)} />
         <ReinvestEntries entries={entries} setEntries={setEntries} />
       </div>
