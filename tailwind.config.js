@@ -11,6 +11,7 @@ module.exports = {
       text: '#fff',
       navigation: '#222',
       light: '#333',
+      code: '#ccc',
       hint: '#ddd',
       discord: '#5865f2',
       gdoc: '#4688f4',
