@@ -2,6 +2,7 @@ import { ChartEntry } from '../dtos/chart-entry.dto'
 import { ReinvestTarget } from '../dtos/reinvest-target.dto'
 
 export function toChartEntry(target: ReinvestTarget): ChartEntry {
+  if (!target.value || !target.name) throw new Error('Cannot convert empty targets')
   return {
     value: target.value,
     label: target.name,
@@ -9,9 +10,6 @@ export function toChartEntry(target: ReinvestTarget): ChartEntry {
     background: backgroundFor(target.name),
   }
 }
-const DFI = { value: 30, label: 'DFI', color: '#ff00af', background: 'bg-[#ff00af]' }
-const BTC = { value: 30, label: 'BTC', color: '#f2a900', background: 'bg-[#f2a900]' }
-const ETH = { value: 20, label: 'ETH', color: '#37367b', background: 'bg-[#37367b]' }
 
 function colorFor(name: string): string {
   switch (name) {

@@ -1,28 +1,31 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { ReinvestTarget } from '../../dtos/reinvest-target.dto'
 import { faCirclePlus, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import uuid from 'react-uuid'
-import DropDown from '../base/dropdown'
+import Dropdown from '../base/dropdown'
+import { ReinvestContext } from '../../contexts/reinvest.context'
 
-export interface ReinvestEntriesProps {
-  entries: ReinvestTarget[]
-  setEntries: (entries: ReinvestTarget[]) => void
-}
+export interface ReinvestEntriesProps {}
 
-export default function ReinvestEntries({ entries, setEntries }: ReinvestEntriesProps) {
+export default function ReinvestEntries({}: ReinvestEntriesProps) {
+  const reinvestContext = useContext(ReinvestContext)
+
   const onAdd = (): void => {
-    setEntries(entries.concat({ id: uuid(), value: 20, name: 'BTC' }))
+    reinvestContext.update({
+      key: 'targets',
+      value: reinvestContext.state.targets.concat({ id: uuid(), value: 0, name: 'DFI' }),
+    })
   }
 
   const onRemove = (entry?: ReinvestTarget): void => {
-    setEntries(entries.filter((e) => e.id !== entry?.id))
+    reinvestContext.update({ key: 'targets', value: reinvestContext.state.targets.filter((e) => e.id !== entry?.id) })
   }
 
   return (
     <div className="flex flex-col gap-2 w-full max-w-2xl">
       <h3 className="text-white self-center pr-5">Your targets</h3>
-      {entries.map((entry, key) => (
+      {reinvestContext.state.targets.map((entry, key) => (
         <Entry key={key} onRemove={onRemove} entry={entry} />
       ))}
       <AddEntry add={onAdd}></AddEntry>
@@ -44,7 +47,13 @@ function Entry({
   return (
     <div className="flex flex-row gap-4 items-center">
       <div className="bg-light h-12 flex flex-row rounded-lg w-full items-center px-2 py-4">
-        <DropDown />
+        <Dropdown
+          items={[{ label: 'DFI' }, { label: 'BTC' }, { label: 'ETH' }, { label: 'TSLA-DUSD' }]}
+          onSelect={(item) => {
+            if (entry) entry.name = item.label
+            console.log(entry)
+          }}
+        />
         <p className="truncate">{entry?.id}</p>
       </div>
       <button

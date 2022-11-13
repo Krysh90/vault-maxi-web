@@ -15,7 +15,7 @@ function SelectedIndicator() {
   )
 }
 
-function DropDownIndicator() {
+function DropdownIndicator() {
   return (
     <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
       <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -29,7 +29,7 @@ function DropDownIndicator() {
   )
 }
 
-function ItemDisplay({ item }: { item?: Item }) {
+function ItemDisplay({ item }: { item?: DropdownItem }) {
   return (
     <span className="flex items-center">
       {item && <div className="bg-main rounded-full h-8 w-8" />}
@@ -38,7 +38,7 @@ function ItemDisplay({ item }: { item?: Item }) {
   )
 }
 
-function DropDownFilter({ onChange }: { onChange: (filter: string) => void }) {
+function DropdownFilter({ onChange }: { onChange: (filter: string) => void }) {
   return (
     <input
       type={'text'}
@@ -49,16 +49,26 @@ function DropDownFilter({ onChange }: { onChange: (filter: string) => void }) {
   )
 }
 
-interface Item {
+export interface DropdownItem {
   label: string
 }
 
-export default function DropDown() {
+export interface DropdownProps {
+  items: DropdownItem[]
+  onSelect: (item: DropdownItem) => void
+}
+
+export default function Dropdown({ items, onSelect }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<Item>()
+  const [selectedItem, setSelectedItem] = useState<DropdownItem>()
   const [filter, setFilter] = useState<string>()
 
-  const items = [{ label: 'DFI' }, { label: 'BTC' }, { label: 'ETH' }, { label: 'TSLA-DUSD' }]
+  const select = (item: DropdownItem): void => {
+    setSelectedItem(item)
+    setFilter(undefined)
+    setIsOpen(false)
+    onSelect(item)
+  }
 
   return (
     <div className="relative w-52">
@@ -67,8 +77,8 @@ export default function DropDown() {
         className="relative w-full cursor-default py-2 pl-3 pr-10 text-left"
         onClick={() => setIsOpen(!isOpen)}
       >
-        {isOpen ? <DropDownFilter onChange={setFilter} /> : <ItemDisplay item={selectedItem} />}
-        <DropDownIndicator />
+        {isOpen ? <DropdownFilter onChange={setFilter} /> : <ItemDisplay item={selectedItem} />}
+        <DropdownIndicator />
       </button>
 
       <ul
@@ -83,9 +93,7 @@ export default function DropDown() {
               <button
                 className="min-w-full min-h-full"
                 onClick={() => {
-                  setSelectedItem(item)
-                  setFilter(undefined)
-                  setIsOpen(false)
+                  select(item)
                 }}
               >
                 <ItemDisplay item={item} />
