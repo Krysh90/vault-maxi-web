@@ -11,9 +11,9 @@ const Reinvest: NextPage = () => {
         <Image src={overview} alt="Overview of reinvest" />
         <div>
           <p>
-            Reinvest is now 100% customizable and powerful as it gets. This feature is completely integrated into{' '}
-            <em>Vault-Maxi</em> and can be used as a standalone bot, which can be hosted on your AWS. It a real powerful
-            automation, which triggers on having above a configured amount of DFI on your address.
+            Reinvest is now 100% customizable and as powerful as it gets. This feature is completely integrated into{' '}
+            <em>Vault-Maxi</em> and can be used as a standalone bot, which can be hosted on your AWS. It is a real
+            powerful automation, which triggers on having above a configured amount of DFI on your address.
           </p>
           <p>
             As soon as this threshold is met, it will swap, send, deposit and/or add to liquidity pool depending on your
@@ -25,7 +25,10 @@ const Reinvest: NextPage = () => {
               target token, either a token like <em>DFI</em>, <em>DUSD</em>... or a liquidity mining token like{' '}
               <em>TSLA-DUSD</em>...
             </li>
-            <li className="list-disc">percentage which should be used for this target</li>
+            <li className="list-disc">
+              percentage which should be used for this target. If no percentage is defined, all remaining percentages
+              will be distributed equally over all targets without a defined percentage
+            </li>
             <li className="list-disc">address or vault, where this should be sent or deposited</li>
           </ul>
           <h4 className="pt-2">Example patterns</h4>
