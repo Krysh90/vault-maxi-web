@@ -20,7 +20,7 @@ export default function ReinvestEntries({ entries, setEntries }: ReinvestEntries
   }
 
   return (
-    <div className="flex flex-col gap-2 w-full max-w-lg">
+    <div className="flex flex-col gap-2 w-full max-w-2xl">
       <h3 className="text-white self-center pr-5">Your targets</h3>
       {entries.map((entry, key) => (
         <Entry key={key} onRemove={onRemove} entry={entry} />
@@ -45,7 +45,7 @@ function Entry({
     <div className="flex flex-row gap-4 items-center">
       <div className="bg-light h-12 flex flex-row rounded-lg w-full items-center px-2 py-4">
         <DropDown />
-        <p>{entry?.id}</p>
+        <p className="truncate">{entry?.id}</p>
       </div>
       <button
         onClick={() => {

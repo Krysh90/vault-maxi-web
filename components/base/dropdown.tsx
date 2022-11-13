@@ -32,9 +32,20 @@ function DropDownIndicator() {
 function ItemDisplay({ item }: { item?: Item }) {
   return (
     <span className="flex items-center">
-      <div className="bg-main rounded-full h-8 w-8" />
+      {item && <div className="bg-main rounded-full h-8 w-8" />}
       <span className="ml-3 block truncate">{item?.label ?? 'Select a coin'}</span>
     </span>
+  )
+}
+
+function DropDownFilter({ onChange }: { onChange: (filter: string) => void }) {
+  return (
+    <input
+      type={'text'}
+      onChange={(e) => onChange(e.target.value)}
+      autoFocus={true}
+      className="bg-light text-white ml-3 focus:outline-none"
+    />
   )
 }
 
@@ -45,38 +56,42 @@ interface Item {
 export default function DropDown() {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<Item>()
+  const [filter, setFilter] = useState<string>()
 
   const items = [{ label: 'DFI' }, { label: 'BTC' }, { label: 'ETH' }, { label: 'TSLA-DUSD' }]
 
   return (
-    <div className="relative w-72">
+    <div className="relative w-52">
       <button
         type="button"
-        className="relative w-full cursor-default py-2 pl-3 pr-10 text-left sm:text-sm"
+        className="relative w-full cursor-default py-2 pl-3 pr-10 text-left"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <ItemDisplay item={selectedItem} />
+        {isOpen ? <DropDownFilter onChange={setFilter} /> : <ItemDisplay item={selectedItem} />}
         <DropDownIndicator />
       </button>
 
       <ul
-        className="absolute z-10 max-h-32 w-full overflow-auto text-base sm:text-sm bg-dark rounded-b-md"
+        className="absolute z-10 max-h-32 w-full overflow-auto text-base bg-dark rounded-b-md"
         tabIndex={-1}
         hidden={!isOpen}
       >
-        {items.map((item, key) => (
-          <li className="text-white relative cursor-default border-t-white select-none py-2 px-3" key={key}>
-            <button
-              className="min-w-full min-h-full"
-              onClick={() => {
-                setSelectedItem(item)
-                setIsOpen(false)
-              }}
-            >
-              <ItemDisplay item={item} />
-            </button>
-          </li>
-        ))}
+        {items
+          .filter((item) => (filter ? item.label.toLowerCase().includes(filter.toLowerCase()) : true))
+          .map((item, key) => (
+            <li className="text-white relative cursor-default border-t-white select-none py-2 px-3" key={key}>
+              <button
+                className="min-w-full min-h-full"
+                onClick={() => {
+                  setSelectedItem(item)
+                  setFilter(undefined)
+                  setIsOpen(false)
+                }}
+              >
+                <ItemDisplay item={item} />
+              </button>
+            </li>
+          ))}
       </ul>
     </div>
   )
