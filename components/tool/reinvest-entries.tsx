@@ -3,6 +3,7 @@ import { ReinvestTarget } from '../../dtos/reinvest-target.dto'
 import { faCirclePlus, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import uuid from 'react-uuid'
+import DropDown from '../base/dropdown'
 
 export interface ReinvestEntriesProps {
   entries: ReinvestTarget[]
@@ -42,7 +43,10 @@ function Entry({
 
   return (
     <div className="flex flex-row gap-4 items-center">
-      <div className="bg-light h-12 flex flex-row rounded-full w-full items-center p-4">{`${entry?.name} ${entry?.id}`}</div>
+      <div className="bg-light h-12 flex flex-row rounded-lg w-full items-center px-2 py-4">
+        <DropDown />
+        <p>{entry?.id}</p>
+      </div>
       <button
         onClick={() => {
           if (onRemove) onRemove(entry)
@@ -60,7 +64,7 @@ function Entry({
 function AddEntry({ add }: { add: () => void }) {
   return (
     <div className="w-full pr-9">
-      <div className="outline-dashed outline-light outline-2 h-12 flex flex-row rounded-full items-center p-4">
+      <div className="outline-dashed outline-light outline-2 h-12 flex flex-row rounded-lg items-center py-4">
         <button className="w-full" onClick={add}>
           <FontAwesomeIcon icon={faCirclePlus} size={'xl'} color={'#ff00af'} />
         </button>
