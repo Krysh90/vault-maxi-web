@@ -1,6 +1,6 @@
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function DropdownIndicator() {
   return (
@@ -43,12 +43,17 @@ export interface DropdownItem {
 export interface DropdownProps {
   items: DropdownItem[]
   onSelect: (item: DropdownItem) => void
+  preselection?: DropdownItem
 }
 
-export default function Dropdown({ items, onSelect }: DropdownProps) {
+export default function Dropdown({ items, onSelect, preselection }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<DropdownItem>()
   const [filter, setFilter] = useState<string>()
+
+  useEffect(() => {
+    if (preselection) setSelectedItem(preselection)
+  }, [preselection])
 
   const select = (item: DropdownItem): void => {
     setSelectedItem(item)

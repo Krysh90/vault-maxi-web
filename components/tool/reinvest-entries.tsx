@@ -61,6 +61,7 @@ function Entry({
         <Dropdown
           items={[{ label: 'DFI' }, { label: 'BTC' }, { label: 'ETH' }, { label: 'TSLA-DUSD' }]}
           onSelect={(item) => updateToken(item.label, entry)}
+          preselection={entry && entry.name ? { label: entry.name } : undefined}
         />
         <ValueChooser entry={entry} boundary={{ min: 1, max: 100 }} onChange={(value) => updateValue(value, entry)} />
       </div>
