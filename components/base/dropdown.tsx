@@ -1,3 +1,5 @@
+import { faCheck } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useState } from 'react'
 
 function DropdownIndicator() {
@@ -81,12 +83,13 @@ export default function Dropdown({ items, onSelect }: DropdownProps) {
               key={key}
             >
               <button
-                className="min-w-full min-h-full"
+                className="min-w-full min-h-full flex flex-row items-center justify-between"
                 onClick={() => {
                   select(item)
                 }}
               >
                 <ItemDisplay item={item} />
+                {item.label === selectedItem?.label && <FontAwesomeIcon icon={faCheck} size={'sm'} />}
               </button>
             </li>
           ))}

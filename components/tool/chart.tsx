@@ -25,7 +25,7 @@ export default function Chart({}: ChartProps) {
       <table className="w-[216px]">
         <tbody>
           {reinvestContext.targets
-            .filter((target) => target.value && target.name)
+            .filter((target) => target.name && target.value > 0)
             .map((target) => toChartEntry(target))
             .map((item, key) => (
               <tr key={key} className="h-10">

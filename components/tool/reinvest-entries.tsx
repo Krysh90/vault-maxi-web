@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import uuid from 'react-uuid'
 import Dropdown from '../base/dropdown'
 import { ReinvestContext } from '../../contexts/reinvest.context'
+import ValueChooser from './value-chooser'
 
 export interface ReinvestEntriesProps {}
 
@@ -12,7 +13,7 @@ export default function ReinvestEntries({}: ReinvestEntriesProps) {
   const reinvestContext = useContext(ReinvestContext)
 
   const onAdd = (): void => {
-    reinvestContext.update(reinvestContext.targets.concat({ id: uuid(), value: 10, name: 'DFI' }))
+    reinvestContext.update(reinvestContext.targets.concat({ id: uuid(), value: 0 }))
   }
 
   const onRemove = (entry?: ReinvestTarget): void => {
@@ -42,18 +43,26 @@ function Entry({
   const reinvestContext = useContext(ReinvestContext)
   const [hover, setHover] = useState(false)
 
+  const updateToken = (value: string, entry?: ReinvestTarget) => {
+    const target = reinvestContext.targets.find((target) => target.id === entry?.id)
+    if (target) target.name = value
+    reinvestContext.update(reinvestContext.targets)
+  }
+
+  const updateValue = (value: number, entry?: ReinvestTarget) => {
+    const target = reinvestContext.targets.find((target) => target.id === entry?.id)
+    if (target) target.value = value
+    reinvestContext.update(reinvestContext.targets)
+  }
+
   return (
     <div className="flex flex-row gap-4 items-center">
-      <div className="bg-light h-12 flex flex-row rounded-lg w-full items-center px-2 py-4">
+      <div className="bg-light h-12 flex flex-row rounded-lg w-full items-center px-2 py-4 gap-4">
         <Dropdown
           items={[{ label: 'DFI' }, { label: 'BTC' }, { label: 'ETH' }, { label: 'TSLA-DUSD' }]}
-          onSelect={(item) => {
-            const target = reinvestContext.targets.find((target) => target.id === entry?.id)
-            if (target) target.name = item.label
-            reinvestContext.update(reinvestContext.targets)
-          }}
+          onSelect={(item) => updateToken(item.label, entry)}
         />
-        <p className="truncate">{entry?.id}</p>
+        <ValueChooser entry={entry} boundary={{ min: 1, max: 100 }} onChange={(value) => updateValue(value, entry)} />
       </div>
       <button
         onClick={() => {

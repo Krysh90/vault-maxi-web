@@ -1,6 +1,6 @@
 export interface ReinvestTarget {
   id: string
-  value?: number
+  value: number
   name?: string
   targetAddress?: string
   targetVault?: string
