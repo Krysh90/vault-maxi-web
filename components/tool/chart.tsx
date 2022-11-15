@@ -1,12 +1,15 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { ReinvestContext } from '../../contexts/reinvest.context'
-import { ChartEntry } from '../../dtos/chart-entry.dto'
 import { toChartEntry } from '../../lib/reinvest-generator.lib'
 
 export interface ChartProps {}
 
 export default function Chart({}: ChartProps) {
   const reinvestContext = useContext(ReinvestContext)
+
+  useEffect(() => {
+    console.log('chart', reinvestContext.targets)
+  }, [reinvestContext.targets])
 
   return (
     <div className="flex flex-col gap-8 items-center">
@@ -21,7 +24,7 @@ export default function Chart({}: ChartProps) {
       /> */}
       <table className="w-[216px]">
         <tbody>
-          {reinvestContext.state.targets
+          {reinvestContext.targets
             .filter((target) => target.value && target.name)
             .map((target) => toChartEntry(target))
             .map((item, key) => (

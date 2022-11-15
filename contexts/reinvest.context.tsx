@@ -1,34 +1,21 @@
 import { Component, createContext, ReactNode } from 'react'
 import { ReinvestTarget } from '../dtos/reinvest-target.dto'
 
-interface ReinvestContextProviderState {
+interface ReinvestContextProps {
   targets: ReinvestTarget[]
+  update: (targets: ReinvestTarget[]) => void
 }
 
-interface ReinvestContextUpdateStateArg {
-  key: keyof ReinvestContextProviderState
-  value: ReinvestTarget[]
-}
+export const ReinvestContext = createContext({} as ReinvestContextProps)
 
-interface ReinvestContext {
-  state: ReinvestContextProviderState
-  update: (arg: ReinvestContextUpdateStateArg) => void
-}
-
-export const ReinvestContext = createContext({} as ReinvestContext)
-
-export class ReinvestContextProvider extends Component<{ children?: ReactNode }, ReinvestContextProviderState> {
-  public readonly state = {
-    targets: [],
-  }
-
-  private update = ({ key, value }: ReinvestContextUpdateStateArg) => {
-    this.setState({ [key]: value })
+export class ReinvestContextProvider extends Component<{ children?: ReactNode }, { targets: ReinvestTarget[] }> {
+  private update = (targets: ReinvestTarget[]) => {
+    this.setState({ targets })
   }
 
   public render() {
-    const store: ReinvestContext = {
-      state: this.state,
+    const store: ReinvestContextProps = {
+      targets: this.state?.targets ?? [],
       update: this.update,
     }
 

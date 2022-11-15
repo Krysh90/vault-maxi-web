@@ -12,20 +12,17 @@ export default function ReinvestEntries({}: ReinvestEntriesProps) {
   const reinvestContext = useContext(ReinvestContext)
 
   const onAdd = (): void => {
-    reinvestContext.update({
-      key: 'targets',
-      value: reinvestContext.state.targets.concat({ id: uuid(), value: 0, name: 'DFI' }),
-    })
+    reinvestContext.update(reinvestContext.targets.concat({ id: uuid(), value: 10, name: 'DFI' }))
   }
 
   const onRemove = (entry?: ReinvestTarget): void => {
-    reinvestContext.update({ key: 'targets', value: reinvestContext.state.targets.filter((e) => e.id !== entry?.id) })
+    reinvestContext.update(reinvestContext.targets.filter((e) => e.id !== entry?.id))
   }
 
   return (
     <div className="flex flex-col gap-2 w-full max-w-2xl">
       <h3 className="text-white self-center pr-5">Your targets</h3>
-      {reinvestContext.state.targets.map((entry, key) => (
+      {reinvestContext.targets.map((entry, key) => (
         <Entry key={key} onRemove={onRemove} entry={entry} />
       ))}
       <AddEntry add={onAdd}></AddEntry>
@@ -42,6 +39,7 @@ function Entry({
   permanent?: boolean
   onRemove?: (entry?: ReinvestTarget) => void
 }) {
+  const reinvestContext = useContext(ReinvestContext)
   const [hover, setHover] = useState(false)
 
   return (
@@ -50,8 +48,9 @@ function Entry({
         <Dropdown
           items={[{ label: 'DFI' }, { label: 'BTC' }, { label: 'ETH' }, { label: 'TSLA-DUSD' }]}
           onSelect={(item) => {
-            if (entry) entry.name = item.label
-            console.log(entry)
+            const target = reinvestContext.targets.find((target) => target.id === entry?.id)
+            if (target) target.name = item.label
+            reinvestContext.update(reinvestContext.targets)
           }}
         />
         <p className="truncate">{entry?.id}</p>
