@@ -15,8 +15,6 @@ export default function TargetInput({ entry, onChange }: TargetInputProps) {
 
   useEffect(() => {
     if (entry?.target.value) setIsInvalid(!entry?.target.isValid ?? false)
-    console.log(`isInvalid? ${!entry?.target.isValid ? 'yes' : 'no'}`)
-    console.log(entry)
   }, [entry, entry?.target.value])
 
   const shortDisplay = (value?: string): string | undefined => {
