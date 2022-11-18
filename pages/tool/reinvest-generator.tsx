@@ -2,6 +2,7 @@ import { NextPage } from 'next'
 import Layout from '../../components/core/layout'
 import Chart from '../../components/tool/chart'
 import ReinvestEntries from '../../components/tool/reinvest-entries'
+import ReinvestResult from '../../components/tool/reinvest-result'
 import { ReinvestContextProvider } from '../../contexts/reinvest.context'
 
 const ReinvestGenerator: NextPage = () => {
@@ -13,9 +14,7 @@ const ReinvestGenerator: NextPage = () => {
           {/* <Chart /> */}
           <ReinvestEntries />
         </div>
-        <div>
-          <p>some text to copy in future</p>
-        </div>
+        <ReinvestResult />
       </ReinvestContextProvider>
     </Layout>
   )

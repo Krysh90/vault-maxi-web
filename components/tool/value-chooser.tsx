@@ -27,9 +27,10 @@ export default function ValueChooser({ entry, onChange, boundary }: ValueChooser
         <ThemedInput
           className="bg-light w-8 ml-8"
           type="number"
+          value={''}
           enterKeyHint="done"
           onChange={(s) => {
-            const value = +s
+            const value = +(s ?? '0')
             if (value > 0 && value <= 100) onChange(value)
           }}
           onSubmit={() => setIsEdit(false)}

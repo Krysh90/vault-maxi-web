@@ -42,8 +42,18 @@ export function isTargetValid(target: string): boolean {
   return target.match(addressRegex) != null || target.match(vaultRegex) != null
 }
 
-export function typeForTarget(target: string): ReinvestTargetType | undefined {
-  if (target.match(addressRegex)) return ReinvestTargetType.WALLET
-  else if (target.match(vaultRegex)) return ReinvestTargetType.VAULT
+export function typeForTarget(target?: string): ReinvestTargetType | undefined {
+  if (target && target.match(addressRegex)) return ReinvestTargetType.WALLET
+  else if (target && target.match(vaultRegex)) return ReinvestTargetType.VAULT
   else return undefined
+}
+
+export function generateReinvestString(targets: ReinvestTarget[]): string {
+  const validTargets = targets.filter(
+    (entry) => entry.name && entry.value > 0 && (entry.target.value === undefined || entry.target.isValid),
+  )
+  if (validTargets.length === 0) return 'Reinvest configuration is not valid'
+  return validTargets
+    .map((target) => `${target.name}:${target.value}${target.target.value ? `:${target.target.value}` : ''}`)
+    .join(' ')
 }

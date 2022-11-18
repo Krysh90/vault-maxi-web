@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { ReinvestTarget } from '../../dtos/reinvest-target.dto'
 import { faCirclePlus, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -7,8 +7,9 @@ import Dropdown from '../base/dropdown'
 import { ReinvestContext } from '../../contexts/reinvest.context'
 import ValueChooser from './value-chooser'
 import TargetInput from './target-input'
-import { isTargetValid, typeForTarget } from '../../lib/reinvest-generator.lib'
+import { isTargetValid } from '../../lib/reinvest-generator.lib'
 import { getAssetIcon } from '../../defiscan'
+import { ThemedIconButton } from '../base/themed-icon-button'
 
 export interface ReinvestEntriesProps {}
 
@@ -44,7 +45,6 @@ function Entry({
   onRemove?: (entry?: ReinvestTarget) => void
 }) {
   const reinvestContext = useContext(ReinvestContext)
-  const [hover, setHover] = useState(false)
 
   const receiveTarget = (entry?: ReinvestTarget): ReinvestTarget | undefined => {
     return reinvestContext.targets.find((target) => target.id === entry?.id)
@@ -62,12 +62,11 @@ function Entry({
     reinvestContext.update(reinvestContext.targets)
   }
 
-  const updateTarget = (value: string, entry?: ReinvestTarget) => {
+  const updateTarget = (value?: string, entry?: ReinvestTarget) => {
     const target = receiveTarget(entry)
     if (target) {
       target.target.value = value
-      target.target.type = typeForTarget(value)
-      target.target.isValid = isTargetValid(value)
+      target.target.isValid = value ? isTargetValid(value) : false
     }
     reinvestContext.update(reinvestContext.targets)
   }
@@ -84,16 +83,15 @@ function Entry({
         <ValueChooser entry={entry} boundary={{ min: 1, max: 100 }} onChange={(value) => updateValue(value, entry)} />
         <TargetInput entry={entry} onChange={(target) => updateTarget(target, entry)} />
       </div>
-      <button
+      <ThemedIconButton
+        icon={faTrashCan}
+        color="#222"
+        hoverColor="#ff00af"
         onClick={() => {
           if (onRemove) onRemove(entry)
         }}
-        onMouseOver={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
         hidden={permanent}
-      >
-        <FontAwesomeIcon icon={faTrashCan} size={'xl'} color={hover ? '#ff00af' : '#222'} />
-      </button>
+      />
     </div>
   )
 }

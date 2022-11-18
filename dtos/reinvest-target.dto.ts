@@ -3,7 +3,6 @@ export interface ReinvestTarget {
   value: number
   name?: string
   target: {
-    type?: ReinvestTargetType
     value?: string
     isValid: boolean
   }
