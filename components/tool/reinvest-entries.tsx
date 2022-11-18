@@ -74,7 +74,7 @@ function Entry({
 
   return (
     <div className="flex flex-row gap-4 items-center">
-      <div className="bg-light h-12 flex flex-row rounded-lg w-full items-center px-2 py-4 gap-4">
+      <div className="bg-light flex flex-row flex-wrap justify-center rounded-lg w-full items-center px-2 py-4 gap-4 md:flex-nowrap md:h-12">
         <Dropdown
           items={[{ label: 'DFI' }, { label: 'BTC' }, { label: 'ETH' }, { label: 'TSLA-DUSD' }]}
           onSelect={(item) => updateToken(item.label, entry)}

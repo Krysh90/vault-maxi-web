@@ -64,7 +64,7 @@ export default function Dropdown({ items, onSelect, preselection, getIcon }: Dro
   }
 
   return (
-    <div className="relative w-52">
+    <div className="relative w-full md:w-52">
       <button
         type="button"
         className={`relative w-full cursor-default py-2 pl-3 pr-10 text-left bg-dark ${

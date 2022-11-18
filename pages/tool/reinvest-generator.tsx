@@ -10,7 +10,7 @@ const ReinvestGenerator: NextPage = () => {
       <ReinvestContextProvider>
         <h1 className="text-4xl text-main">Reinvest generator</h1>
         <div className="flex flex-col md:flex-row py-8 gap-8 flex-grow justify-center w-full">
-          <Chart />
+          {/* <Chart /> */}
           <ReinvestEntries />
         </div>
         <div>
