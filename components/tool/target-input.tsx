@@ -31,7 +31,7 @@ export default function TargetInput({ entry, onChange }: TargetInputProps) {
       <FontAwesomeIcon
         icon={entry?.target.type === ReinvestTargetType.VAULT ? faVault : faWallet}
         size={'lg'}
-        className="px-2 py-2"
+        className="px-3 py-2"
       />
       {isEdit ? (
         <ThemedInput

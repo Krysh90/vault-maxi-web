@@ -2,11 +2,15 @@
     "editor.formatOnSave": true,
     "cSpell.words": [
         "defichain",
+        "defiscan",
+        "defich",
         "dtos",
         "DUSD",
         "fontawesome",
         "fortawesome",
         "Kügi",
-        "TSLA"
+        "randomcolor",
+        "TSLA",
+        "UTXO"
     ]
 }

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { ReinvestTarget, ReinvestTargetType } from '../../dtos/reinvest-target.dto'
+import { ReinvestTarget } from '../../dtos/reinvest-target.dto'
 import { faCirclePlus, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import uuid from 'react-uuid'
@@ -8,6 +8,7 @@ import { ReinvestContext } from '../../contexts/reinvest.context'
 import ValueChooser from './value-chooser'
 import TargetInput from './target-input'
 import { isTargetValid, typeForTarget } from '../../lib/reinvest-generator.lib'
+import { getAssetIcon } from '../../defiscan'
 
 export interface ReinvestEntriesProps {}
 
@@ -78,6 +79,7 @@ function Entry({
           items={[{ label: 'DFI' }, { label: 'BTC' }, { label: 'ETH' }, { label: 'TSLA-DUSD' }]}
           onSelect={(item) => updateToken(item.label, entry)}
           preselection={entry && entry.name ? { label: entry.name } : undefined}
+          getIcon={(token) => getAssetIcon(token)({ height: 24, width: 24 })}
         />
         <ValueChooser entry={entry} boundary={{ min: 1, max: 100 }} onChange={(value) => updateValue(value, entry)} />
         <TargetInput entry={entry} onChange={(target) => updateTarget(target, entry)} />

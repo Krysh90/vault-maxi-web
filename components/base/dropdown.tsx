@@ -16,10 +16,10 @@ function DropdownIndicator() {
   )
 }
 
-function ItemDisplay({ item }: { item?: DropdownItem }) {
+function ItemDisplay({ item, getIcon }: { item?: DropdownItem; getIcon?: (label: string) => JSX.Element }) {
   return (
     <span className="flex items-center">
-      {item && <div className="bg-main rounded-full h-6 w-6" />}
+      {item && getIcon && getIcon(item.label)}
       <span className="ml-3 block truncate">{item?.label ?? 'Select a coin'}</span>
     </span>
   )
@@ -44,9 +44,10 @@ export interface DropdownProps {
   items: DropdownItem[]
   onSelect: (item: DropdownItem) => void
   preselection?: DropdownItem
+  getIcon?: (label: string) => JSX.Element
 }
 
-export default function Dropdown({ items, onSelect, preselection }: DropdownProps) {
+export default function Dropdown({ items, onSelect, preselection, getIcon }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<DropdownItem>()
   const [filter, setFilter] = useState<string>()
@@ -71,7 +72,7 @@ export default function Dropdown({ items, onSelect, preselection }: DropdownProp
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        {isOpen ? <DropdownFilter onChange={setFilter} /> : <ItemDisplay item={selectedItem} />}
+        {isOpen ? <DropdownFilter onChange={setFilter} /> : <ItemDisplay item={selectedItem} getIcon={getIcon} />}
         <DropdownIndicator />
       </button>
 
@@ -93,7 +94,7 @@ export default function Dropdown({ items, onSelect, preselection }: DropdownProp
                   select(item)
                 }}
               >
-                <ItemDisplay item={item} />
+                <ItemDisplay item={item} getIcon={getIcon} />
                 {item.label === selectedItem?.label && <FontAwesomeIcon icon={faCheck} size={'sm'} />}
               </button>
             </li>
