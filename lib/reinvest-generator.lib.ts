@@ -1,5 +1,5 @@
 import { ChartEntry } from '../dtos/chart-entry.dto'
-import { ReinvestTarget } from '../dtos/reinvest-target.dto'
+import { ReinvestTarget, ReinvestTargetType } from '../dtos/reinvest-target.dto'
 
 export function toChartEntry(target: ReinvestTarget): ChartEntry {
   if (!target.value || !target.name) throw new Error('Cannot convert empty targets')
@@ -33,4 +33,17 @@ function backgroundFor(name: string): string {
       return 'bg-[#37367b]'
   }
   return 'bg-[#123456]'
+}
+
+const addressRegex = /^(8\w{33}|d\w{33}|d\w{41})$/
+const vaultRegex = /^[a-f0-9]{64}$/i
+
+export function isTargetValid(target: string): boolean {
+  return target.match(addressRegex) != null || target.match(vaultRegex) != null
+}
+
+export function typeForTarget(target: string): ReinvestTargetType | undefined {
+  if (target.match(addressRegex)) return ReinvestTargetType.WALLET
+  else if (target.match(vaultRegex)) return ReinvestTargetType.VAULT
+  else return undefined
 }

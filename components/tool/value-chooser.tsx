@@ -1,12 +1,13 @@
-import { faMinus, faPlus, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useState } from 'react'
 import { ReinvestTarget } from '../../dtos/reinvest-target.dto'
+import ThemedInput from '../base/themed-input'
 
 export interface ValueChooserProps {
-  boundary: { min: number; max: number }
   entry?: ReinvestTarget
   onChange: (value: number) => void
+  boundary: { min: number; max: number }
 }
 
 export default function ValueChooser({ entry, onChange, boundary }: ValueChooserProps) {
@@ -21,25 +22,18 @@ export default function ValueChooser({ entry, onChange, boundary }: ValueChooser
   }
 
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div className="flex flex-row items-center w-24 justify-between">
       {isEdit ? (
-        <>
-          <input
-            type={'number'}
-            enterKeyHint={'done'}
-            onChange={(e) => {
-              const value = +e.target.value
-              if (value > 0 && value <= 100) onChange(value)
-            }}
-            onKeyUp={(e) => e.key === 'Enter' && setIsEdit(false)}
-            onSubmit={() => setIsEdit(false)}
-            autoFocus={true}
-            className="text-white bg-light w-8 ml-8 focus:outline-none"
-          />
-          <button className="h-6 w-6" onClick={() => setIsEdit(false)}>
-            <FontAwesomeIcon icon={faCheck} size={'sm'} />
-          </button>
-        </>
+        <ThemedInput
+          className="bg-light w-8 ml-8"
+          type="number"
+          enterKeyHint="done"
+          onChange={(s) => {
+            const value = +s
+            if (value > 0 && value <= 100) onChange(value)
+          }}
+          onSubmit={() => setIsEdit(false)}
+        />
       ) : (
         <>
           <button className="h-6 w-6" onClick={decrease}>

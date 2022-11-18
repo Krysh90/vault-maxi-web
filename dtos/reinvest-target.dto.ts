@@ -2,6 +2,14 @@ export interface ReinvestTarget {
   id: string
   value: number
   name?: string
-  targetAddress?: string
-  targetVault?: string
+  target: {
+    type?: ReinvestTargetType
+    value?: string
+    isValid: boolean
+  }
+}
+
+export enum ReinvestTargetType {
+  WALLET,
+  VAULT,
 }
