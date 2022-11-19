@@ -16,11 +16,19 @@ function DropdownIndicator() {
   )
 }
 
-function ItemDisplay({ item, getIcon }: { item?: DropdownItem; getIcon?: (label: string) => JSX.Element }) {
+function ItemDisplay({
+  item,
+  getIcon,
+  placeholder,
+}: {
+  item?: DropdownItem
+  getIcon?: (label: string) => JSX.Element
+  placeholder?: string
+}) {
   return (
     <span className="flex items-center">
       {item && getIcon && getIcon(item.label)}
-      <span className="ml-3 block truncate">{item?.label ?? 'Select a coin'}</span>
+      <span className="ml-3 block truncate">{item?.label ?? placeholder}</span>
     </span>
   )
 }
@@ -72,7 +80,11 @@ export default function Dropdown({ items, onSelect, preselection, getIcon }: Dro
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        {isOpen ? <DropdownFilter onChange={setFilter} /> : <ItemDisplay item={selectedItem} getIcon={getIcon} />}
+        {isOpen ? (
+          <DropdownFilter onChange={setFilter} />
+        ) : (
+          <ItemDisplay item={selectedItem} getIcon={getIcon} placeholder={'Select a token'} />
+        )}
         <DropdownIndicator />
       </button>
 

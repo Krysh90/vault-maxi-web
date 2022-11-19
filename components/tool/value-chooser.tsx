@@ -7,9 +7,10 @@ export interface ValueChooserProps {
   value: number
   onChange: (value: number) => void
   boundary: { min: number; max: number }
+  special: { on: number; text: string }
 }
 
-export default function ValueChooser({ value, onChange, boundary }: ValueChooserProps) {
+export default function ValueChooser({ value, onChange, boundary, special }: ValueChooserProps) {
   const [isEdit, setIsEdit] = useState(false)
 
   const decrease = () => {
@@ -40,7 +41,7 @@ export default function ValueChooser({ value, onChange, boundary }: ValueChooser
             <FontAwesomeIcon icon={faMinus} size={'sm'} />
           </button>
           <button onClick={() => setIsEdit(true)}>
-            <p>{value}%</p>
+            {special.on === value ? <p>{special.text}</p> : <p>{value}%</p>}
           </button>
           <button className="h-6 w-6" onClick={increase}>
             <FontAwesomeIcon icon={faPlus} size={'sm'} />

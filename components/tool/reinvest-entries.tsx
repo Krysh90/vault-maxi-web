@@ -8,7 +8,7 @@ import TargetInput from './target-input'
 import { getAssetIcon } from '../../defiscan'
 import { ThemedIconButton } from '../base/themed-icon-button'
 import { Reinvest } from '../../entities/reinvest.entity'
-import { useTokens } from '../../hooks/use-tokens.hook'
+import { useTokens } from '../../hooks/tokens.hook'
 import { Token } from '../../dtos/token.dto'
 
 export interface ReinvestEntriesProps {}
@@ -18,7 +18,7 @@ export default function ReinvestEntries({}: ReinvestEntriesProps) {
   const { tokens, isLoading } = useTokens()
 
   const onAdd = (): void => {
-    reinvestContext.update(reinvestContext.entries.concat(Reinvest.create()))
+    reinvestContext.update(reinvestContext.entries.concat(Reinvest.create(tokens?.find((t) => t.symbol === 'DFI'))))
   }
 
   const onRemove = (entry?: Reinvest): void => {
@@ -61,14 +61,15 @@ function Entry({
       <div className="bg-light flex flex-row flex-wrap justify-center rounded-lg w-full items-center px-2 py-4 gap-4 md:flex-nowrap md:h-12">
         <Dropdown
           items={tokens?.map((t) => ({ label: t.symbol })) ?? []}
-          onSelect={(item) => update({ token: item.label })}
-          preselection={entry && entry.token ? { label: entry.token } : undefined}
+          onSelect={(item) => update({ token: tokens?.find((t) => t.symbol === item.label) })}
+          preselection={entry && entry.token ? { label: entry.token.symbol } : undefined}
           getIcon={(token) => getAssetIcon(token)({ height: 24, width: 24 })}
         />
         <ValueChooser
           value={entry?.value ?? 0}
           boundary={{ min: 0, max: 100 }}
           onChange={(value) => update({ value })}
+          special={{ on: 0, text: 'fill' }}
         />
         <TargetInput entry={entry} onChange={(target) => update({ target })} />
       </div>
