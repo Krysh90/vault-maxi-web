@@ -1,12 +1,11 @@
 import { faWallet, faVault } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useEffect, useState } from 'react'
-import { ReinvestTarget, ReinvestTargetType } from '../../dtos/reinvest-target.dto'
-import { typeForTarget } from '../../lib/reinvest-generator.lib'
+import { Reinvest, ReinvestTargetType } from '../../entities/reinvest.entity'
 import ThemedInput from '../base/themed-input'
 
 export interface TargetInputProps {
-  entry?: ReinvestTarget
+  entry?: Reinvest
   onChange: (value?: string) => void
 }
 
@@ -15,9 +14,8 @@ export default function TargetInput({ entry, onChange }: TargetInputProps) {
   const [isInvalid, setIsInvalid] = useState(false)
 
   useEffect(() => {
-    if (entry?.target.value) setIsInvalid(!entry?.target.isValid ?? false)
-    else setIsInvalid(false)
-  }, [entry, entry?.target.value])
+    setIsInvalid(!entry?.isTargetValid() ?? false)
+  }, [entry, entry?.target])
 
   const shortDisplay = (value?: string): string | undefined => {
     const visibleChars = 5
@@ -32,22 +30,22 @@ export default function TargetInput({ entry, onChange }: TargetInputProps) {
       }`}
     >
       <FontAwesomeIcon
-        icon={typeForTarget(entry?.target.value) === ReinvestTargetType.VAULT ? faVault : faWallet}
+        icon={entry?.getTargetType() === ReinvestTargetType.VAULT ? faVault : faWallet}
         size={'lg'}
         className="px-3 py-2"
       />
       {isEdit ? (
         <ThemedInput
           type="text"
-          value={entry?.target.value ?? ''}
+          value={entry?.target ?? ''}
           enterKeyHint="done"
           className="bg-dark grow"
-          onChange={onChange}
+          onChange={(target) => onChange(target.length > 0 ? target : undefined)}
           onSubmit={() => setIsEdit(false)}
         />
       ) : (
         <button className="w-full" onClick={() => setIsEdit(true)}>
-          {shortDisplay(entry?.target.value) ?? 'enter address or vault'}
+          {shortDisplay(entry?.target) ?? 'enter address or vault'}
         </button>
       )}
     </div>

@@ -7,7 +7,7 @@ export interface ThemedInputProps {
   value: string
   type: HTMLInputTypeAttribute
   enterKeyHint: 'search' | 'enter' | 'done' | 'go' | 'next' | 'previous' | 'send' | undefined
-  onChange: (value?: string) => void
+  onChange: (value: string) => void
   onSubmit: () => void
 }
 

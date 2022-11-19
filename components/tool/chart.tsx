@@ -8,8 +8,8 @@ export default function Chart({}: ChartProps) {
   const reinvestContext = useContext(ReinvestContext)
 
   useEffect(() => {
-    console.log('chart', reinvestContext.targets)
-  }, [reinvestContext.targets])
+    console.log('chart', reinvestContext.entries)
+  }, [reinvestContext.entries])
 
   return (
     <div className="flex flex-col gap-8 items-center">
@@ -24,14 +24,14 @@ export default function Chart({}: ChartProps) {
       /> */}
       <table className="w-[216px]">
         <tbody>
-          {reinvestContext.targets
-            .filter((target) => target.name && target.value > 0)
-            .map((target) => toChartEntry(target))
+          {reinvestContext.entries
+            .filter((entry) => entry.token && entry.value > 0)
+            .map((entry) => toChartEntry(entry))
             .map((item, key) => (
               <tr key={key} className="h-10">
-                <td>
+                {/* <td>
                   <div className={`w-8 h-8 rounded-full ${item.background}`}></div>
-                </td>
+                </td> */}
                 <td className="text-center">{item.label}</td>
                 <td className="text-center">{item.value}%</td>
               </tr>

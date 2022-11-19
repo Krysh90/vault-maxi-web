@@ -1,15 +1,13 @@
 import React, { useContext } from 'react'
-import { ReinvestTarget } from '../../dtos/reinvest-target.dto'
 import { faCirclePlus, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import uuid from 'react-uuid'
 import Dropdown from '../base/dropdown'
 import { ReinvestContext } from '../../contexts/reinvest.context'
 import ValueChooser from './value-chooser'
 import TargetInput from './target-input'
-import { isTargetValid } from '../../lib/reinvest-generator.lib'
 import { getAssetIcon } from '../../defiscan'
 import { ThemedIconButton } from '../base/themed-icon-button'
+import { Reinvest } from '../../entities/reinvest.entity'
 
 export interface ReinvestEntriesProps {}
 
@@ -17,17 +15,17 @@ export default function ReinvestEntries({}: ReinvestEntriesProps) {
   const reinvestContext = useContext(ReinvestContext)
 
   const onAdd = (): void => {
-    reinvestContext.update(reinvestContext.targets.concat({ id: uuid(), value: 0, target: { isValid: false } }))
+    reinvestContext.update(reinvestContext.entries.concat(Reinvest.create()))
   }
 
-  const onRemove = (entry?: ReinvestTarget): void => {
-    reinvestContext.update(reinvestContext.targets.filter((e) => e.id !== entry?.id))
+  const onRemove = (entry?: Reinvest): void => {
+    reinvestContext.update(reinvestContext.entries.filter((e) => e.id !== entry?.id))
   }
 
   return (
     <div className="flex flex-col gap-2 w-full max-w-2xl">
       <h3 className="text-white self-center pr-5">Your targets</h3>
-      {reinvestContext.targets.map((entry, key) => (
+      {reinvestContext.entries.map((entry, key) => (
         <Entry key={key} onRemove={onRemove} entry={entry} />
       ))}
       <AddEntry add={onAdd}></AddEntry>
@@ -40,35 +38,15 @@ function Entry({
   permanent,
   onRemove,
 }: {
-  entry?: ReinvestTarget
+  entry?: Reinvest
   permanent?: boolean
-  onRemove?: (entry?: ReinvestTarget) => void
+  onRemove?: (entry?: Reinvest) => void
 }) {
   const reinvestContext = useContext(ReinvestContext)
 
-  const receiveTarget = (entry?: ReinvestTarget): ReinvestTarget | undefined => {
-    return reinvestContext.targets.find((target) => target.id === entry?.id)
-  }
-
-  const updateToken = (value: string, entry?: ReinvestTarget) => {
-    const target = receiveTarget(entry)
-    if (target) target.name = value
-    reinvestContext.update(reinvestContext.targets)
-  }
-
-  const updateValue = (value: number, entry?: ReinvestTarget) => {
-    const target = receiveTarget(entry)
-    if (target) target.value = value
-    reinvestContext.update(reinvestContext.targets)
-  }
-
-  const updateTarget = (value?: string, entry?: ReinvestTarget) => {
-    const target = receiveTarget(entry)
-    if (target) {
-      target.target.value = value
-      target.target.isValid = value ? isTargetValid(value) : false
-    }
-    reinvestContext.update(reinvestContext.targets)
+  const update = (values: Partial<Reinvest>) => {
+    entry?.update(values)
+    reinvestContext.updated()
   }
 
   return (
@@ -76,12 +54,16 @@ function Entry({
       <div className="bg-light flex flex-row flex-wrap justify-center rounded-lg w-full items-center px-2 py-4 gap-4 md:flex-nowrap md:h-12">
         <Dropdown
           items={[{ label: 'DFI' }, { label: 'BTC' }, { label: 'ETH' }, { label: 'TSLA-DUSD' }]}
-          onSelect={(item) => updateToken(item.label, entry)}
-          preselection={entry && entry.name ? { label: entry.name } : undefined}
+          onSelect={(item) => update({ token: item.label })}
+          preselection={entry && entry.token ? { label: entry.token } : undefined}
           getIcon={(token) => getAssetIcon(token)({ height: 24, width: 24 })}
         />
-        <ValueChooser entry={entry} boundary={{ min: 1, max: 100 }} onChange={(value) => updateValue(value, entry)} />
-        <TargetInput entry={entry} onChange={(target) => updateTarget(target, entry)} />
+        <ValueChooser
+          value={entry?.value ?? 0}
+          boundary={{ min: 0, max: 100 }}
+          onChange={(value) => update({ value })}
+        />
+        <TargetInput entry={entry} onChange={(target) => update({ target })} />
       </div>
       <ThemedIconButton
         icon={faTrashCan}

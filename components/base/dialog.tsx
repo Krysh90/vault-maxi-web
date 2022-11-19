@@ -1,8 +1,7 @@
 import React from 'react'
-import { ReinvestTarget } from '../../dtos/reinvest-target.dto'
 
 export interface DialogProps {
-  close: (target?: ReinvestTarget) => void
+  close: () => void
   children: any
 }
 
@@ -14,13 +13,13 @@ export default function Dialog({ close, children }: DialogProps) {
         <div className="flex flex-row gap-4">
           <button
             className="my-5 w-auto px-8 h-10 bg-blue-600 text-white rounded-md shadow hover:shadow-lg font-semibold bg-main"
-            // onClick={() => close({ value: 20, name: 'BTC' })}
+            onClick={() => close()}
           >
             Add
           </button>
           <button
             className="my-5 w-auto px-8 h-10 bg-blue-600 text-white rounded-md shadow hover:shadow-lg font-semibold bg-dark"
-            onClick={() => close(undefined)}
+            onClick={() => close()}
           >
             Discard
           </button>

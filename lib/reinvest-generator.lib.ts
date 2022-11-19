@@ -1,59 +1,16 @@
 import { ChartEntry } from '../dtos/chart-entry.dto'
-import { ReinvestTarget, ReinvestTargetType } from '../dtos/reinvest-target.dto'
+import { Reinvest } from '../entities/reinvest.entity'
 
-export function toChartEntry(target: ReinvestTarget): ChartEntry {
-  if (!target.value || !target.name) throw new Error('Cannot convert empty targets')
+export function toChartEntry(entry: Reinvest): ChartEntry {
+  if (!entry.value || !entry.token) throw new Error('Cannot convert empty targets')
   return {
-    value: target.value,
-    label: target.name,
-    color: colorFor(target.name),
-    background: backgroundFor(target.name),
+    value: entry.value,
+    label: entry.token,
   }
 }
 
-function colorFor(name: string): string {
-  switch (name) {
-    case 'DFI':
-      return '#ff00af'
-    case 'BTC':
-      return '#f2a900'
-    case 'ETH':
-      return '#37367b'
-  }
-  return '#123456'
-}
-
-function backgroundFor(name: string): string {
-  switch (name) {
-    case 'DFI':
-      return 'bg-[#ff00af]'
-    case 'BTC':
-      return 'bg-[#f2a900]'
-    case 'ETH':
-      return 'bg-[#37367b]'
-  }
-  return 'bg-[#123456]'
-}
-
-const addressRegex = /^(8\w{33}|d\w{33}|d\w{41})$/
-const vaultRegex = /^[a-f0-9]{64}$/i
-
-export function isTargetValid(target: string): boolean {
-  return target.match(addressRegex) != null || target.match(vaultRegex) != null
-}
-
-export function typeForTarget(target?: string): ReinvestTargetType | undefined {
-  if (target && target.match(addressRegex)) return ReinvestTargetType.WALLET
-  else if (target && target.match(vaultRegex)) return ReinvestTargetType.VAULT
-  else return undefined
-}
-
-export function generateReinvestString(targets: ReinvestTarget[]): string {
-  const validTargets = targets.filter(
-    (entry) => entry.name && entry.value > 0 && (entry.target.value === undefined || entry.target.isValid),
-  )
-  if (validTargets.length === 0) return 'Reinvest configuration is not valid'
-  return validTargets
-    .map((target) => `${target.name}:${target.value}${target.target.value ? `:${target.target.value}` : ''}`)
-    .join(' ')
+export function generateReinvestStringBasedOn(entries: Reinvest[]): string {
+  const validEntries = entries.filter((entry) => entry.token && entry.value > 0 && entry.isTargetValid())
+  if (validEntries.length === 0) return 'Reinvest configuration is not valid'
+  return validEntries.map((entry) => entry.getReinvestString()).join(' ')
 }

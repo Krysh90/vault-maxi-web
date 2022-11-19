@@ -1,24 +1,28 @@
 import { createContext, PropsWithChildren, useEffect, useState } from 'react'
-import { ReinvestTarget } from '../dtos/reinvest-target.dto'
+import { Reinvest } from '../entities/reinvest.entity'
 
 interface ReinvestContextProps {
-  targets: ReinvestTarget[]
-  update: (targets: ReinvestTarget[]) => void
+  entries: Reinvest[]
+  update: (entries: Reinvest[]) => void
+  updated: () => void
 }
 
 export const ReinvestContext = createContext({} as ReinvestContextProps)
 
 export function ReinvestContextProvider(props: PropsWithChildren<{}>): JSX.Element {
-  const [targets, setTargets] = useState<ReinvestTarget[]>([])
+  const [entries, setEntries] = useState<Reinvest[]>([])
 
   // Krysh: maybe due to inexperience, but we would need a new render on each target update
   const [renderCount, setRenderCount] = useState(0)
   useEffect(() => {}, [renderCount])
 
   const context = {
-    targets,
-    update: (targets: ReinvestTarget[]) => {
-      setTargets(targets)
+    entries,
+    update: (entries: Reinvest[]) => {
+      setEntries(entries)
+      setRenderCount((renderCount + 1) % 2)
+    },
+    updated: () => {
       setRenderCount((renderCount + 1) % 2)
     },
   }
