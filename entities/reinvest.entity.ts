@@ -25,7 +25,11 @@ export class Reinvest {
   }
 
   public getReinvestString(): string {
-    return `${this.token}:${this.value}${this.target ? `:${this.target}` : ''}`
+    return `${this.token}${this.reinvestValuePart()}${this.reinvestTargetPart()}`
+  }
+
+  public isValid(): boolean {
+    return this.token !== undefined && this.isTargetValid()
   }
 
   public isTargetValid(): boolean {
@@ -40,5 +44,14 @@ export class Reinvest {
 
   public static create(): Reinvest {
     return new Reinvest()
+  }
+
+  private reinvestValuePart(): string {
+    return this.value > 0 ? `:${this.value}` : ''
+  }
+
+  private reinvestTargetPart(): string {
+    const divider = this.reinvestValuePart().length > 0 ? ':' : '::'
+    return this.target ? `${divider}${this.target}` : ''
   }
 }

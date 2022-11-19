@@ -11,7 +11,7 @@ export default function ReinvestResult({}: ReinvestResultProps) {
 
   return (
     <div className="bg-light rounded-lg h-12 w-full px-2 py-1 md:w-96">
-      <div className="bg-dark rounded-lg w-full h-full flex flex-row items-center gap-4 px-2">
+      <div className="bg-dark rounded-lg w-full h-full flex flex-row items-center gap-1 px-2">
         {reinvestContext.entries.length === 0 ? (
           <p className="grow text-center">Please add targets</p>
         ) : (

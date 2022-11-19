@@ -13,11 +13,11 @@ export default function ValueChooser({ value, onChange, boundary }: ValueChooser
   const [isEdit, setIsEdit] = useState(false)
 
   const decrease = () => {
-    onChange(value - 1)
+    if (value > boundary.min) onChange(value - 1)
   }
 
   const increase = () => {
-    onChange(value + 1)
+    if (value < boundary.max) onChange(value + 1)
   }
 
   return (
