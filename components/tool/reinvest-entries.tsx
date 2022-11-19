@@ -10,6 +10,7 @@ import { ThemedIconButton } from '../base/themed-icon-button'
 import { Reinvest } from '../../entities/reinvest.entity'
 import { useTokens } from '../../hooks/tokens.hook'
 import { Token } from '../../dtos/token.dto'
+import { Spinner } from '../base/spinner'
 
 export interface ReinvestEntriesProps {}
 
@@ -25,15 +26,19 @@ export default function ReinvestEntries({}: ReinvestEntriesProps) {
     reinvestContext.update(reinvestContext.entries.filter((e) => e.id !== entry?.id))
   }
 
-  return isLoading ? (
-    <h1>loading tokens</h1>
-  ) : (
+  return (
     <div className="flex flex-col gap-2 w-full max-w-2xl">
-      <h3 className="text-white self-center pr-5">Your targets</h3>
-      {reinvestContext.entries.map((entry, key) => (
-        <Entry tokens={tokens} key={key} onRemove={onRemove} entry={entry} />
-      ))}
-      <AddEntry add={onAdd}></AddEntry>
+      {isLoading ? (
+        <Spinner text="Loading tokens..." />
+      ) : (
+        <>
+          <h3 className="text-white self-center pr-5">Your targets</h3>
+          {reinvestContext.entries.map((entry, key) => (
+            <Entry tokens={tokens} key={key} onRemove={onRemove} entry={entry} />
+          ))}
+          <AddEntry add={onAdd}></AddEntry>
+        </>
+      )}
     </div>
   )
 }
