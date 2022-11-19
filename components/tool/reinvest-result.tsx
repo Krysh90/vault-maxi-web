@@ -23,7 +23,7 @@ export default function ReinvestResult({}: ReinvestResultProps) {
           color="#fff"
           hoverColor="#ff00af"
           icon={faClipboard}
-          onClick={() => console.log('todo clipboard')}
+          onClick={() => console.log(generateReinvestStringBasedOn(reinvestContext.entries))}
         />
       </div>
     </div>

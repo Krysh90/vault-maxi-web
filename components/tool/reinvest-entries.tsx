@@ -8,11 +8,14 @@ import TargetInput from './target-input'
 import { getAssetIcon } from '../../defiscan'
 import { ThemedIconButton } from '../base/themed-icon-button'
 import { Reinvest } from '../../entities/reinvest.entity'
+import { useTokens } from '../../hooks/use-tokens.hook'
+import { Token } from '../../dtos/token.dto'
 
 export interface ReinvestEntriesProps {}
 
 export default function ReinvestEntries({}: ReinvestEntriesProps) {
   const reinvestContext = useContext(ReinvestContext)
+  const { tokens, isLoading } = useTokens()
 
   const onAdd = (): void => {
     reinvestContext.update(reinvestContext.entries.concat(Reinvest.create()))
@@ -22,11 +25,13 @@ export default function ReinvestEntries({}: ReinvestEntriesProps) {
     reinvestContext.update(reinvestContext.entries.filter((e) => e.id !== entry?.id))
   }
 
-  return (
+  return isLoading ? (
+    <h1>loading tokens</h1>
+  ) : (
     <div className="flex flex-col gap-2 w-full max-w-2xl">
       <h3 className="text-white self-center pr-5">Your targets</h3>
       {reinvestContext.entries.map((entry, key) => (
-        <Entry key={key} onRemove={onRemove} entry={entry} />
+        <Entry tokens={tokens} key={key} onRemove={onRemove} entry={entry} />
       ))}
       <AddEntry add={onAdd}></AddEntry>
     </div>
@@ -34,10 +39,12 @@ export default function ReinvestEntries({}: ReinvestEntriesProps) {
 }
 
 function Entry({
+  tokens,
   entry,
   permanent,
   onRemove,
 }: {
+  tokens?: Token[]
   entry?: Reinvest
   permanent?: boolean
   onRemove?: (entry?: Reinvest) => void
@@ -53,7 +60,7 @@ function Entry({
     <div className="flex flex-row gap-4 items-center">
       <div className="bg-light flex flex-row flex-wrap justify-center rounded-lg w-full items-center px-2 py-4 gap-4 md:flex-nowrap md:h-12">
         <Dropdown
-          items={[{ label: 'DFI' }, { label: 'BTC' }, { label: 'ETH' }, { label: 'TSLA-DUSD' }]}
+          items={tokens?.map((t) => ({ label: t.symbol })) ?? []}
           onSelect={(item) => update({ token: item.label })}
           preselection={entry && entry.token ? { label: entry.token } : undefined}
           getIcon={(token) => getAssetIcon(token)({ height: 24, width: 24 })}
