@@ -9,6 +9,11 @@ export interface ReinvestResultProps {}
 export default function ReinvestResult({}: ReinvestResultProps) {
   const reinvestContext = useContext(ReinvestContext)
 
+  const copyToClipboard = () => {
+    const textToCopy = generateReinvestStringBasedOn(reinvestContext.entries)
+    if (window.isSecureContext && navigator && navigator.clipboard) navigator.clipboard.writeText(textToCopy)
+  }
+
   return (
     <div className="bg-light rounded-lg h-12 w-full px-2 py-1 md:w-96">
       <div className="bg-dark rounded-lg w-full h-full flex flex-row items-center gap-1 px-2">
@@ -23,7 +28,8 @@ export default function ReinvestResult({}: ReinvestResultProps) {
           color="#fff"
           hoverColor="#ff00af"
           icon={faClipboard}
-          onClick={() => console.log(generateReinvestStringBasedOn(reinvestContext.entries))}
+          onClick={() => copyToClipboard()}
+          useCheckmarkAnimation
         />
       </div>
     </div>
