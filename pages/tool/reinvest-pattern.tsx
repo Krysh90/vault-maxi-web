@@ -6,9 +6,9 @@ import { ReinvestContextProvider } from '../../contexts/reinvest.context'
 
 const ReinvestGenerator: NextPage = () => {
   return (
-    <Layout page="Tool - Reinvest generator" full maxWidth withoutSupport>
+    <Layout page="Tool - Reinvest pattern" full maxWidth withoutSupport>
       <ReinvestContextProvider>
-        <h1 className="text-4xl text-main">Reinvest generator</h1>
+        <h1 className="text-4xl text-main">Reinvest pattern</h1>
         <div className="flex flex-col md:flex-row py-8 gap-8 flex-grow justify-center w-full">
           {/* <Chart /> */}
           <ReinvestEntries />
