@@ -11,5 +11,5 @@ export function toChartEntry(entry: Reinvest): ChartEntry {
 
 export function generateReinvestStringBasedOn(entries: Reinvest[]): string {
   const validEntries = entries.filter((entry) => entry.isValid())
-  return validEntries.map((entry) => entry.getReinvestString()).join(' ')
+  return validEntries.map((entry) => entry.getReinvestString()).join(',')
 }
