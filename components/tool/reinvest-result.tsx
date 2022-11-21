@@ -1,7 +1,7 @@
 import { faClipboard } from '@fortawesome/free-solid-svg-icons'
 import { useContext } from 'react'
 import { ReinvestContext } from '../../contexts/reinvest.context'
-import { generateReinvestStringBasedOn } from '../../lib/reinvest-generator.lib'
+import { generateReinvestStringBasedOn } from '../../lib/reinvest.lib'
 import { ThemedIconButton } from '../base/themed-icon-button'
 
 export interface ReinvestResultProps {}

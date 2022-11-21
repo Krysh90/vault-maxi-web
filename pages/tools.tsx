@@ -12,6 +12,7 @@ const Tools: NextPage = () => {
           title: t.name,
           description: t.description,
           icon: t.icon,
+          specialIcon: t.specialIcon,
           links: t.links,
         }))}
       />
