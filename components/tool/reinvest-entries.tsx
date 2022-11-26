@@ -1,4 +1,10 @@
-import { faCirclePlus, faTrashCan } from '@fortawesome/free-solid-svg-icons'
+import {
+  faCirclePlus,
+  faTrashCan,
+  faTriangleExclamation,
+  faCircleInfo,
+  IconDefinition,
+} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Dropdown from '../base/dropdown'
 import ValueChooser from './value-chooser'
@@ -12,7 +18,7 @@ import { Spinner } from '../base/spinner'
 import { useReinvestContext } from '../../contexts/reinvest.context'
 
 export default function ReinvestEntries(): JSX.Element {
-  const { entries, updateEntries } = useReinvestContext()
+  const { entries, updateEntries, showWarning, warning, showInfo, info } = useReinvestContext()
   const { tokens, isLoading } = useTokens()
 
   const onAdd = (): void => {
@@ -29,10 +35,12 @@ export default function ReinvestEntries(): JSX.Element {
         <Spinner text="Loading tokens..." />
       ) : (
         <>
+          {showWarning && <StaticEntry type="warn" text={warning} />}
+          {showInfo && <StaticEntry type="info" text={info} />}
           {entries.map((entry, key) => (
             <Entry tokens={tokens} key={key} onRemove={onRemove} entry={entry} />
           ))}
-          <AddEntry add={onAdd}></AddEntry>
+          <StaticEntry type="add" add={onAdd} />
         </>
       )}
     </div>
@@ -87,13 +95,71 @@ function Entry({
   )
 }
 
-function AddEntry({ add }: { add: () => void }): JSX.Element {
+interface StaticEntryProps {
+  type: 'info' | 'warn' | 'add'
+  text?: string
+  add?: () => void
+}
+
+function StaticEntry({ type, text, add }: StaticEntryProps): JSX.Element {
+  function backgroundColor(): string | undefined {
+    switch (type) {
+      case 'info':
+        return 'bg-info-base'
+      case 'warn':
+        return 'bg-warn-base'
+    }
+  }
+
+  function icon(): IconDefinition {
+    switch (type) {
+      case 'info':
+        return faCircleInfo
+      case 'warn':
+        return faTriangleExclamation
+      case 'add':
+        return faCirclePlus
+    }
+  }
+
+  function iconColor(): string {
+    switch (type) {
+      case 'info':
+        return '#40869b'
+      case 'warn':
+        return '#cca300'
+      case 'add':
+        return '#ff00af'
+    }
+  }
+
+  function outline(): string {
+    switch (type) {
+      case 'info':
+      case 'warn':
+        return 'outline outline-light outline-1'
+      case 'add':
+        return 'outline-dashed outline-light outline-2'
+    }
+  }
+
   return (
     <div className="w-full pr-9">
-      <div className="outline-dashed outline-light outline-2 h-12 flex flex-row rounded-lg items-center py-4">
-        <button className="w-full" onClick={add}>
-          <FontAwesomeIcon icon={faCirclePlus} size={'xl'} color={'#ff00af'} />
-        </button>
+      <div
+        className={`${backgroundColor()} ${outline()} flex flex-row rounded-lg items-center py-4 px-2 ${
+          type !== 'add' ? 'gap-4 md:flex-nowrap md:h-12' : ''
+        }`}
+      >
+        {type === 'add' ? (
+          <button className="w-full" onClick={add}>
+            <FontAwesomeIcon icon={icon()} size={'xl'} color={iconColor()} />
+          </button>
+        ) : (
+          <>
+            <FontAwesomeIcon className="ml-3" icon={icon()} size={'xl'} color={iconColor()} />
+            <p className="text-light mx-auto">{text}</p>
+          </>
+        )}
       </div>
     </div>
   )

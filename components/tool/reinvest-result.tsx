@@ -4,9 +4,10 @@ import { generateReinvestStringBasedOn } from '../../lib/reinvest.lib'
 import { ThemedIconButton } from '../base/themed-icon-button'
 
 export default function ReinvestResult(): JSX.Element {
-  const { entries } = useReinvestContext()
+  const { entries, showWarning } = useReinvestContext()
 
-  const copyToClipboard = () => {
+  function copyToClipboard() {
+    if (showWarning) return
     const textToCopy = generateReinvestStringBasedOn(entries)
     if (window.isSecureContext && navigator && navigator.clipboard) navigator.clipboard.writeText(textToCopy)
   }
@@ -16,6 +17,8 @@ export default function ReinvestResult(): JSX.Element {
       <div className="bg-dark rounded-lg w-full h-full flex flex-row items-center gap-1 px-2">
         {entries.length === 0 ? (
           <p className="grow text-center">Please add targets</p>
+        ) : showWarning ? (
+          <p className="grow truncate">Please check the warning</p>
         ) : (
           <p className="grow truncate">{generateReinvestStringBasedOn(entries)}</p>
         )}
@@ -27,6 +30,7 @@ export default function ReinvestResult(): JSX.Element {
           icon={faClipboard}
           onClick={() => copyToClipboard()}
           useCheckmarkAnimation
+          disabled={showWarning}
         />
       </div>
     </div>
