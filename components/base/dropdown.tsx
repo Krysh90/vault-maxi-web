@@ -2,7 +2,7 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useEffect, useState } from 'react'
 
-function DropdownIndicator() {
+function DropdownIndicator(): JSX.Element {
   return (
     <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-1">
       <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -24,7 +24,7 @@ function ItemDisplay({
   item?: DropdownItem
   getIcon?: (label: string) => JSX.Element
   placeholder?: string
-}) {
+}): JSX.Element {
   return (
     <span className="flex items-center">
       {item && getIcon && getIcon(item.label)}
@@ -33,7 +33,7 @@ function ItemDisplay({
   )
 }
 
-function DropdownFilter({ onChange }: { onChange: (filter: string) => void }) {
+function DropdownFilter({ onChange }: { onChange: (filter: string) => void }): JSX.Element {
   return (
     <input
       type={'text'}
@@ -55,7 +55,7 @@ export interface DropdownProps {
   getIcon?: (label: string) => JSX.Element
 }
 
-export default function Dropdown({ items, onSelect, preselection, getIcon }: DropdownProps) {
+export default function Dropdown({ items, onSelect, preselection, getIcon }: DropdownProps): JSX.Element {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<DropdownItem>()
   const [filter, setFilter] = useState<string>()

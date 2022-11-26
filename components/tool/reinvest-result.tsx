@@ -6,7 +6,7 @@ import { ThemedIconButton } from '../base/themed-icon-button'
 
 export interface ReinvestResultProps {}
 
-export default function ReinvestResult({}: ReinvestResultProps) {
+export default function ReinvestResult({}: ReinvestResultProps): JSX.Element {
   const reinvestContext = useContext(ReinvestContext)
 
   const copyToClipboard = () => {

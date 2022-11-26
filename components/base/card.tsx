@@ -19,7 +19,7 @@ export interface CardProps {
   item: CardItem
 }
 
-export default function Card({ key, item }: CardProps) {
+export default function Card({ key, item }: CardProps): JSX.Element {
   return (
     <div key={key} className="flex flex-col w-full items-start bg-light rounded-lg px-4 py-6 lg:w-96 lg:h-56">
       {item.image && (

@@ -1,6 +1,5 @@
 import { ToolDto } from '../dtos/tool.dto'
 import { faDollar, faRotateRight } from '@fortawesome/free-solid-svg-icons'
-import JSXStyle from 'styled-jsx/style'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export class ToolRepository {
