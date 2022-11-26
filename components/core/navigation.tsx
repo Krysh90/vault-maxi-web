@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import styles from './navigation.module.css'
 import vaultMaxi from '../../public/vault-maxi.png'
 
-export default function Navigation() {
+export default function Navigation(): JSX.Element {
   const [isChecked, setChecked] = useState(false)
 
   return (

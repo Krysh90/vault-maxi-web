@@ -1,3 +1,4 @@
+import { faCircleDollarToSlot, faTerminal } from '@fortawesome/free-solid-svg-icons'
 import { FeatureDto } from '../dtos/feature.dto'
 import imgVaultMaxi from '../public/vault-maxi.png'
 
@@ -21,16 +22,13 @@ const vaultMaxi: FeatureDto = {
 
 const commandCenter: FeatureDto = {
   name: 'Command Center',
-  image: undefined,
-  imageAlt: '',
   description: 'Execute commands via telegram chat',
   links: [{ url: '/feature/command-center', display: 'Read more' }],
 }
 
 const reinvest: FeatureDto = {
   name: 'Reinvest',
-  image: undefined,
-  imageAlt: '',
+  icon: { definition: faCircleDollarToSlot, color: '#666', size: '5x' },
   description: 'Reinvests DFI rewards into a defined liquidity mining pool',
   links: [{ url: '/feature/reinvest', display: 'Read more' }],
 }

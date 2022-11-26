@@ -5,7 +5,7 @@ export interface DialogProps {
   children: any
 }
 
-export default function Dialog({ close, children }: DialogProps) {
+export default function Dialog({ close, children }: DialogProps): JSX.Element {
   return (
     <div className="fixed w-screen h-screen bg-[black] bg-opacity-75 top-0 left-0">
       <div className="absolute left-1/2 translate-x-[-50%] top-1/2 translate-y-[-50%] flex justify-center items-center flex-col w-72 rounded-lg shadow-xl h-auto p-2 bg-light">

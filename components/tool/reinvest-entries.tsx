@@ -1,8 +1,6 @@
-import React, { useContext } from 'react'
 import { faCirclePlus, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Dropdown from '../base/dropdown'
-import { ReinvestContext } from '../../contexts/reinvest.context'
 import ValueChooser from './value-chooser'
 import TargetInput from './target-input'
 import { getAssetIcon } from '../../defiscan'
@@ -11,19 +9,18 @@ import { Reinvest } from '../../entities/reinvest.entity'
 import { useTokens } from '../../hooks/tokens.hook'
 import { Token } from '../../dtos/token.dto'
 import { Spinner } from '../base/spinner'
+import { useReinvestContext } from '../../contexts/reinvest.context'
 
-export interface ReinvestEntriesProps {}
-
-export default function ReinvestEntries({}: ReinvestEntriesProps) {
-  const reinvestContext = useContext(ReinvestContext)
+export default function ReinvestEntries(): JSX.Element {
+  const { entries, updateEntries } = useReinvestContext()
   const { tokens, isLoading } = useTokens()
 
   const onAdd = (): void => {
-    reinvestContext.update(reinvestContext.entries.concat(Reinvest.create(tokens?.find((t) => t.symbol === 'DFI'))))
+    updateEntries(entries.concat(Reinvest.create(tokens?.find((t) => t.symbol === 'DFI'))))
   }
 
   const onRemove = (entry?: Reinvest): void => {
-    reinvestContext.update(reinvestContext.entries.filter((e) => e.id !== entry?.id))
+    updateEntries(entries.filter((e) => e.id !== entry?.id))
   }
 
   return (
@@ -32,8 +29,7 @@ export default function ReinvestEntries({}: ReinvestEntriesProps) {
         <Spinner text="Loading tokens..." />
       ) : (
         <>
-          <h3 className="text-white self-center pr-5">Your targets</h3>
-          {reinvestContext.entries.map((entry, key) => (
+          {entries.map((entry, key) => (
             <Entry tokens={tokens} key={key} onRemove={onRemove} entry={entry} />
           ))}
           <AddEntry add={onAdd}></AddEntry>
@@ -53,12 +49,12 @@ function Entry({
   entry?: Reinvest
   permanent?: boolean
   onRemove?: (entry?: Reinvest) => void
-}) {
-  const reinvestContext = useContext(ReinvestContext)
+}): JSX.Element {
+  const { updated } = useReinvestContext()
 
   const update = (values: Partial<Reinvest>) => {
     entry?.update(values)
-    reinvestContext.updated()
+    updated()
   }
 
   return (
@@ -91,7 +87,7 @@ function Entry({
   )
 }
 
-function AddEntry({ add }: { add: () => void }) {
+function AddEntry({ add }: { add: () => void }): JSX.Element {
   return (
     <div className="w-full pr-9">
       <div className="outline-dashed outline-light outline-2 h-12 flex flex-row rounded-lg items-center py-4">

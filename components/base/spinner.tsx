@@ -2,7 +2,7 @@ export interface SpinnerProps {
   text: string
 }
 
-export function Spinner({ text }: SpinnerProps) {
+export function Spinner({ text }: SpinnerProps): JSX.Element {
   return (
     <div className="flex flex-col gap-4 justify-center items-center">
       <div

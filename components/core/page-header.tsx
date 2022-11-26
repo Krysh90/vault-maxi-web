@@ -3,7 +3,7 @@ interface PageHeaderProps {
   children: any
 }
 
-export default function PageHeader({ pageHeader, children }: PageHeaderProps) {
+export default function PageHeader({ pageHeader, children }: PageHeaderProps): JSX.Element {
   return (
     <>
       <h1 className="text-4xl text-main">{pageHeader}</h1>

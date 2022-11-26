@@ -10,9 +10,7 @@ const Tools: NextPage = () => {
       <CardOverview
         items={ToolRepository.all().map((t) => ({
           title: t.name,
-          description: t.description,
-          icon: t.icon,
-          links: t.links,
+          ...t,
         }))}
       />
     </Layout>

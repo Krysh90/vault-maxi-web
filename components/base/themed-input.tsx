@@ -11,7 +11,7 @@ export interface ThemedInputProps {
   onSubmit: () => void
 }
 
-function CustomInput({ className, value, type, enterKeyHint, onChange, onSubmit }: ThemedInputProps) {
+function CustomInput({ className, value, type, enterKeyHint, onChange, onSubmit }: ThemedInputProps): JSX.Element {
   const [currentValue, setCurrentValue] = useState(value)
 
   return (
@@ -37,7 +37,14 @@ function CustomInput({ className, value, type, enterKeyHint, onChange, onSubmit 
   )
 }
 
-export default function ThemedInput({ className, value, type, enterKeyHint, onChange, onSubmit }: ThemedInputProps) {
+export default function ThemedInput({
+  className,
+  value,
+  type,
+  enterKeyHint,
+  onChange,
+  onSubmit,
+}: ThemedInputProps): JSX.Element {
   return (
     <>
       <CustomInput

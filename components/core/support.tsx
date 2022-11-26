@@ -1,6 +1,6 @@
 import styles from './support.module.css'
 
-export default function Support() {
+export default function Support(): JSX.Element {
   return (
     <div className={styles.container}>
       <h3>Need support or have questions?</h3>

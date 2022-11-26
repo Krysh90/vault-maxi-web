@@ -10,7 +10,7 @@ export interface ValueChooserProps {
   special: { on: number; text: string }
 }
 
-export default function ValueChooser({ value, onChange, boundary, special }: ValueChooserProps) {
+export default function ValueChooser({ value, onChange, boundary, special }: ValueChooserProps): JSX.Element {
   const [isEdit, setIsEdit] = useState(false)
 
   const decrease = () => {
