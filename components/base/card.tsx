@@ -28,8 +28,8 @@ export default function Card({ key, item }: CardProps): JSX.Element {
             className="absolute top-0 right-0 opacity-20"
             src={item.image}
             alt={item.imageAlt ?? ''}
-            height={100}
-            width={100}
+            height={80}
+            width={80}
           />
         </div>
       )}
