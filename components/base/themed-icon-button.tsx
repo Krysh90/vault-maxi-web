@@ -1,9 +1,8 @@
-import { faCheck } from '@fortawesome/free-solid-svg-icons'
-import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useState } from 'react'
 
-export interface ThemedIconButton {
+export interface ThemedIconButtonProps {
   className?: string
   icon: IconDefinition
   color: string
@@ -21,7 +20,7 @@ export function ThemedIconButton({
   hidden,
   onClick,
   useCheckmarkAnimation,
-}: ThemedIconButton) {
+}: ThemedIconButtonProps): JSX.Element {
   const [hover, setHover] = useState(false)
   const [changeToCheckmark, setChangeToCheckmark] = useState(false)
 

@@ -1,5 +1,5 @@
 import { ToolDto } from '../dtos/tool.dto'
-import { faSackDollar } from '@fortawesome/free-solid-svg-icons'
+import { faCircleDollarToSlot } from '@fortawesome/free-solid-svg-icons'
 
 export class ToolRepository {
   static all(): ToolDto[] {
@@ -10,10 +10,6 @@ export class ToolRepository {
 const reinvestPattern: ToolDto = {
   name: 'Reinvest pattern',
   description: 'Generate a reinvest pattern that fits your needs',
-  icon: {
-    definition: faSackDollar,
-    color: '#fff',
-    size: '5x',
-  },
+  icon: { definition: faCircleDollarToSlot, color: '#666', size: '5x' },
   links: [{ url: '/tool/reinvest-pattern', display: 'Open tool' }],
 }

@@ -12,7 +12,7 @@ interface LayoutProps {
   children: any
 }
 
-export default function Layout({ page, full, maxWidth, withoutSupport, children }: LayoutProps) {
+export default function Layout({ page, full, maxWidth, withoutSupport, children }: LayoutProps): JSX.Element {
   return (
     <div className="flex flex-col h-screen">
       <Head>

@@ -4,10 +4,11 @@ import { LinkDto } from './link.dto'
 export interface ToolDto {
   name: string
   description: string
-  icon: {
+  icon?: {
     definition: IconDefinition
     color: string
     size: SizeProp
   }
+  specialIcon?: () => JSX.Element
   links: LinkDto[]
 }

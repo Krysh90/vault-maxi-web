@@ -10,10 +10,7 @@ const Features: NextPage = () => {
       <CardOverview
         items={FeatureRepository.all().map((f) => ({
           title: f.name,
-          description: f.description,
-          image: f.image,
-          imageAlt: f.imageAlt,
-          links: f.links,
+          ...f,
         }))}
       />
     </Layout>

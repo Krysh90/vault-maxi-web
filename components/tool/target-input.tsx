@@ -9,7 +9,7 @@ export interface TargetInputProps {
   onChange: (value?: string) => void
 }
 
-export default function TargetInput({ entry, onChange }: TargetInputProps) {
+export default function TargetInput({ entry, onChange }: TargetInputProps): JSX.Element {
   const [isEdit, setIsEdit] = useState(false)
   const [isInvalid, setIsInvalid] = useState(false)
 

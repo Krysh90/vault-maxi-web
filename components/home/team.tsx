@@ -4,7 +4,7 @@ import { imageAltOf, imageOf } from '../../lib/team.lib'
 import { TeamRepository } from '../../lib/team.repository'
 import styles from './team.module.css'
 
-function Description({ member }: { member: TeamDto }) {
+function Description({ member }: { member: TeamDto }): JSX.Element {
   return (
     <div className={styles.descriptionContainer}>
       <h3>{member.name}</h3>
@@ -27,7 +27,7 @@ function Description({ member }: { member: TeamDto }) {
   )
 }
 
-export default function Team() {
+export default function Team(): JSX.Element {
   return (
     <div className={styles.container}>
       <h2>Team</h2>
