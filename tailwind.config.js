@@ -17,7 +17,9 @@ module.exports = {
       discord: '#5865f2',
       gdoc: '#4688f4',
       white: '#fff',
-      invalid: '#c00'
-    }
-  }
-};
+      invalid: '#c00',
+      warn: { base: '#ffcc00', dark: '#cca300' },
+      info: { base: '#5bc0de', dark: '#40869b' },
+    },
+  },
+}

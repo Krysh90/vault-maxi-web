@@ -17,7 +17,7 @@ export function toChartData(entries: Reinvest[]): ChartData {
   }
 }
 
-function toTotalValue(entries: Reinvest[]): number {
+export function toTotalValue(entries: Reinvest[]): number {
   if (entries.length === 0) return 0
   return entries.map((entry) => entry.value).reduce((curr, prev) => curr + prev)
 }
