@@ -3,9 +3,7 @@ import { Doughnut } from 'react-chartjs-2'
 import { toChartData } from '../../lib/reinvest.lib'
 import { useReinvestContext } from '../../contexts/reinvest.context'
 
-export interface ChartProps {}
-
-export default function Chart({}: ChartProps): JSX.Element {
+export default function Chart(): JSX.Element {
   const { entries } = useReinvestContext()
 
   return (

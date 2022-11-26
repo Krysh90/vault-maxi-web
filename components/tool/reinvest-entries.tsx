@@ -1,4 +1,3 @@
-import React, { useContext } from 'react'
 import { faCirclePlus, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Dropdown from '../base/dropdown'
@@ -12,9 +11,7 @@ import { Token } from '../../dtos/token.dto'
 import { Spinner } from '../base/spinner'
 import { useReinvestContext } from '../../contexts/reinvest.context'
 
-export interface ReinvestEntriesProps {}
-
-export default function ReinvestEntries({}: ReinvestEntriesProps): JSX.Element {
+export default function ReinvestEntries(): JSX.Element {
   const { entries, updateEntries } = useReinvestContext()
   const { tokens, isLoading } = useTokens()
 

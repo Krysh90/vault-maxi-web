@@ -1,26 +1,23 @@
 import { faClipboard } from '@fortawesome/free-solid-svg-icons'
-import { useContext } from 'react'
-import { ReinvestContext } from '../../contexts/reinvest.context'
+import { useReinvestContext } from '../../contexts/reinvest.context'
 import { generateReinvestStringBasedOn } from '../../lib/reinvest.lib'
 import { ThemedIconButton } from '../base/themed-icon-button'
 
-export interface ReinvestResultProps {}
-
-export default function ReinvestResult({}: ReinvestResultProps): JSX.Element {
-  const reinvestContext = useContext(ReinvestContext)
+export default function ReinvestResult(): JSX.Element {
+  const { entries } = useReinvestContext()
 
   const copyToClipboard = () => {
-    const textToCopy = generateReinvestStringBasedOn(reinvestContext.entries)
+    const textToCopy = generateReinvestStringBasedOn(entries)
     if (window.isSecureContext && navigator && navigator.clipboard) navigator.clipboard.writeText(textToCopy)
   }
 
   return (
     <div className="bg-light rounded-lg h-12 w-full px-2 py-1 md:w-96">
       <div className="bg-dark rounded-lg w-full h-full flex flex-row items-center gap-1 px-2">
-        {reinvestContext.entries.length === 0 ? (
+        {entries.length === 0 ? (
           <p className="grow text-center">Please add targets</p>
         ) : (
-          <p className="grow truncate">{generateReinvestStringBasedOn(reinvestContext.entries)}</p>
+          <p className="grow truncate">{generateReinvestStringBasedOn(entries)}</p>
         )}
 
         <ThemedIconButton
