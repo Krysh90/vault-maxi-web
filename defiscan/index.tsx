@@ -41,10 +41,26 @@ const mapping: Record<string, (props: SVGProps<SVGSVGElement>) => JSX.Element> =
  * @return {(props: SVGProps<SVGSVGElement>) => JSX.Element}
  */
 export function getAssetIcon(symbol: string): (props: SVGProps<SVGSVGElement>) => JSX.Element {
+  if (symbol.includes('-')) {
+    return PoolPairIcon(symbol)
+  }
   const Icon = mapping[symbol] ?? mapping[`d${symbol}`]
   if (Icon === undefined) {
     // if its a loan token
     return _TokenDefault(symbol)
   }
   return Icon
+}
+
+function PoolPairIcon(symbol: string): (props: SVGProps<SVGSVGElement>) => JSX.Element {
+  const tokens = symbol.split('-')
+  // eslint-disable-next-line react/display-name
+  return (props) => (
+    <div className="flex flex-row">
+      <div style={{ zIndex: 1 }}>{getAssetIcon(tokens[0])(props)}</div>
+      <div style={{ marginTop: 2, marginLeft: -6, zIndex: 0 }}>
+        {getAssetIcon(tokens[1])({ width: 20, height: 20 })}
+      </div>
+    </div>
+  )
 }
