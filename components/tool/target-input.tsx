@@ -11,11 +11,6 @@ export interface TargetInputProps {
 
 export default function TargetInput({ entry, onChange }: TargetInputProps): JSX.Element {
   const [isEdit, setIsEdit] = useState(false)
-  const [isInvalid, setIsInvalid] = useState(false)
-
-  useEffect(() => {
-    setIsInvalid(!entry?.isTargetValid() ?? false)
-  }, [entry, entry?.target])
 
   const shortDisplay = (value?: string): string | undefined => {
     const visibleChars = 5
@@ -26,7 +21,7 @@ export default function TargetInput({ entry, onChange }: TargetInputProps): JSX.
   return (
     <div
       className={`flex flex-row flex-grow items-center justify-between bg-dark rounded-md h-10 ${
-        isInvalid ? 'border border-invalid' : ''
+        !(entry?.isTargetValid() ?? true) ? 'border border-invalid' : ''
       }`}
     >
       <FontAwesomeIcon

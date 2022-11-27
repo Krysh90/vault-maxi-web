@@ -41,13 +41,22 @@ export function ReinvestContextProvider(props: PropsWithChildren): JSX.Element {
     setRenderCount((renderCount + 1) % 2)
     const entriesToCheck = inputEntries ?? entries
     const total = toTotalValue(entriesToCheck)
-    const hasAFillTarget = entriesToCheck.filter((r) => r.value === 0).length > 0
+
+    checkWarnings(entriesToCheck, total)
+    checkInfos(entriesToCheck, total)
+  }
+
+  function checkWarnings(entries: Reinvest[], total: number) {
     const isAbove100 = total > 100
-    const hasOneInvalidTarget = entriesToCheck.filter((r) => !r.isTargetValid()).length > 0
+    const hasOneInvalidTarget = entries.filter((e) => !e.isTargetValid()).length > 0
     setShowWarning(isAbove100 || hasOneInvalidTarget)
     if (isAbove100) setWarning(warningAboveMax)
     else if (hasOneInvalidTarget) setWarning(warningInvalidTarget)
     else setWarning(undefined)
+  }
+
+  function checkInfos(entries: Reinvest[], total: number) {
+    const hasAFillTarget = entries.filter((e) => e.value === 0).length > 0
 
     const hasUnused = total < 100 && !hasAFillTarget
     setShowInfo(hasUnused)

@@ -96,12 +96,9 @@ export default function Dropdown({ items, onSelect, preselection, getIcon }: Dro
         {items
           .filter((item) => (filter ? item.label.toLowerCase().includes(filter.toLowerCase()) : true))
           .map((item, key) => (
-            <li
-              className="text-white flex justify-center cursor-default select-none py-3 px-3 hover:bg-light"
-              key={key}
-            >
+            <li className="text-white flex justify-center cursor-default select-none hover:bg-light" key={key}>
               <button
-                className="min-w-full min-h-full flex flex-row items-center justify-between"
+                className="min-w-full min-h-full flex flex-row items-center justify-between py-3 px-3"
                 onClick={() => {
                   select(item)
                 }}
