@@ -5,6 +5,6 @@ export interface ChartData {
 
 export interface ChartDataset {
   data: number[]
-  backgroundColor: string[]
+  backgroundColor: (string | CanvasGradient | undefined)[]
   hoverOffset: number
 }
