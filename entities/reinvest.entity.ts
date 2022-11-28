@@ -46,7 +46,11 @@ export class Reinvest {
   }
 
   public getTargetType(): ReinvestTargetType {
-    if ((this.target && this.target.match(vaultRegex)) || this.target === Reinvest.Constants.vault)
+    if (
+      (this.target && this.target.match(vaultRegex)) ||
+      this.target === Reinvest.Constants.vault ||
+      (!this.target && (this.token?.canBeCollateral ?? false))
+    )
       return ReinvestTargetType.VAULT
     else return ReinvestTargetType.WALLET
   }
