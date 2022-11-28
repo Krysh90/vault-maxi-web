@@ -26,7 +26,7 @@ export function ReinvestContextProvider(props: PropsWithChildren): JSX.Element {
   const [info, setInfo] = useState<string>()
 
   const warningAboveMax = 'Please review your targets, currently you are above 100%'
-  const warningInvalidTarget = 'Please review your targets, one destination is invalid'
+  const warningInvalidTarget = 'Please review your targets, at least one destination is invalid'
 
   // Krysh: maybe due to inexperience, but we would need a new render on each target update
   const [renderCount, setRenderCount] = useState(0)
