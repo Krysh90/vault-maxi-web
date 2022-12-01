@@ -2,7 +2,7 @@ import { PoolPairData } from '@defichain/whale-api-client/dist/api/poolpairs'
 import { CollateralToken } from '@defichain/whale-api-client/dist/api/loan'
 import { Token, TokenType } from '../dtos/token.dto'
 
-const blockedPairs = ['csETH-ETH']
+const blockedPairs: string[] = []
 
 export function toTokens(poolpairs: PoolPairData[], collateralTokens: CollateralToken[]): Token[] {
   const filteredPoolpairs = poolpairs.filter((p) => p.status && !blockedPairs.includes(p.symbol))
