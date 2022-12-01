@@ -8,7 +8,8 @@ const Tools: NextPage = () => {
     <Layout page="Tools" full>
       <h1 className="text-4xl text-main">Tools</h1>
       <CardOverview
-        items={ToolRepository.all().map((t) => ({
+        items={ToolRepository.all().map((t, index) => ({
+          index,
           title: t.name,
           ...t,
         }))}
