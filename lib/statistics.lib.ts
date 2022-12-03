@@ -169,7 +169,6 @@ export function toLineChartData(history: VaultStats[], type: StatisticsChartData
       })
       break
   }
-
   return {
     labels: history.map((entry) => moment(entry.tstamp).format('DD-MM-YYYY')),
     datasets: entries.map((entry) => ({

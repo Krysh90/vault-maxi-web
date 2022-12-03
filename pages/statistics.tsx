@@ -5,7 +5,7 @@ import HistoryChart from '../components/statistic/history-chart'
 import { VaultStats } from '../dtos/vault-stats.dto'
 import { historyDaysToLoad, StatisticsChartDataType, toChartData } from '../lib/statistics.lib'
 
-export async function getServerSideProps(): Promise<{ props: StatisticsProps }> {
+export async function getStaticProps(): Promise<{ props: StatisticsProps; revalidate: number }> {
   const res = await fetch('https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/vaultAnalysis/latest.json')
   const statistics: VaultStats = await res.json()
   const history = await Promise.all<VaultStats>(
@@ -17,7 +17,7 @@ export async function getServerSideProps(): Promise<{ props: StatisticsProps }> 
           .catch(() => {}),
       ),
   ).then((stats) => stats.filter((stat) => stat !== undefined))
-  return { props: { statistics, history } }
+  return { props: { statistics, history }, revalidate: 3600 }
 }
 
 interface StatisticsProps {
