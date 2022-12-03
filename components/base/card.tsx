@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { LinkDto } from '../../dtos/link.dto'
 
 export interface CardItem {
+  index: number
   title: string
   description: string
   image?: StaticImageData
@@ -15,13 +16,12 @@ export interface CardItem {
 }
 
 export interface CardProps {
-  key: number | string
   item: CardItem
 }
 
-export default function Card({ key, item }: CardProps): JSX.Element {
+export default function Card({ item }: CardProps): JSX.Element {
   return (
-    <div key={key} className="flex flex-col w-full items-start bg-light rounded-lg px-4 py-6 lg:w-96 lg:h-56">
+    <div key={item.index} className="flex flex-col w-full items-start bg-light rounded-lg px-4 py-6 lg:w-96 lg:h-56">
       {item.image && (
         <div className="relative m-auto w-full">
           <Image

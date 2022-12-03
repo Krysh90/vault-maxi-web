@@ -8,7 +8,8 @@ const Features: NextPage = () => {
     <Layout page="Features" full>
       <h1 className="text-4xl text-main">Features</h1>
       <CardOverview
-        items={FeatureRepository.all().map((f) => ({
+        items={FeatureRepository.all().map((f, index) => ({
+          index,
           title: f.name,
           ...f,
         }))}

@@ -7,4 +7,7 @@ export interface ChartDataset {
   data: number[]
   backgroundColor: string[]
   hoverOffset: number
+  label?: string
+  borderColor?: string[]
+  yAxisID?: string
 }
