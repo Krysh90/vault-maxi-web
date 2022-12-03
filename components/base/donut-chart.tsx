@@ -1,15 +1,16 @@
 import 'chart.js/auto'
 import { Doughnut } from 'react-chartjs-2'
-import { toChartData } from '../../lib/reinvest.lib'
-import { useReinvestContext } from '../../contexts/reinvest.context'
 import { ChartData } from '../../dtos/chart-data.dto'
 
-export default function Chart(): JSX.Element {
-  const { entries, showWarning } = useReinvestContext()
+interface DonutChartProps {
+  chartData: ChartData
+  disabled?: boolean
+}
 
+export default function DonutChart({ disabled, chartData }: DonutChartProps): JSX.Element {
   function getChartData(): ChartData {
-    const data = toChartData(entries)
-    if (showWarning) {
+    const data = chartData
+    if (disabled) {
       data.datasets = data.datasets.map((c) => {
         c.backgroundColor = ['#333']
         return c
@@ -26,9 +27,11 @@ export default function Chart(): JSX.Element {
         options={{
           cutout: '66%',
           elements: { arc: { borderWidth: 0 } },
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false, labels: { color: '#fff', usePointStyle: true } },
+          },
           resizeDelay: 500,
-          events: showWarning ? [] : undefined,
+          events: disabled ? [] : undefined,
         }}
       />
     </div>
