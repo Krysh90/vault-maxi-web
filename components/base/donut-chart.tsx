@@ -27,7 +27,9 @@ export default function DonutChart({ disabled, chartData }: DonutChartProps): JS
         options={{
           cutout: '66%',
           elements: { arc: { borderWidth: 0 } },
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false, labels: { color: '#fff', usePointStyle: true } },
+          },
           resizeDelay: 500,
           events: disabled ? [] : undefined,
         }}
