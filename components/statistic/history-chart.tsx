@@ -1,7 +1,7 @@
 import 'chart.js/auto'
 import { Line } from 'react-chartjs-2'
 import { VaultStats } from '../../dtos/vault-stats.dto'
-import { StatisticsChartDataType, toLineChartData } from '../../lib/statistics.lib'
+import { StatisticsChartDataType, toLineChartData, toScales } from '../../lib/statistics.lib'
 
 interface HistoryChartProps {
   history: VaultStats[]
@@ -21,10 +21,11 @@ export default function HistoryChart({ history }: HistoryChartProps): JSX.Elemen
               labels: { usePointStyle: true, color: '#fff' },
             },
           },
+          scales: toScales(StatisticsChartDataType.NUMBER_OF_VAULTS),
         }}
       />
       <div>
-        <h3>History data</h3>
+        <h3>Show</h3>
         <ul className="list">
           <li>number of vaults</li>
           <li>avg coll ratio</li>

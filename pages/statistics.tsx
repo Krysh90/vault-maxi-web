@@ -14,7 +14,7 @@ export async function getServerSideProps(): Promise<{ props: StatisticsProps }> 
       .map((url) =>
         fetch(url)
           .then((res) => res.json())
-          .catch(console.error),
+          .catch(() => {}),
       ),
   ).then((stats) => stats.filter((stat) => stat !== undefined))
   const needsLatestInHistory = !history.find((stats) => stats.tstamp === statistics.tstamp)
@@ -34,8 +34,8 @@ const Statistics: NextPage<StatisticsProps> = ({ statistics, history }: Statisti
       inDollar: false,
     },
     {
-      title: 'Total value locked in $',
-      type: StatisticsChartDataType.TVL,
+      title: 'Collateral in $',
+      type: StatisticsChartDataType.COLLATERAL,
       inDollar: true,
     },
     {

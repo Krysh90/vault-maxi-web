@@ -9,4 +9,5 @@ export interface ChartDataset {
   hoverOffset: number
   label?: string
   borderColor?: string[]
+  yAxisID?: string
 }
