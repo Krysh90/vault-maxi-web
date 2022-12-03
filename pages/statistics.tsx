@@ -17,8 +17,7 @@ export async function getServerSideProps(): Promise<{ props: StatisticsProps }> 
           .catch(() => {}),
       ),
   ).then((stats) => stats.filter((stat) => stat !== undefined))
-  const needsLatestInHistory = !history.find((stats) => stats.tstamp === statistics.tstamp)
-  return { props: { statistics, history: history.concat(needsLatestInHistory ? statistics : []) } }
+  return { props: { statistics, history } }
 }
 
 interface StatisticsProps {

@@ -6,6 +6,8 @@ export enum StatisticsChartDataType {
   NUMBER_OF_VAULTS,
   COLLATERAL,
   STRATEGY,
+  AVERAGE_COLLATERAL_RATIO,
+  DONATION,
 }
 
 interface ChartEntry {
@@ -76,35 +78,97 @@ interface LineChartEntry {
   label: string
   data: number[]
   color: string
-  scale: string
+  scale?: string
 }
 
 export function toLineChartData(history: VaultStats[], type: StatisticsChartDataType): ChartData {
   const entries: LineChartEntry[] = []
 
-  entries.push({
-    label: 'Vault Maxi',
-    data: history.map(
-      (entry) =>
-        entry.botData.doubleMintMaxi.totalVaults +
-        entry.botData.dfiSingleMintMaxi.totalVaults +
-        entry.botData.dusdSingleMintMaxi.totalVaults,
-    ),
-    color: Color.vaultMaxi,
-    scale: 'maxi',
-  })
-  entries.push({
-    label: 'Wizard',
-    data: history.map((entry) => entry.botData.wizard.totalVaults),
-    color: Color.wizard,
-    scale: 'wizard',
-  })
-  entries.push({
-    label: 'Manual vaults',
-    data: history.map((entry) => entry.nonEmptyVaults - entry.allBotVaults),
-    color: Color.others,
-    scale: 'others',
-  })
+  switch (type) {
+    case StatisticsChartDataType.NUMBER_OF_VAULTS:
+      entries.push({
+        label: 'Vault Maxi',
+        data: history.map(
+          (entry) =>
+            entry.botData.doubleMintMaxi.totalVaults +
+            entry.botData.dfiSingleMintMaxi.totalVaults +
+            entry.botData.dusdSingleMintMaxi.totalVaults,
+        ),
+        color: Color.vaultMaxi,
+        scale: 'maxi',
+      })
+      entries.push({
+        label: 'Wizard',
+        data: history.map((entry) => entry.botData.wizard.totalVaults),
+        color: Color.wizard,
+        scale: 'wizard',
+      })
+      entries.push({
+        label: 'Manual vaults',
+        data: history.map((entry) => entry.nonEmptyVaults - entry.allBotVaults),
+        color: Color.others,
+        scale: 'others',
+      })
+      break
+    case StatisticsChartDataType.COLLATERAL:
+      entries.push({
+        label: 'Double mint',
+        data: history.map((entry) => entry.botData.doubleMintMaxi.totalCollateral),
+        color: Color.double,
+      })
+      entries.push({
+        label: 'Single DFI',
+        data: history.map((entry) => entry.botData.dfiSingleMintMaxi.totalCollateral),
+        color: Color.DFI,
+      })
+      entries.push({
+        label: 'Single DUSD',
+        data: history.map((entry) => entry.botData.dusdSingleMintMaxi.totalCollateral),
+        color: Color.DUSD,
+      })
+      break
+    case StatisticsChartDataType.AVERAGE_COLLATERAL_RATIO:
+      entries.push({
+        label: 'Double mint',
+        data: history.map((entry) => entry.botData.doubleMintMaxi.avgRatio),
+        color: Color.double,
+      })
+      entries.push({
+        label: 'Single DFI',
+        data: history.map((entry) => entry.botData.dfiSingleMintMaxi.avgRatio),
+        color: Color.DFI,
+      })
+      entries.push({
+        label: 'Single DUSD',
+        data: history.map((entry) => entry.botData.dusdSingleMintMaxi.avgRatio),
+        color: Color.DUSD,
+      })
+      break
+    case StatisticsChartDataType.STRATEGY:
+      entries.push({
+        label: 'Double mint',
+        data: history.map((entry) => entry.botData.doubleMintMaxi.totalVaults),
+        color: Color.double,
+      })
+      entries.push({
+        label: 'Single DFI',
+        data: history.map((entry) => entry.botData.dfiSingleMintMaxi.totalVaults),
+        color: Color.DFI,
+      })
+      entries.push({
+        label: 'Single DUSD',
+        data: history.map((entry) => entry.botData.dusdSingleMintMaxi.totalVaults),
+        color: Color.DUSD,
+      })
+      break
+    case StatisticsChartDataType.DONATION:
+      entries.push({
+        label: 'Auto-Donation activated',
+        data: history.map((entry) => entry.donatingMaxis),
+        color: Color.vaultMaxi,
+      })
+      break
+  }
 
   return {
     labels: history.map((entry) => moment(entry.tstamp).format('DD-MM-YYYY')),
@@ -132,6 +196,9 @@ export function toScales(type: StatisticsChartDataType): any {
         wizard: scale,
         others: scale,
       }
+    case StatisticsChartDataType.AVERAGE_COLLATERAL_RATIO:
+    case StatisticsChartDataType.STRATEGY:
+    case StatisticsChartDataType.DONATION:
     default:
       return undefined
   }
