@@ -40,7 +40,7 @@ export default function HistoryChart({ history }: HistoryChartProps): JSX.Elemen
           scales: toScales(currentChartData.type),
         }}
       />
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 pl-10">
         <h3 className="text-white">History of</h3>
         <RadioButtons items={items} onChanged={(index) => setCurrentChartData(items[index])} preselectIndex={0} />
       </div>

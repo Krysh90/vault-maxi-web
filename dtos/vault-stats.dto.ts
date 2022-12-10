@@ -6,6 +6,7 @@ export interface VaultStats {
   usedVaults: number
   allBotVaults: number
   donatingMaxis: number
+  vaultData: VaultStatsData
   botData: VaultStatsBotData
 }
 
@@ -15,20 +16,26 @@ export interface VaultStatsParams {
 }
 
 export interface VaultStatsBotData {
-  allBotVaults: VaultStatsBotDataEntry
-  dusdSingleMintMaxi: VaultStatsBotDataEntry
-  dfiSingleMintMaxi: VaultStatsBotDataEntry
-  doubleMintMaxi: VaultStatsBotDataEntry
-  wizard: VaultStatsBotDataEntry
+  allBotVaults: VaultStatsDataEntry
+  dusdSingleMintMaxi: VaultStatsDataEntry
+  dfiSingleMintMaxi: VaultStatsDataEntry
+  doubleMintMaxi: VaultStatsDataEntry
+  wizard: VaultStatsDataEntry
 }
 
-export interface VaultStatsBotDataEntry {
+export interface VaultStatsData {
+  nonEmptyVaults: VaultStatsDataEntry
+  usedVaults: VaultStatsDataEntry
+}
+
+export interface VaultStatsDataEntry {
   minRatio: number
   maxRatio: number
   avgRatio: number
   avgRatioWeighted: number
   totalCollateral: number
   totalLoans: number
+  totalDUSDLoans: number
   minCollateral: number
   maxCollateral: number
   totalVaults: number
