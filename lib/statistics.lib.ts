@@ -5,6 +5,7 @@ import { VaultStats } from '../dtos/vault-stats.dto'
 export enum StatisticsChartDataType {
   NUMBER_OF_VAULTS,
   COLLATERAL,
+  LOAN,
   STRATEGY,
   AVERAGE_COLLATERAL_RATIO,
   DONATION,
@@ -19,13 +20,15 @@ interface ChartEntry {
 const Color = {
   vaultMaxi: '#ff00af',
   wizard: '#000',
-  others: '#333',
+  others: '#42f9c2',
+  manualToken: '#0821bb',
+  manualDUSD: '#42f9c2',
   double: '#333',
   DFI: '#ff00af',
   DUSD: '#ffccef',
 }
 
-export function toChartData(stats: VaultStats, type: StatisticsChartDataType): ChartData {
+export function toChartData(stats: VaultStats, type: StatisticsChartDataType, sort: boolean): ChartData {
   let entries: ChartEntry[] = []
   switch (type) {
     case StatisticsChartDataType.NUMBER_OF_VAULTS:
@@ -37,6 +40,18 @@ export function toChartData(stats: VaultStats, type: StatisticsChartDataType): C
       entries.push({ label: 'Vault Maxi', data: vaultMaxi, color: Color.vaultMaxi })
       entries.push({ label: 'Wizard', data: stats.botData.wizard.totalVaults, color: Color.wizard })
       entries.push({ label: 'Manual vaults', data: stats.nonEmptyVaults - stats.allBotVaults, color: Color.others })
+      break
+    case StatisticsChartDataType.LOAN:
+      const dusdManual = stats.vaultData.nonEmptyVaults.totalDUSDLoans - stats.botData.allBotVaults.totalDUSDLoans
+      const totalManual = stats.vaultData.nonEmptyVaults.totalLoans - stats.botData.allBotVaults.totalLoans
+      entries.push({ label: 'DUSD manual', data: dusdManual, color: Color.manualDUSD })
+      entries.push({ label: 'dToken manual', data: totalManual - dusdManual, color: Color.manualToken })
+      entries.push({ label: 'DUSD bots', data: stats.botData.allBotVaults.totalDUSDLoans, color: Color.DUSD })
+      entries.push({
+        label: 'dToken bots',
+        data: stats.botData.allBotVaults.totalLoans - stats.botData.allBotVaults.totalDUSDLoans,
+        color: Color.double,
+      })
       break
     case StatisticsChartDataType.COLLATERAL:
       entries.push({ label: 'Double mint', data: stats.botData.doubleMintMaxi.totalCollateral, color: Color.double })
@@ -50,7 +65,7 @@ export function toChartData(stats: VaultStats, type: StatisticsChartDataType): C
       entries.push({ label: 'Single DUSD', data: stats.botData.dusdSingleMintMaxi.totalVaults, color: Color.DUSD })
       break
   }
-  entries = entries.sort((a, b) => b.data - a.data)
+  if (sort) entries = entries.sort((a, b) => b.data - a.data)
   return {
     labels: entries.map((entry) => entry.label),
     datasets: [
@@ -78,7 +93,6 @@ interface LineChartEntry {
   label: string
   data: number[]
   color: string
-  scale?: string
 }
 
 export function toLineChartData(history: VaultStats[], type: StatisticsChartDataType): ChartData {
@@ -95,19 +109,16 @@ export function toLineChartData(history: VaultStats[], type: StatisticsChartData
             entry.botData.dusdSingleMintMaxi.totalVaults,
         ),
         color: Color.vaultMaxi,
-        scale: 'maxi',
       })
       entries.push({
         label: 'Wizard',
         data: history.map((entry) => entry.botData.wizard.totalVaults),
         color: Color.wizard,
-        scale: 'wizard',
       })
       entries.push({
         label: 'Manual vaults',
         data: history.map((entry) => entry.nonEmptyVaults - entry.allBotVaults),
         color: Color.others,
-        scale: 'others',
       })
       break
     case StatisticsChartDataType.COLLATERAL:
@@ -143,6 +154,14 @@ export function toLineChartData(history: VaultStats[], type: StatisticsChartData
         data: history.map((entry) => entry.botData.dusdSingleMintMaxi.avgRatio),
         color: Color.DUSD,
       })
+      const manual = history.map((entry) => entry.vaultData?.usedVaults.avgRatio)
+      if (manual.length > 2) {
+        entries.push({
+          label: 'Manual',
+          data: manual,
+          color: Color.others,
+        })
+      }
       break
     case StatisticsChartDataType.STRATEGY:
       entries.push({
@@ -176,25 +195,16 @@ export function toLineChartData(history: VaultStats[], type: StatisticsChartData
       data: entry.data,
       borderColor: [entry.color],
       backgroundColor: [entry.color],
-      yAxisID: entry.scale,
       hoverOffset: 4,
     })),
   }
 }
 
 export function toScales(type: StatisticsChartDataType): any {
-  const scale = {
-    type: 'linear' as const,
-    display: false,
-    position: 'left',
-  }
+  const logScale = { y: { type: 'logarithmic', display: true, position: 'left' } }
   switch (type) {
     case StatisticsChartDataType.NUMBER_OF_VAULTS:
-      return {
-        maxi: scale,
-        wizard: scale,
-        others: scale,
-      }
+      return logScale
     case StatisticsChartDataType.AVERAGE_COLLATERAL_RATIO:
     case StatisticsChartDataType.STRATEGY:
     case StatisticsChartDataType.DONATION:

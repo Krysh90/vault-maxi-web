@@ -1,5 +1,6 @@
 import { NextPage } from 'next'
 import DonutChart from '../components/base/donut-chart'
+import { StaticEntry } from '../components/base/static-entry'
 import Layout from '../components/core/layout'
 import HistoryChart from '../components/statistic/history-chart'
 import { VaultStats } from '../dtos/vault-stats.dto'
@@ -31,25 +32,34 @@ const Statistics: NextPage<StatisticsProps> = ({ statistics, history }: Statisti
       title: 'Number of vaults',
       type: StatisticsChartDataType.NUMBER_OF_VAULTS,
       inDollar: false,
+      sort: true,
     },
+    { title: 'Loans', type: StatisticsChartDataType.LOAN, inDollar: true, sort: false },
     {
-      title: 'Collateral in $',
+      title: "Bot managed vaults' collateral",
       type: StatisticsChartDataType.COLLATERAL,
       inDollar: true,
+      sort: true,
     },
     {
-      title: 'Strategy',
+      title: 'Vault Maxi strategies',
       type: StatisticsChartDataType.STRATEGY,
       inDollar: false,
+      sort: true,
     },
   ]
+
+  const infoText = `All information shown on this page were done via blockchain analysis of Kügi. Only active vaults are shown with a minimum collateral of ${statistics.params.minCollateral}. Bots are identified by a specific transaction pattern of the last ${statistics.params.maxHistory} transactions.`
 
   return (
     <Layout page="Statistics" full maxWidth withoutSupport>
       <h1 className="text-4xl text-main">Statistics</h1>
       <div className="flex flex-row flex-wrap py-8 gap-16 flex-grow justify-center items-start w-full">
+        {/* <div className="max-w-lg"> */}
+        <StaticEntry type="info" text={infoText} variableHeight />
+        {/* </div> */}
         {charts.map((info, index) => {
-          const data = toChartData(statistics, info.type)
+          const data = toChartData(statistics, info.type, info.sort)
           const total = data.datasets[0].data.reduce((curr, prev) => curr + prev)
           const tableContent = [total].concat(data.datasets[0].data)
           const tableLabels = ['Total'].concat(data.labels)
