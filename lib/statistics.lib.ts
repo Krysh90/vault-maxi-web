@@ -28,7 +28,13 @@ const Color = {
   DUSD: '#ffccef',
 }
 
-export function toChartData(stats: VaultStats, type: StatisticsChartDataType, sort: boolean): ChartData {
+interface ChartInfo {
+  type: StatisticsChartDataType
+  sort: boolean
+  inDollar: boolean
+}
+
+export function toChartData(stats: VaultStats, { type, sort }: ChartInfo): ChartData {
   let entries: ChartEntry[] = []
   switch (type) {
     case StatisticsChartDataType.NUMBER_OF_VAULTS:
@@ -76,6 +82,42 @@ export function toChartData(stats: VaultStats, type: StatisticsChartDataType, so
       },
     ],
   }
+}
+
+interface TableData {
+  content: string[]
+  labels: string[]
+  percentages: string[]
+  colors: string[]
+}
+
+export function generateTableContent(chartData: ChartData, { inDollar }: ChartInfo): TableData {
+  const total = chartData.datasets[0].data.reduce((curr, prev) => curr + prev)
+  const contentNumber = [total].concat(chartData.datasets[0].data)
+  const content = contentNumber.map((entry) => formatNumber(entry).concat(inDollar ? '$' : ''))
+  const percentages = contentNumber.map((entry) => ((entry / total) * 100).toFixed(1))
+  const labels = ['Total'].concat(chartData.labels)
+  const colors = [''].concat(chartData.datasets[0].backgroundColor)
+
+  return { content, labels, percentages, colors }
+}
+
+function formatNumber(value: number): string {
+  let postfix = ''
+  let fixed = 0
+  if (value > 1e6) {
+    value = value / 1e6
+    postfix = 'M'
+    fixed = 2
+  } else if (value > 1e3) {
+    value = value / 1e3
+    postfix = 'k'
+    fixed = 2
+  }
+  return value
+    .toFixed(fixed)
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    .concat(postfix)
 }
 
 export function historyDaysToLoad(): string[] {
@@ -155,7 +197,7 @@ export function toLineChartData(history: VaultStats[], type: StatisticsChartData
         color: Color.DUSD,
       })
       const manual = history.map((entry) => entry.vaultData?.usedVaults.avgRatio)
-      if (manual.length > 2) {
+      if (manual.filter((entry) => entry != null).length > 2) {
         entries.push({
           label: 'Manual',
           data: manual,
