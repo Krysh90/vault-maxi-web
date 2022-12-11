@@ -1,5 +1,5 @@
 export interface VaultStats {
-  tstamp: Date
+  tstamp: string
   params: VaultStatsParams
   totalVaults: number
   nonEmptyVaults: number

@@ -137,7 +137,26 @@ interface LineChartEntry {
   color: string
 }
 
-export function toLineChartData(history: VaultStats[], type: StatisticsChartDataType): ChartData {
+export enum LineChartTimeFrame {
+  ALL = 'All',
+  THREE_MONTHS = 'Last 3 months',
+  MONTH = 'Last month',
+  WEEK = 'Last week',
+}
+
+const valueOfTimeFrame: Record<LineChartTimeFrame, number> = {
+  [LineChartTimeFrame.ALL]: 0,
+  [LineChartTimeFrame.THREE_MONTHS]: -90,
+  [LineChartTimeFrame.MONTH]: -30,
+  [LineChartTimeFrame.WEEK]: -7,
+}
+
+interface LineChartInfo {
+  type: StatisticsChartDataType
+  timeFrame: LineChartTimeFrame
+}
+
+export function toLineChartData(history: VaultStats[], { type, timeFrame }: LineChartInfo): ChartData {
   const entries: LineChartEntry[] = []
 
   switch (type) {
@@ -230,11 +249,12 @@ export function toLineChartData(history: VaultStats[], type: StatisticsChartData
       })
       break
   }
+
   return {
-    labels: history.map((entry) => moment(entry.tstamp).format('DD-MM-YYYY')),
+    labels: history.map((entry) => moment(entry.tstamp).utc().format('DD-MM-YYYY')).slice(valueOfTimeFrame[timeFrame]),
     datasets: entries.map((entry) => ({
       label: entry.label,
-      data: entry.data,
+      data: entry.data.slice(valueOfTimeFrame[timeFrame]),
       borderColor: [entry.color],
       backgroundColor: [entry.color],
       hoverOffset: 4,

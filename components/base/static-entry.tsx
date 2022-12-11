@@ -54,7 +54,7 @@ export function StaticEntry({ type, text, add, variableHeight }: StaticEntryProp
   const variableHeightConfig = 'gap-4 md:flex-nowrap'
 
   return (
-    <div className="w-full pr-9">
+    <div className={`w-full ${variableHeight ? '' : 'pr-9'}`}>
       <div
         className={`${backgroundColor()} ${outline()} flex flex-row rounded-lg items-center py-4 px-2 ${
           type !== 'add' ? (variableHeight ? variableHeightConfig : defaultConfig) : ''
