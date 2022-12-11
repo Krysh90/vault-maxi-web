@@ -49,7 +49,7 @@ const Statistics: NextPage<StatisticsProps> = ({ statistics, history }: Statisti
     },
   ]
 
-  const infoText = `All information shown on this page were collected via blockchain analysis. Only active vaults are shown with a minimum collateral of ${statistics.params.minCollateral}$. Bots are identified by the state of the vault and a specific transaction pattern within the last ${statistics.params.maxHistory} transactions.`
+  const infoText = `All information shown on this page were collected via blockchain analysis. Only active vaults are shown with a minimum collateral of ${statistics.params.minCollateral}$. Bots are identified by the state of the vault and a specific transaction pattern within the last ${statistics.params.maxHistory} transactions. The values shown for Vault Maxi single mint collateral do not reflect the full TVL as only the collateral deposited to the vault is counted. The real TVL is higher as part of the users' funds are used for liquidity mining.`
 
   return (
     <Layout page="Statistics" full maxWidth withoutSupport>
