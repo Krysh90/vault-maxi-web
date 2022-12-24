@@ -6,7 +6,7 @@ import { FeatureRepository } from '../lib/feature.repository'
 const Features: NextPage = () => {
   return (
     <Layout page="Features" full>
-      <h1 className="text-4xl text-main">Features</h1>
+      <h1>Features</h1>
       <CardOverview
         items={FeatureRepository.all().map((f, index) => ({
           index,

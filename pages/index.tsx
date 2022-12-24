@@ -25,7 +25,7 @@ const Home: NextPage = () => {
   return (
     <Layout page="Home">
       <div className={styles.claim}>
-        <h1 style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+        <h1 style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', color: '#fff' }}>
           <p>
             <em>
               <strong>MAXI</strong>
