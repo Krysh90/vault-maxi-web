@@ -53,7 +53,7 @@ const Statistics: NextPage<StatisticsProps> = ({ statistics, history }: Statisti
 
   return (
     <Layout page="Statistics" full maxWidth withoutSupport>
-      <h1 className="text-4xl text-main">Statistics</h1>
+      <h1>Statistics</h1>
       <div className="flex flex-row flex-wrap py-8 gap-16 flex-grow justify-center items-start w-full">
         <StaticEntry type="info" text={infoText} variableHeight />
         {charts.map((info, index) => {

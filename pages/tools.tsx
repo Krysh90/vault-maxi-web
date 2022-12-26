@@ -6,7 +6,7 @@ import { ToolRepository } from '../lib/tool.repository'
 const Tools: NextPage = () => {
   return (
     <Layout page="Tools" full>
-      <h1 className="text-4xl text-main">Tools</h1>
+      <h1>Tools</h1>
       <CardOverview
         items={ToolRepository.all().map((t, index) => ({
           index,

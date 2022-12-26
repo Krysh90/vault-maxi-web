@@ -25,6 +25,10 @@ li {
   list-style: none;
 }
 
+h1 {
+  @apply text-4xl text-main;
+}
+
 h2 {
   font-size: xx-large;
   color: #ff00af;

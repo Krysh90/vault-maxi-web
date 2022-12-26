@@ -1,20 +1,29 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCirclePlus, faTriangleExclamation, faCircleInfo, IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import {
+  faQuestion,
+  faCirclePlus,
+  faTriangleExclamation,
+  faCircleInfo,
+  IconDefinition,
+} from '@fortawesome/free-solid-svg-icons'
+import { PropsWithChildren } from 'react'
 
-interface StaticEntryProps {
-  type: 'info' | 'warn' | 'add'
+interface StaticEntryProps extends PropsWithChildren {
+  type: 'info' | 'warn' | 'add' | 'wrapper'
   text?: string
   add?: () => void
   variableHeight?: boolean
 }
 
-export function StaticEntry({ type, text, add, variableHeight }: StaticEntryProps): JSX.Element {
+export function StaticEntry({ type, text, add, variableHeight, children }: StaticEntryProps): JSX.Element {
   function backgroundColor(): string | undefined {
     switch (type) {
       case 'info':
         return 'bg-info-base'
       case 'warn':
         return 'bg-warn-base'
+      case 'wrapper':
+        return 'bg-light'
     }
   }
 
@@ -26,10 +35,12 @@ export function StaticEntry({ type, text, add, variableHeight }: StaticEntryProp
         return faTriangleExclamation
       case 'add':
         return faCirclePlus
+      default:
+        return faQuestion
     }
   }
 
-  function iconColor(): string {
+  function iconColor(): string | undefined {
     switch (type) {
       case 'info':
         return '#40869b'
@@ -40,7 +51,7 @@ export function StaticEntry({ type, text, add, variableHeight }: StaticEntryProp
     }
   }
 
-  function outline(): string {
+  function outline(): string | undefined {
     switch (type) {
       case 'info':
       case 'warn':
@@ -52,22 +63,30 @@ export function StaticEntry({ type, text, add, variableHeight }: StaticEntryProp
 
   const defaultConfig = 'gap-4 md:flex-nowrap md:h-12'
   const variableHeightConfig = 'gap-4 md:flex-nowrap'
+  const height = variableHeight ? variableHeightConfig : defaultConfig
+  const heightConfig = type !== 'add' ? height : ''
+  const paddingRight = variableHeight || type === 'wrapper' ? '' : 'pr-9'
+  const wrapperConfig = type === 'wrapper' ? 'justify-center flex-wrap' : ''
 
   return (
-    <div className={`w-full ${variableHeight ? '' : 'pr-9'}`}>
+    <div className={`w-full ${paddingRight}`}>
       <div
-        className={`${backgroundColor()} ${outline()} flex flex-row rounded-lg items-center py-4 px-2 ${
-          type !== 'add' ? (variableHeight ? variableHeightConfig : defaultConfig) : ''
-        }`}
+        className={`${backgroundColor()} ${outline()} flex flex-row rounded-lg items-center py-4 px-2 ${heightConfig} ${wrapperConfig}`}
       >
-        {type === 'add' ? (
-          <button className="w-full" onClick={add}>
-            <FontAwesomeIcon icon={icon()} size={'xl'} color={iconColor()} />
-          </button>
+        {type === 'wrapper' ? (
+          children
         ) : (
           <>
-            <FontAwesomeIcon className="ml-3" icon={icon()} size={'xl'} color={iconColor()} />
-            <p className="text-light mx-auto">{text}</p>
+            {type === 'add' ? (
+              <button className="w-full" onClick={add}>
+                <FontAwesomeIcon icon={icon()} size={'xl'} color={iconColor()} />
+              </button>
+            ) : (
+              <>
+                <FontAwesomeIcon className="ml-3" icon={icon()} size={'xl'} color={iconColor()} />
+                <p className="text-light mx-auto">{text}</p>
+              </>
+            )}
           </>
         )}
       </div>

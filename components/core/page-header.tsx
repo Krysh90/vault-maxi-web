@@ -6,7 +6,7 @@ interface PageHeaderProps {
 export default function PageHeader({ pageHeader, children }: PageHeaderProps): JSX.Element {
   return (
     <>
-      <h1 className="text-4xl text-main">{pageHeader}</h1>
+      <h1>{pageHeader}</h1>
       <div className="flex flex-col w-full pt-4 gap-4 items-center">{children}</div>
     </>
   )
