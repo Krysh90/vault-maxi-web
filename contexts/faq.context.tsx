@@ -9,6 +9,7 @@ export interface Faq {
 
 interface FaqContextInterface {
   entries: Faq[]
+  loaded: (entries: Faq[]) => void
   filter: (value?: string) => void
 }
 
@@ -22,38 +23,26 @@ export function FaqContextProvider(props: PropsWithChildren): JSX.Element {
   const [entries, setEntries] = useState<Faq[]>([])
   const [filter, setFilter] = useState<string>()
 
-  useEffect(() => {
-    setEntries([testQuestion1, testQuestion2])
-  }, [])
-
   const context: FaqContextInterface = {
-    entries: entries.filter(
+    entries: entries?.filter(
       (faq) =>
         !filter ||
-        faq.question.toLowerCase().includes(filter) ||
-        faq.answer.toLowerCase().includes(filter) ||
-        faq.buzzWords.find((v) => v.includes(filter)) != null,
+        containsOne(filter, faq.question.toLowerCase()) ||
+        containsOne(filter, faq.answer.toLowerCase()) ||
+        containsOne(filter, faq.buzzWords),
     ),
     filter: (value?: string) => {
       setFilter(value?.toLowerCase())
     },
+    loaded: setEntries,
+  }
+
+  function containsOne(needle: string, haystack: string | string[]): boolean {
+    return needle
+      ?.split(' ')
+      .map((v) => haystack.includes(v))
+      .includes(true)
   }
 
   return <FaqContext.Provider value={context}>{props.children}</FaqContext.Provider>
-}
-
-const testQuestion1: Faq = {
-  id: 1,
-  question: 'Hello this is an awesome test question?',
-  answer:
-    'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-  buzzWords: ['statistics', 'income'],
-}
-
-const testQuestion2: Faq = {
-  id: 2,
-  question: 'Hello this is an really long test question?',
-  answer:
-    'Lorem ipsum dolor sit amet, consetetur sadipscing elitr,\nsed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,\nsed diam voluptua.\nAt vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-  buzzWords: ['safetyratio', 'safety-ratio', 'safety', 'collateral'],
 }
