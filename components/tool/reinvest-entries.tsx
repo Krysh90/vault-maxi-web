@@ -61,7 +61,7 @@ function Entry({
 
   return (
     <div className="flex flex-row gap-4 items-center">
-      <div className="bg-light flex flex-row flex-wrap justify-center rounded-lg w-full items-center px-2 py-4 gap-4 md:flex-nowrap md:h-12">
+      <StaticEntry type="wrapper">
         <Dropdown
           items={tokens?.map((t) => ({ label: t.symbol })) ?? []}
           onSelect={(item) => update({ token: tokens?.find((t) => t.symbol === item.label) })}
@@ -75,7 +75,7 @@ function Entry({
           special={{ on: 0, text: 'fill' }}
         />
         <TargetInput entry={entry} onChange={(target) => update({ target })} />
-      </div>
+      </StaticEntry>
       <ThemedIconButton
         icon={faTrashCan}
         color="#222"

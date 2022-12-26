@@ -58,7 +58,7 @@ const Reinvest: NextPage = () => {
             <li className="list-disc text-code font-mono">DUSD::vaultOfJane</li>
             <li>
               {' '}
-              will swap 40% of your reinvested amount in <em>DUSD</em> pool and deposit it to the vault of Jane
+              will swap 30% of your reinvested amount in <em>DUSD</em> pool and deposit it to the vault of Jane
             </li>
           </ul>
           <p className="pt-4">
