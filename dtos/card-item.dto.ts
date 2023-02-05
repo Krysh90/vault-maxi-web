@@ -1,7 +1,7 @@
 import { IconDefinition, SizeProp } from '@fortawesome/fontawesome-svg-core'
 import { LinkDto } from './link.dto'
 
-export interface ToolDto {
+export interface CardItemDto {
   name: string
   description: string
   icon?: {

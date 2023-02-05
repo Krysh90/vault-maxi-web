@@ -1,24 +1,17 @@
 import { NextPage } from 'next'
-import DonutChart from '../components/base/donut-chart'
-import { StaticEntry } from '../components/base/static-entry'
-import Layout from '../components/core/layout'
-import HistoryChart from '../components/statistic/history-chart'
-import { VaultStats } from '../dtos/vault-stats.dto'
-import { generateTableContent } from '../lib/chart.lib'
-import {
-  historyDaysToLoad,
-  StatisticsChartDataType,
-  toChartData,
-  toLineChartData,
-  toScales,
-} from '../lib/statistics.lib'
+import DonutChart from '../../components/base/donut-chart'
+import { StaticEntry } from '../../components/base/static-entry'
+import Layout from '../../components/core/layout'
+import { RealYieldStats } from '../../dtos/real-yield-stats.dto'
+import { generateTableContent } from '../../lib/chart.lib'
+import { historyDaysToLoad, RealYieldChartDataType, toChartData } from '../../lib/real-yield.lib'
 
 export async function getStaticProps(): Promise<{ props: StatisticsProps; revalidate: number }> {
-  const res = await fetch('https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/vaultAnalysis/latest.json')
-  const statistics: VaultStats = await res.json()
-  const history = await Promise.all<VaultStats>(
+  const res = await fetch('https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/realYield/latest.json')
+  const statistics: RealYieldStats = await res.json()
+  const history = await Promise.all<RealYieldStats>(
     historyDaysToLoad()
-      .map((date) => `https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/vaultAnalysis/${date}.json`)
+      .map((date) => `https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/realYield/${date}.json`)
       .map((url) =>
         fetch(url)
           .then((res) => res.json())
@@ -29,46 +22,32 @@ export async function getStaticProps(): Promise<{ props: StatisticsProps; revali
 }
 
 interface StatisticsProps {
-  statistics: VaultStats
-  history: VaultStats[]
+  statistics: RealYieldStats
+  history: RealYieldStats[]
 }
 
 const Statistics: NextPage<StatisticsProps> = ({ statistics, history }: StatisticsProps) => {
   const charts = [
     {
-      title: 'Number of vaults',
-      type: StatisticsChartDataType.NUMBER_OF_VAULTS,
-      inDollar: false,
-      sort: true,
-    },
-    { title: 'Loans', type: StatisticsChartDataType.LOAN, inDollar: true, sort: false },
-    {
-      title: "Bot managed vaults' collateral",
-      type: StatisticsChartDataType.COLLATERAL,
+      title: 'Fees (burned)',
+      type: RealYieldChartDataType.FEE,
       inDollar: true,
       sort: true,
     },
+    { title: 'Crypto commissions (yield)', type: RealYieldChartDataType.COMMISSION_CRYPTO, inDollar: true, sort: true },
     {
-      title: 'Vault Maxi strategies',
-      type: StatisticsChartDataType.STRATEGY,
-      inDollar: false,
+      title: 'dToken commissions (yield)',
+      type: RealYieldChartDataType.COMMISSION_TOKEN,
+      inDollar: true,
       sort: true,
     },
   ]
 
-  const historyItems = [
-    { label: 'Number of vaults', type: StatisticsChartDataType.NUMBER_OF_VAULTS },
-    { label: 'Average collateral ratio', type: StatisticsChartDataType.AVERAGE_COLLATERAL_RATIO },
-    { label: 'Collateral per strategy', type: StatisticsChartDataType.COLLATERAL },
-    { label: 'Vaults per strategy', type: StatisticsChartDataType.STRATEGY },
-    { label: 'Number of donating Vault Maxis', type: StatisticsChartDataType.DONATION },
-  ]
-
-  const infoText = `All information shown on this page were collected via blockchain analysis. Only active vaults are shown with a minimum collateral of ${statistics.params.minCollateral}$. Bots are identified by the state of the vault and a specific transaction pattern within the last ${statistics.params.maxHistory} transactions. The values shown for Vault Maxi single mint collateral do not reflect the full TVL as only the collateral deposited to the vault is counted. The real TVL is higher as part of the users' funds are used for liquidity mining.`
+  const infoText = `Displayed values were taken between blocks ${statistics.meta.startHeight} and ${statistics.meta.endHeight}. Shown values are measured in respective oracles prices (1 DUSD = 1$)`
 
   return (
-    <Layout page="Statistics" full maxWidth withoutSupport>
-      <h1>Statistics</h1>
+    <Layout page="Real yield" full maxWidth withoutSupport>
+      <h1>Real yield</h1>
       <div className="flex flex-row flex-wrap py-8 gap-16 flex-grow justify-center items-start w-full">
         <StaticEntry type="info" text={infoText} variableHeight />
         {charts.map((info, index) => {
@@ -112,7 +91,7 @@ const Statistics: NextPage<StatisticsProps> = ({ statistics, history }: Statisti
           )
         })}
       </div>
-      <HistoryChart history={history} items={historyItems} toLineChartData={toLineChartData} toScales={toScales} />
+      {/* <HistoryChart history={history} /> */}
     </Layout>
   )
 }

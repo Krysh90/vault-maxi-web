@@ -42,6 +42,9 @@ export default function Navigation(): JSX.Element {
           <li>
             <Link href="/faq">FAQ</Link>
           </li>
+          <li>
+            <Link href="/defichain">defichain</Link>
+          </li>
         </div>
       </ul>
     </nav>
