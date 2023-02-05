@@ -4,7 +4,14 @@ import { StaticEntry } from '../components/base/static-entry'
 import Layout from '../components/core/layout'
 import HistoryChart from '../components/statistic/history-chart'
 import { VaultStats } from '../dtos/vault-stats.dto'
-import { generateTableContent, historyDaysToLoad, StatisticsChartDataType, toChartData } from '../lib/statistics.lib'
+import { generateTableContent } from '../lib/chart.lib'
+import {
+  historyDaysToLoad,
+  StatisticsChartDataType,
+  toChartData,
+  toLineChartData,
+  toScales,
+} from '../lib/statistics.lib'
 
 export async function getStaticProps(): Promise<{ props: StatisticsProps; revalidate: number }> {
   const res = await fetch('https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/vaultAnalysis/latest.json')
@@ -47,6 +54,14 @@ const Statistics: NextPage<StatisticsProps> = ({ statistics, history }: Statisti
       inDollar: false,
       sort: true,
     },
+  ]
+
+  const historyItems = [
+    { label: 'Number of vaults', type: StatisticsChartDataType.NUMBER_OF_VAULTS },
+    { label: 'Average collateral ratio', type: StatisticsChartDataType.AVERAGE_COLLATERAL_RATIO },
+    { label: 'Collateral per strategy', type: StatisticsChartDataType.COLLATERAL },
+    { label: 'Vaults per strategy', type: StatisticsChartDataType.STRATEGY },
+    { label: 'Number of donating Vault Maxis', type: StatisticsChartDataType.DONATION },
   ]
 
   const infoText = `All information shown on this page were collected via blockchain analysis. Only active vaults are shown with a minimum collateral of ${statistics.params.minCollateral}$. Bots are identified by the state of the vault and a specific transaction pattern within the last ${statistics.params.maxHistory} transactions. The values shown for Vault Maxi single mint collateral do not reflect the full TVL as only the collateral deposited to the vault is counted. The real TVL is higher as part of the users' funds are used for liquidity mining.`
@@ -97,7 +112,7 @@ const Statistics: NextPage<StatisticsProps> = ({ statistics, history }: Statisti
           )
         })}
       </div>
-      <HistoryChart history={history} />
+      <HistoryChart history={history} items={historyItems} toLineChartData={toLineChartData} toScales={toScales} />
     </Layout>
   )
 }
