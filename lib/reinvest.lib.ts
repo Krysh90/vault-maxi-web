@@ -1,3 +1,4 @@
+import { colorBasedOn } from './colors.lib'
 import { ChartData } from '../dtos/chart-data.dto'
 import { Reinvest } from '../entities/reinvest.entity'
 
@@ -10,7 +11,7 @@ export function toChartData(entries: Reinvest[]): ChartData {
         data: toData(entries, unused),
         backgroundColor: toSymbol(entries, unused)
           .map((symbol) => colorBasedOn(symbol))
-          .concat(unused > 0 ? ['#222'] : []),
+          .concat(unused > 0 ? [colorBasedOn('Unused')] : []),
         hoverOffset: 4,
       },
     ],
@@ -34,33 +35,6 @@ function toData(entries: Reinvest[], unused: number): number[] {
   return entries
     .map((entry) => (entry.value > 0 ? entry.value : unused / numberOfFills))
     .concat(numberOfFills === 0 ? [unused] : [])
-}
-
-function colorBasedOn(symbol: string): string {
-  switch (symbol) {
-    case 'DFI':
-      return '#ff00af'
-    case 'BTC':
-      return '#F7931A'
-    case 'ETH':
-      return '#627EEA'
-    case 'BCH':
-      return '#0AC18E'
-    case 'LTC':
-      return '#345D9D'
-    case 'DOGE':
-      return '#F3EDD6'
-    case 'DUSD':
-      return '#FFCCEF'
-    case 'USDC':
-      return '#2775CA'
-    case 'USDT':
-      return '#26A17B'
-    case 'Unused':
-      return '#222'
-    default:
-      return '#444'
-  }
 }
 
 export function generateReinvestStringBasedOn(entries: Reinvest[]): string {

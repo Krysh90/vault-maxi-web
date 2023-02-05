@@ -1,28 +1,19 @@
 import 'chart.js/auto'
 import { useState } from 'react'
 import { Line } from 'react-chartjs-2'
-import { VaultStats } from '../../dtos/vault-stats.dto'
-import { LineChartTimeFrame, StatisticsChartDataType, toLineChartData, toScales } from '../../lib/statistics.lib'
+import { ChartData } from '../../dtos/chart-data.dto'
+import { HistoryChartItem, LineChartInfo, LineChartTimeFrame } from '../../lib/chart.lib'
 import RadioButtons from '../base/radio-buttons'
 import Selection from '../base/selection'
 
 interface HistoryChartProps {
-  history: VaultStats[]
+  history: any[]
+  items: HistoryChartItem[]
+  toLineChartData: (history: any[], { type, timeFrame }: LineChartInfo) => ChartData
+  toScales: (type: string) => any
 }
 
-interface HistoryChartItem {
-  label: string
-  type: StatisticsChartDataType
-}
-
-export default function HistoryChart({ history }: HistoryChartProps): JSX.Element {
-  const items = [
-    { label: 'number of vaults', type: StatisticsChartDataType.NUMBER_OF_VAULTS },
-    { label: 'average collateral ratio', type: StatisticsChartDataType.AVERAGE_COLLATERAL_RATIO },
-    { label: 'collateral per strategy', type: StatisticsChartDataType.COLLATERAL },
-    { label: 'vaults per strategy', type: StatisticsChartDataType.STRATEGY },
-    { label: 'number of donating Vault Maxis', type: StatisticsChartDataType.DONATION },
-  ]
+export default function HistoryChart({ history, items, toLineChartData, toScales }: HistoryChartProps): JSX.Element {
   const [currentChartData, setCurrentChartData] = useState<HistoryChartItem>(items[0])
   const [currentTimeFrame, setCurrentTimeFrame] = useState<LineChartTimeFrame>(LineChartTimeFrame.ALL)
 

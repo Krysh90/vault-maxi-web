@@ -1,20 +1,15 @@
 import moment from 'moment'
 import { ChartData } from '../dtos/chart-data.dto'
 import { VaultStats } from '../dtos/vault-stats.dto'
+import { ChartEntry, ChartInfo, getDates, LineChartEntry, LineChartInfo, valueOfTimeFrame } from './chart.lib'
 
 export enum StatisticsChartDataType {
-  NUMBER_OF_VAULTS,
-  COLLATERAL,
-  LOAN,
-  STRATEGY,
-  AVERAGE_COLLATERAL_RATIO,
-  DONATION,
-}
-
-interface ChartEntry {
-  label: string
-  data: number
-  color: string
+  NUMBER_OF_VAULTS = 'NUMBER_OF_VAULTS',
+  COLLATERAL = 'COLLATERAL',
+  LOAN = 'LOAN',
+  STRATEGY = 'STRATEGY',
+  AVERAGE_COLLATERAL_RATIO = 'AVERAGE_COLLATERAL_RATIO',
+  DONATION = 'DONATION',
 }
 
 const Color = {
@@ -26,12 +21,6 @@ const Color = {
   double: '#333',
   DFI: '#ff00af',
   DUSD: '#ffccef',
-}
-
-interface ChartInfo {
-  type: StatisticsChartDataType
-  sort: boolean
-  inDollar: boolean
 }
 
 export function toChartData(stats: VaultStats, { type, sort }: ChartInfo): ChartData {
@@ -84,76 +73,8 @@ export function toChartData(stats: VaultStats, { type, sort }: ChartInfo): Chart
   }
 }
 
-interface TableData {
-  content: string[]
-  labels: string[]
-  percentages: string[]
-  colors: string[]
-}
-
-export function generateTableContent(chartData: ChartData, { inDollar }: ChartInfo): TableData {
-  const total = chartData.datasets[0].data.reduce((curr, prev) => curr + prev)
-  const contentNumber = [total].concat(chartData.datasets[0].data)
-  const content = contentNumber.map((entry) => formatNumber(entry).concat(inDollar ? '$' : ''))
-  const percentages = contentNumber.map((entry) => ((entry / total) * 100).toFixed(1))
-  const labels = ['Total'].concat(chartData.labels)
-  const colors = [''].concat(chartData.datasets[0].backgroundColor)
-
-  return { content, labels, percentages, colors }
-}
-
-function formatNumber(value: number): string {
-  let postfix = ''
-  let fixed = 0
-  if (value > 1e6) {
-    value = value / 1e6
-    postfix = 'M'
-    fixed = 2
-  } else if (value > 1e3) {
-    value = value / 1e3
-    postfix = 'k'
-    fixed = 2
-  }
-  return value
-    .toFixed(fixed)
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-    .concat(postfix)
-}
-
 export function historyDaysToLoad(): string[] {
   return getDates('2022-11-28').map((date) => date.toISOString().slice(0, 10))
-}
-
-function getDates(start: string) {
-  for (var arr = [], dt = new Date(start); dt <= new Date(); dt.setDate(dt.getDate() + 1)) {
-    arr.push(new Date(dt))
-  }
-  return arr
-}
-
-interface LineChartEntry {
-  label: string
-  data: number[]
-  color: string
-}
-
-export enum LineChartTimeFrame {
-  ALL = 'All',
-  THREE_MONTHS = 'Last 3 months',
-  MONTH = 'Last month',
-  WEEK = 'Last week',
-}
-
-const valueOfTimeFrame: Record<LineChartTimeFrame, number> = {
-  [LineChartTimeFrame.ALL]: 0,
-  [LineChartTimeFrame.THREE_MONTHS]: -90,
-  [LineChartTimeFrame.MONTH]: -30,
-  [LineChartTimeFrame.WEEK]: -7,
-}
-
-interface LineChartInfo {
-  type: StatisticsChartDataType
-  timeFrame: LineChartTimeFrame
 }
 
 export function toLineChartData(history: VaultStats[], { type, timeFrame }: LineChartInfo): ChartData {
@@ -262,7 +183,7 @@ export function toLineChartData(history: VaultStats[], { type, timeFrame }: Line
   }
 }
 
-export function toScales(type: StatisticsChartDataType): any {
+export function toScales(type: string): any {
   const logScale = { y: { type: 'logarithmic', display: true, position: 'left' } }
   switch (type) {
     case StatisticsChartDataType.NUMBER_OF_VAULTS:

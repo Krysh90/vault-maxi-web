@@ -1,4 +1,4 @@
-import { faCircleDollarToSlot, faTerminal } from '@fortawesome/free-solid-svg-icons'
+import { faCircleDollarToSlot } from '@fortawesome/free-solid-svg-icons'
 import { FeatureDto } from '../dtos/feature.dto'
 import imgVaultMaxi from '../public/vault-maxi.png'
 
