@@ -21,12 +21,17 @@ export function colorBasedOn(symbol: string): string {
     case 'Unused':
       return '#222'
     default:
-      return '#444'
+      return '#444444'
   }
 }
 
-export function randomGrayscale(): string {
-  const value = (Math.random() * 0xff) | 0
-  const grayscale = (value << 16) | (value << 8) | value
-  return '#' + grayscale.toString(16)
+export function adjustColor(color: string, amount: number): string {
+  return (
+    '#' +
+    color
+      .replace(/^#/, '')
+      .replace(/../g, (color) =>
+        ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).slice(-2),
+      )
+  )
 }

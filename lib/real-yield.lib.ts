@@ -1,8 +1,8 @@
 import moment from 'moment'
 import { ChartData } from '../dtos/chart-data.dto'
-import { RealYieldInfo, RealYieldStats } from '../dtos/real-yield-stats.dto'
+import { RealYieldStats } from '../dtos/real-yield-stats.dto'
 import { ChartEntry, ChartInfo, getDates, LineChartEntry, LineChartInfo, valueOfTimeFrame } from './chart.lib'
-import { colorBasedOn } from './colors.lib'
+import { adjustColor, colorBasedOn } from './colors.lib'
 
 export enum RealYieldChartDataType {
   FEE = 'FEE',
@@ -20,14 +20,6 @@ export function getAllSymbols(stats: RealYieldStats): string[] {
   return Object.keys(stats.tokens)
 }
 
-function calcFee(info: RealYieldInfo): number {
-  return ((info.usdValue ?? 0) / (info.commission + info.fee)) * info.fee
-}
-
-function calcCommission(info: RealYieldInfo): number {
-  return ((info.usdValue ?? 0) / (info.commission + info.fee)) * info.commission
-}
-
 function sumAllBelowLimit(values: number[], limit: number): number {
   return values.filter((value) => value <= limit).reduce((prev, curr) => prev + curr, 0)
 }
@@ -41,7 +33,7 @@ export function toChartData(stats: RealYieldStats, { type, sort }: ChartInfo): C
       const feeLimit = stats.totalUSD.fee * 0.005
       const allTokenFees = Object.entries(stats.tokens).map(([symbol, info]) => ({
         label: symbol,
-        data: calcFee(info),
+        data: info.feeInUSD,
         color: colorBasedOn(symbol),
       }))
       entries = allTokenFees.filter((entry) => entry.data > feeLimit)
@@ -56,18 +48,21 @@ export function toChartData(stats: RealYieldStats, { type, sort }: ChartInfo): C
       break
     case RealYieldChartDataType.COMMISSION_CRYPTO:
     case RealYieldChartDataType.COMMISSION_TOKEN:
-      const commissionLimit = stats.totalUSD.commission * 0.02 // TODO (Krysh) implement filter correctly, as total commissions are for crypto + dToken
       const allCommissions = Object.entries(stats.tokens)
         .filter(([symbol]) =>
           type === RealYieldChartDataType.COMMISSION_CRYPTO
             ? listOfCryptos.includes(symbol)
             : !listOfCryptos.includes(symbol),
         )
-        .map(([symbol, info]) => ({
-          label: symbol,
-          data: calcCommission(info),
-          color: colorBasedOn(symbol),
-        }))
+        .map(([symbol, info], index) => {
+          const color = colorBasedOn(symbol)
+          return {
+            label: symbol,
+            data: info.commissionInUSD,
+            color: color === '#444444' ? adjustColor(color, index * 2) : color,
+          }
+        })
+      const commissionLimit = allCommissions.map((e) => e.data).reduce((curr, prev) => curr + prev, 0) * 0.02
       entries = allCommissions.filter((entry) => entry.data > commissionLimit)
       entries = entries.concat({
         label: 'Others',
