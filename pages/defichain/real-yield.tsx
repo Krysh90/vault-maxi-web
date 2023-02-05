@@ -2,11 +2,18 @@ import { NextPage } from 'next'
 import DonutChart from '../../components/base/donut-chart'
 import { StaticEntry } from '../../components/base/static-entry'
 import Layout from '../../components/core/layout'
+import HistoryChart from '../../components/statistic/history-chart'
 import { RealYieldStats } from '../../dtos/real-yield-stats.dto'
-import { generateTableContent } from '../../lib/chart.lib'
-import { historyDaysToLoad, RealYieldChartDataType, toChartData } from '../../lib/real-yield.lib'
+import { formatNumber, generateTableContent } from '../../lib/chart.lib'
+import {
+  historyDaysToLoad,
+  RealYieldChartDataType,
+  toChartData,
+  toLineChartData,
+  toScales,
+} from '../../lib/real-yield.lib'
 
-export async function getStaticProps(): Promise<{ props: StatisticsProps; revalidate: number }> {
+export async function getStaticProps(): Promise<{ props: RealYieldProps; revalidate: number }> {
   const res = await fetch('https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/realYield/latest.json')
   const statistics: RealYieldStats = await res.json()
   const history = await Promise.all<RealYieldStats>(
@@ -18,15 +25,21 @@ export async function getStaticProps(): Promise<{ props: StatisticsProps; revali
           .catch(() => {}),
       ),
   ).then((stats) => stats.filter((stat) => stat !== undefined))
-  return { props: { statistics, history }, revalidate: 3600 }
+  return {
+    props: {
+      statistics,
+      history,
+    },
+    revalidate: 3600,
+  }
 }
 
-interface StatisticsProps {
+interface RealYieldProps {
   statistics: RealYieldStats
   history: RealYieldStats[]
 }
 
-const Statistics: NextPage<StatisticsProps> = ({ statistics, history }: StatisticsProps) => {
+const RealYield: NextPage<RealYieldProps> = ({ statistics, history }: RealYieldProps) => {
   const charts = [
     {
       title: 'Fees (burned)',
@@ -43,11 +56,45 @@ const Statistics: NextPage<StatisticsProps> = ({ statistics, history }: Statisti
     },
   ]
 
+  const historyItems = [
+    { label: 'Overall', type: RealYieldChartDataType.OVERALL },
+    { label: 'Fees (burned)', type: RealYieldChartDataType.FEE },
+    { label: 'Commission (yield)', type: RealYieldChartDataType.COMMISSION },
+  ]
+
   const infoText = `Displayed values were taken between blocks ${statistics.meta.startHeight} and ${statistics.meta.endHeight}. Shown values are measured in respective oracles prices (1 DUSD = 1$)`
 
   return (
     <Layout page="Real yield" full maxWidth withoutSupport>
       <h1>Real yield</h1>
+      <div className="py-6 text-lg">
+        <div className="pb-4">
+          <p>Total commissions yesterday: {formatNumber(statistics.totalUSD.commission)}$</p>
+          <p>
+            Daily average in last week:{' '}
+            {formatNumber(
+              history
+                .slice(-7)
+                .map((s) => s.totalUSD.commission)
+                .reduce((prev, curr) => prev + curr, 0) / 7,
+            )}
+            $
+          </p>
+        </div>
+        <div>
+          <p>Total fees yesterday: {formatNumber(statistics.totalUSD.fee)}$</p>
+          <p>
+            Daily average in last week:{' '}
+            {formatNumber(
+              history
+                .slice(-7)
+                .map((s) => s.totalUSD.fee)
+                .reduce((prev, curr) => prev + curr, 0) / 7,
+            )}
+            $
+          </p>
+        </div>
+      </div>
       <div className="flex flex-row flex-wrap py-8 gap-16 flex-grow justify-center items-start w-full">
         <StaticEntry type="info" text={infoText} variableHeight />
         {charts.map((info, index) => {
@@ -91,9 +138,9 @@ const Statistics: NextPage<StatisticsProps> = ({ statistics, history }: Statisti
           )
         })}
       </div>
-      {/* <HistoryChart history={history} /> */}
+      <HistoryChart history={history} items={historyItems} toLineChartData={toLineChartData} toScales={toScales} />
     </Layout>
   )
 }
 
-export default Statistics
+export default RealYield

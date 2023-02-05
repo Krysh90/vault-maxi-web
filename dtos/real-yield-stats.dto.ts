@@ -7,6 +7,8 @@ export interface RealYieldStats {
 
 export interface RealYieldInfo {
   commission: number
+  commissionInUSD: number
   fee: number
+  feeInUSD: number
   usdValue?: number
 }

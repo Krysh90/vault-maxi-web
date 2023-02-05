@@ -30,7 +30,7 @@ export function generateTableContent(chartData: ChartData, { inDollar }: ChartIn
   return { content, labels, percentages, colors }
 }
 
-function formatNumber(value: number): string {
+export function formatNumber(value: number): string {
   let postfix = ''
   let fixed = 0
   if (value > 1e6) {
