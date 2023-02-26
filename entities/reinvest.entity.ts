@@ -1,8 +1,6 @@
 import uuid from 'react-uuid'
+import { regex } from '../definitions/regex'
 import { Token } from '../dtos/token.dto'
-
-const addressRegex = /^(8\w{33}|d\w{33}|d\w{41})$/
-const vaultRegex = /^[a-f0-9]{64}$/i
 
 export enum ReinvestTargetType {
   WALLET,
@@ -39,7 +37,7 @@ export class Reinvest {
   public isTargetValid(): boolean {
     return (
       this.target === undefined ||
-      this.target.match(addressRegex) != null ||
+      this.target.match(regex.address) != null ||
       this.target === Reinvest.Constants.wallet ||
       this.isTargetVaultValid()
     )
@@ -47,7 +45,7 @@ export class Reinvest {
 
   public getTargetType(): ReinvestTargetType {
     if (
-      (this.target && this.target.match(vaultRegex)) ||
+      (this.target && this.target.match(regex.vault)) ||
       this.target === Reinvest.Constants.vault ||
       (!this.target && (this.token?.canBeCollateral ?? false))
     )
@@ -57,7 +55,7 @@ export class Reinvest {
 
   isTargetVaultValid(): boolean {
     return (
-      ((this.target && this.target.match(vaultRegex)) || this.target === Reinvest.Constants.vault) &&
+      ((this.target && this.target.match(regex.vault)) || this.target === Reinvest.Constants.vault) &&
       (this.token?.canBeCollateral ?? false)
     )
   }
