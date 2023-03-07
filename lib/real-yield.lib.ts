@@ -112,7 +112,7 @@ export function toLineChartData(history: RealYieldStats[], { type, timeFrame }: 
       entries.push(
         ...symbols.map((symbol) => ({
           label: symbol,
-          data: history.map((h) => h.tokens[symbol].feeInUSD),
+          data: history.map((h) => h.tokens[symbol]?.feeInUSD ?? 0),
           color: colorBasedOn(symbol),
         })),
       )
@@ -121,7 +121,7 @@ export function toLineChartData(history: RealYieldStats[], { type, timeFrame }: 
       entries.push(
         ...symbols.map((symbol) => ({
           label: symbol,
-          data: history.map((h) => h.tokens[symbol].commissionInUSD),
+          data: history.map((h) => h.tokens[symbol]?.commissionInUSD ?? 0),
           color: colorBasedOn(symbol),
         })),
       )
