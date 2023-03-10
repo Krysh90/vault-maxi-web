@@ -1,9 +1,9 @@
 import BigNumber from 'bignumber.js'
 import moment from 'moment'
 import { ChartData } from '../dtos/chart-data.dto'
-import { QuantumStats, QuantumWalletStats } from '../dtos/quantum-stats.dto'
+import { QuantumStats } from '../dtos/quantum-stats.dto'
 import { ChartEntry, ChartInfo, getDates, LineChartEntry, LineChartInfo, valueOfTimeFrame } from './chart.lib'
-import { adjustColor, colorBasedOn } from './colors.lib'
+import { colorBasedOn } from './colors.lib'
 
 export enum QuantumChartDataType {
   IN = 'IN',
@@ -77,18 +77,18 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
   switch (type) {
     case QuantumChartDataType.NUMBER_OF_TXS:
       entries.push({
-        label: 'In',
+        label: 'defichain -> ETH',
         data: history.map((entry) =>
           entry.txsInBlocks[2880].map((txStats) => txStats.txsIn).reduce((prev, curr) => prev + curr, 0),
         ),
-        color: colorBasedOn('DFI'),
+        color: colorBasedOn('ETH'),
       })
       entries.push({
-        label: 'Out',
+        label: 'ETH -> defichain',
         data: history.map((entry) =>
           entry.txsInBlocks[2880].map((txStats) => txStats.txsOut).reduce((prev, curr) => prev + curr, 0),
         ),
-        color: colorBasedOn('ETH'),
+        color: colorBasedOn('DFI'),
       })
       break
     case QuantumChartDataType.MAX_IN_SWAP:

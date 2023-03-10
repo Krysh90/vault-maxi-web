@@ -36,33 +36,33 @@ interface QuantumProps {
 const Quantum: NextPage<QuantumProps> = ({ statistics, history }: QuantumProps) => {
   const charts = [
     {
-      title: 'Liquidity',
+      title: 'Liquidity on defichain',
       type: QuantumChartDataType.LIQUIDITY,
       inDollar: true,
       sort: true,
     },
     {
-      title: 'In',
+      title: 'defichain -> ETH',
       type: QuantumChartDataType.IN,
-      inDollar: false,
+      inDollar: true,
       sort: true,
     },
     {
-      title: 'Out',
+      title: 'ETH -> defichain',
       type: QuantumChartDataType.OUT,
-      inDollar: false,
+      inDollar: true,
       sort: true,
     },
   ]
 
   const historyItems = [
     { label: 'Number of txs', type: QuantumChartDataType.NUMBER_OF_TXS },
-    { label: 'Volume in', type: QuantumChartDataType.VOLUME_IN },
-    { label: 'Volume out', type: QuantumChartDataType.VOLUME_OUT },
-    { label: 'Coins in', type: QuantumChartDataType.COINS_IN },
-    { label: 'Coins out', type: QuantumChartDataType.COINS_OUT },
-    { label: 'Max in swap', type: QuantumChartDataType.MAX_IN_SWAP },
-    { label: 'Max out swap', type: QuantumChartDataType.MAX_OUT_SWAP },
+    { label: 'Volume defichain -> ETH', type: QuantumChartDataType.VOLUME_IN },
+    { label: 'Volume ETH -> defichain', type: QuantumChartDataType.VOLUME_OUT },
+    { label: 'Coins defichain -> ETH', type: QuantumChartDataType.COINS_IN },
+    { label: 'Coins ETH -> defichain', type: QuantumChartDataType.COINS_OUT },
+    { label: 'Max defichain -> ETH swap', type: QuantumChartDataType.MAX_IN_SWAP },
+    { label: 'Max ETH -> defichain swap', type: QuantumChartDataType.MAX_OUT_SWAP },
   ]
 
   const infoText = `Displayed values were taken at block ${statistics.meta.analysedAt}. It is important to understand that we are only analyzing the defichain side of Quantum. Prices are taken from defichain oracles'`
