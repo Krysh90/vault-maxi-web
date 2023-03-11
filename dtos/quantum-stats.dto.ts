@@ -20,5 +20,10 @@ export interface QuantumTokenTxStats {
 }
 
 export interface QuantumWalletStats {
-  [key: string]: string
+  [key: string]: TokenData
+}
+
+interface TokenData {
+  amount: string
+  oraclePrice: string
 }

@@ -58,6 +58,8 @@ const Quantum: NextPage<QuantumProps> = ({ statistics, history }: QuantumProps) 
 
   const historyItems = [
     { label: 'Number of txs', type: QuantumChartDataType.NUMBER_OF_TXS },
+    { label: 'Liquidity in $', type: QuantumChartDataType.LIQUIDITY },
+    { label: 'Liquidity in coins', type: QuantumChartDataType.LIQUIDITY_COINS },
     { label: 'Volume to ETH vs to defichain', type: QuantumChartDataType.VOLUME_IN_VS_OUT },
     { label: 'Volume to ETH', type: QuantumChartDataType.VOLUME_IN },
     { label: 'Volume to defichain', type: QuantumChartDataType.VOLUME_OUT },

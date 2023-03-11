@@ -9,6 +9,7 @@ export enum QuantumChartDataType {
   IN = 'IN',
   OUT = 'OUT',
   LIQUIDITY = 'LIQUIDITY',
+  LIQUIDITY_COINS = 'LIQUIDITY COINS',
   NUMBER_OF_TXS = 'NUMBER OF TXS',
   COINS_IN = 'COINS IN',
   COINS_OUT = 'COUNS OUT',
@@ -31,32 +32,35 @@ export const listOfCryptos = ['DFI', 'BTC', 'ETH', 'LTC', 'BCH', 'DOGE', 'USDT',
 
 export function toChartData(stats: QuantumStats, { type, sort }: ChartInfo): ChartData {
   let entries: ChartEntry[] = []
-  const pricesMap = stats.txsInBlocks[2880].map((txStats) => ({ token: txStats.tokenName, price: txStats.oraclePrice }))
   switch (type) {
     case QuantumChartDataType.LIQUIDITY:
       entries = stats.liquidity.hotwallet
         ? Object.keys(stats.liquidity.hotwallet).map((token) => ({
             label: token,
-            data: new BigNumber(stats.liquidity.hotwallet![token])
-              .multipliedBy(pricesMap.find((p) => p.token === token)?.price ?? 0)
+            data: new BigNumber(stats.liquidity.hotwallet![token].amount)
+              .multipliedBy(stats.liquidity.hotwallet![token].oraclePrice)
               .toNumber(),
             color: colorBasedOn(token),
           }))
         : []
       break
     case QuantumChartDataType.IN:
-      entries = stats.txsInBlocks[2880].map((txStats) => ({
-        label: txStats.tokenName,
-        data: new BigNumber(txStats.coinsIn).multipliedBy(txStats.oraclePrice).toNumber(),
-        color: colorBasedOn(txStats.tokenName),
-      }))
+      entries = stats.txsInBlocks[2880]
+        .filter((txStats) => +txStats.coinsIn > 0)
+        .map((txStats) => ({
+          label: txStats.tokenName,
+          data: new BigNumber(txStats.coinsIn).multipliedBy(txStats.oraclePrice).toNumber(),
+          color: colorBasedOn(txStats.tokenName),
+        }))
       break
     case QuantumChartDataType.OUT:
-      entries = stats.txsInBlocks[2880].map((txStats) => ({
-        label: txStats.tokenName,
-        data: new BigNumber(txStats.coinsOut).multipliedBy(txStats.oraclePrice).toNumber(),
-        color: colorBasedOn(txStats.tokenName),
-      }))
+      entries = stats.txsInBlocks[2880]
+        .filter((txStats) => +txStats.coinsOut > 0)
+        .map((txStats) => ({
+          label: txStats.tokenName,
+          data: new BigNumber(txStats.coinsOut).multipliedBy(txStats.oraclePrice).toNumber(),
+          color: colorBasedOn(txStats.tokenName),
+        }))
       break
   }
   if (sort) entries = entries.sort((a, b) => b.data - a.data)
@@ -74,7 +78,7 @@ export function toChartData(stats: QuantumStats, { type, sort }: ChartInfo): Cha
 
 export function toLineChartData(history: QuantumStats[], { type, timeFrame }: LineChartInfo): ChartData {
   const entries: LineChartEntry[] = []
-  const tokens = ['BTC', 'ETH']
+  const tokens = history[history.length - 1].txsInBlocks[86400].map((txStats) => txStats.tokenName)
   switch (type) {
     case QuantumChartDataType.NUMBER_OF_TXS:
       entries.push({
@@ -91,6 +95,32 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
         ),
         color: colorBasedOn('DFI'),
       })
+      break
+    case QuantumChartDataType.LIQUIDITY:
+      entries.push(
+        ...tokens.map((token) => ({
+          label: token,
+          data: history
+            .filter((entry) => entry.liquidity.hotwallet !== undefined)
+            .map((entry) =>
+              new BigNumber(entry.liquidity.hotwallet![token].amount)
+                .multipliedBy(entry.liquidity.hotwallet![token].oraclePrice)
+                .toNumber(),
+            ),
+          color: colorBasedOn(token),
+        })),
+      )
+      break
+    case QuantumChartDataType.LIQUIDITY_COINS:
+      entries.push(
+        ...tokens.map((token) => ({
+          label: token,
+          data: history
+            .filter((entry) => entry.liquidity.hotwallet !== undefined)
+            .map((entry) => new BigNumber(entry.liquidity.hotwallet![token].amount).toNumber()),
+          color: colorBasedOn(token),
+        })),
+      )
       break
     case QuantumChartDataType.MAX_IN_SWAP:
     case QuantumChartDataType.MAX_OUT_SWAP:
