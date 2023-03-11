@@ -14,6 +14,7 @@ export enum QuantumChartDataType {
   COINS_OUT = 'COUNS OUT',
   VOLUME_IN = 'VOLUME IN',
   VOLUME_OUT = 'VOLUME OUT',
+  VOLUME_IN_VS_OUT = 'VOLUME IN VS OUT',
   MAX_IN_SWAP = 'MAX IN SWAP',
   MAX_OUT_SWAP = 'MAX OUT SWAP',
 }
@@ -77,14 +78,14 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
   switch (type) {
     case QuantumChartDataType.NUMBER_OF_TXS:
       entries.push({
-        label: 'defichain -> ETH',
+        label: 'to ETH',
         data: history.map((entry) =>
           entry.txsInBlocks[2880].map((txStats) => txStats.txsIn).reduce((prev, curr) => prev + curr, 0),
         ),
         color: colorBasedOn('ETH'),
       })
       entries.push({
-        label: 'ETH -> defichain',
+        label: 'to defichain',
         data: history.map((entry) =>
           entry.txsInBlocks[2880].map((txStats) => txStats.txsOut).reduce((prev, curr) => prev + curr, 0),
         ),
@@ -125,6 +126,26 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
           color: colorBasedOn(token),
         })),
       )
+      break
+    case QuantumChartDataType.VOLUME_IN_VS_OUT:
+      entries.push({
+        label: 'to ETH',
+        data: history.map((entry) =>
+          entry.txsInBlocks[2880]
+            .map((txStats) => new BigNumber(txStats.coinsIn).multipliedBy(txStats.oraclePrice).toNumber())
+            .reduce((prev, curr) => prev + curr, 0),
+        ),
+        color: colorBasedOn('ETH'),
+      })
+      entries.push({
+        label: 'to defichain',
+        data: history.map((entry) =>
+          entry.txsInBlocks[2880]
+            .map((txStats) => new BigNumber(txStats.coinsOut).multipliedBy(txStats.oraclePrice).toNumber())
+            .reduce((prev, curr) => prev + curr, 0),
+        ),
+        color: colorBasedOn('DFI'),
+      })
       break
     case QuantumChartDataType.COINS_IN:
     case QuantumChartDataType.COINS_OUT:
