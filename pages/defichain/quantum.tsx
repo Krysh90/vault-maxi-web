@@ -69,7 +69,7 @@ const Quantum: NextPage<QuantumProps> = ({ statistics, history }: QuantumProps) 
     { label: 'Max to defichain swap', type: QuantumChartDataType.MAX_OUT_SWAP },
   ]
 
-  const infoText = `Displayed values were taken at block ${statistics.meta.analysedAt}. It is important to understand that we are only analyzing the defichain side of Quantum. Prices are taken from defichain oracles'`
+  const infoText = `Displayed values were taken at block ${statistics.meta.analysedAt}. Technically the last 24 hours are 2880 blocks and 30 days are 86400 blocks. It is important to understand that we are only analyzing the defichain side of Quantum. Prices are taken from defichain oracles'`
 
   const calculateVolume = (txStats: QuantumTokenTxStats[], useIn: boolean): number => {
     return txStats
