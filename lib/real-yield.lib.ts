@@ -24,7 +24,7 @@ function sumAllBelowLimit(values: number[], limit: number): number {
   return values.filter((value) => value <= limit).reduce((prev, curr) => prev + curr, 0)
 }
 
-export const listOfCryptos = ['DFI', 'BTC', 'ETH', 'LTC', 'BCH', 'DOGE', 'USDT', 'USDC']
+export const listOfCryptos = ['DFI', 'BTC', 'ETH', 'LTC', 'BCH', 'DOGE', 'USDT', 'USDC', 'EUROC']
 
 export function toChartData(stats: RealYieldStats, { type, sort }: ChartInfo): ChartData {
   let entries: ChartEntry[] = []
