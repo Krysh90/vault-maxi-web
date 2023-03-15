@@ -18,6 +18,8 @@ export function colorBasedOn(symbol: string): string {
       return '#2775CA'
     case 'USDT':
       return '#26A17B'
+    case 'EUROC':
+      return '#F5F5F5'
     case 'Unused':
       return '#222'
     default:
