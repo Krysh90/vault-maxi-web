@@ -1,29 +1,35 @@
 export interface QuantumStats {
   meta: { tstamp: string; analysedAt: number }
-  txsInBlocks: {
-    '2880': QuantumTokenTxStats[]
-    '86400': QuantumTokenTxStats[]
-  }
-  liquidity: { hotwallet?: QuantumWalletStats; coldWallet?: QuantumWalletStats }
+  prices: TokenBalances
+  txs: QuantumTx[]
+  liquidity: { defichain: TokenBalances; ethereum: TokenBalances }
+  quantumData: QuantumData
 }
 
-export interface QuantumTokenTxStats {
+export interface QuantumTx {
   tokenName: string
-  txsIn: number
-  txsOut: number
-  coinsIn: string
-  coinsOut: string
-  maxIn: string
-  maxOut: string
-  liquidity: string
-  oraclePrice: string
+  txsToEthereum: number
+  txsToDefichain: number
+  coinsToEthereum: string
+  coinsToDefichain: string
+  maxToEthereum: string
+  maxToDefichain: string
 }
 
-export interface QuantumWalletStats {
-  [key: string]: TokenData
+export interface QuantumData {
+  liqEth: TokenBalances
+  liqDfc: TokenBalances
+  txsToDfc: QuantumBridgeTxStats
+  txsToEth: QuantumBridgeTxStats
 }
 
-interface TokenData {
-  amount: string
-  oraclePrice: string
+export interface QuantumBridgeTxStats {
+  totalTransactions: number
+  confirmedTransactions: number
+  amountBridged: TokenBalances
+  totalBridgedAmount: TokenBalances
+}
+
+export interface TokenBalances {
+  [key: string]: string
 }

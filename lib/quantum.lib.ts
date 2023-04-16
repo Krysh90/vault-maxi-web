@@ -6,18 +6,11 @@ import { ChartEntry, ChartInfo, getDates, LineChartEntry, LineChartInfo, valueOf
 import { colorBasedOn } from './colors.lib'
 
 export enum QuantumChartDataType {
-  IN = 'IN',
-  OUT = 'OUT',
   LIQUIDITY = 'LIQUIDITY',
-  LIQUIDITY_COINS = 'LIQUIDITY COINS',
-  NUMBER_OF_TXS = 'NUMBER OF TXS',
-  COINS_IN = 'COINS IN',
-  COINS_OUT = 'COUNS OUT',
-  VOLUME_IN = 'VOLUME IN',
-  VOLUME_OUT = 'VOLUME OUT',
-  VOLUME_IN_VS_OUT = 'VOLUME IN VS OUT',
-  MAX_IN_SWAP = 'MAX IN SWAP',
-  MAX_OUT_SWAP = 'MAX OUT SWAP',
+  VOLUME_ETH = 'VOLUME ETH',
+  VOLUME_DFC = 'VOLUME DFC',
+  LIQUIDITY_ETH = 'LIQUIDITY ETH',
+  LIQUIDITY_DFC = 'LIQUIDITY DFC',
 }
 
 export function historyDaysToLoad(): string[] {
@@ -25,41 +18,69 @@ export function historyDaysToLoad(): string[] {
 }
 
 export function getAllSymbols(stats: QuantumStats): string[] {
-  return stats.liquidity.hotwallet ? Object.keys(stats.liquidity.hotwallet) : []
+  return Object.keys(stats.liquidity.defichain)
 }
 
-export const listOfCryptos = ['DFI', 'BTC', 'ETH', 'LTC', 'BCH', 'DOGE', 'USDT', 'USDC']
+export const listOfCryptos = ['DFI', 'BTC', 'ETH', 'LTC', 'BCH', 'DOGE', 'USDT', 'USDC', 'EUROC']
+
+function getPriceOf(symbol: string, stats: QuantumStats): BigNumber {
+  return new BigNumber(stats.prices[symbol] ?? 0)
+}
+
+function totalAmountOfLiquidity(liquidity: { token: string; amount: string }[], stats: QuantumStats): BigNumber {
+  return liquidity
+    .map((entry) => new BigNumber(entry.amount).multipliedBy(getPriceOf(entry.token, stats)))
+    .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
+    .decimalPlaces(2)
+}
 
 export function toChartData(stats: QuantumStats, { type, sort }: ChartInfo): ChartData {
   let entries: ChartEntry[] = []
   switch (type) {
     case QuantumChartDataType.LIQUIDITY:
-      entries = stats.liquidity.hotwallet
-        ? Object.keys(stats.liquidity.hotwallet).map((token) => ({
-            label: token,
-            data: new BigNumber(stats.liquidity.hotwallet![token].amount)
-              .multipliedBy(stats.liquidity.hotwallet![token].oraclePrice)
-              .toNumber(),
-            color: colorBasedOn(token),
-          }))
-        : []
+      const defichain = Object.entries(stats.liquidity.defichain)
+        .map(([token, amount]) => ({ token, amount }))
+        .sort((a, b) => a.token.localeCompare(b.token))
+      const ethereum = Object.entries(stats.liquidity.ethereum)
+        .map(([token, amount]) => ({ token, amount }))
+        .sort((a, b) => b.token.localeCompare(a.token))
+      entries = defichain.map((entry) => ({
+        label: entry.token + ' on defichain',
+        data: new BigNumber(entry.amount).multipliedBy(getPriceOf(entry.token, stats)).toNumber(),
+        color: colorBasedOn(entry.token),
+      }))
+      entries.push({
+        label: '',
+        data: totalAmountOfLiquidity(defichain, stats)
+          .minus(totalAmountOfLiquidity(ethereum, stats))
+          .absoluteValue()
+          .toNumber(),
+        color: '#111',
+      })
+      entries = entries.concat(
+        ...ethereum.map((entry) => ({
+          label: entry.token + ' on Ethereum',
+          data: new BigNumber(entry.amount).multipliedBy(getPriceOf(entry.token, stats)).toNumber(),
+          color: colorBasedOn(entry.token),
+        })),
+      )
       break
-    case QuantumChartDataType.IN:
-      entries = stats.txsInBlocks[2880]
-        .filter((txStats) => +txStats.coinsIn > 0)
-        .map((txStats) => ({
-          label: txStats.tokenName,
-          data: new BigNumber(txStats.coinsIn).multipliedBy(txStats.oraclePrice).toNumber(),
-          color: colorBasedOn(txStats.tokenName),
+    case QuantumChartDataType.VOLUME_ETH:
+      entries = stats.txs
+        .filter((quantumTx) => quantumTx.txsToEthereum > 0)
+        .map((tx) => ({
+          label: tx.tokenName,
+          data: new BigNumber(tx.coinsToEthereum).multipliedBy(getPriceOf(tx.tokenName, stats)).toNumber(),
+          color: colorBasedOn(tx.tokenName),
         }))
       break
-    case QuantumChartDataType.OUT:
-      entries = stats.txsInBlocks[2880]
-        .filter((txStats) => +txStats.coinsOut > 0)
-        .map((txStats) => ({
-          label: txStats.tokenName,
-          data: new BigNumber(txStats.coinsOut).multipliedBy(txStats.oraclePrice).toNumber(),
-          color: colorBasedOn(txStats.tokenName),
+    case QuantumChartDataType.VOLUME_DFC:
+      entries = stats.txs
+        .filter((quantumTx) => quantumTx.txsToDefichain > 0)
+        .map((tx) => ({
+          label: tx.tokenName,
+          data: new BigNumber(tx.coinsToDefichain).multipliedBy(getPriceOf(tx.tokenName, stats)).toNumber(),
+          color: colorBasedOn(tx.tokenName),
         }))
       break
   }
@@ -78,118 +99,61 @@ export function toChartData(stats: QuantumStats, { type, sort }: ChartInfo): Cha
 
 export function toLineChartData(history: QuantumStats[], { type, timeFrame }: LineChartInfo): ChartData {
   const entries: LineChartEntry[] = []
-  const tokens = history[history.length - 1].txsInBlocks[86400].map((txStats) => txStats.tokenName)
+  const defichainTokens = Object.keys(history.slice(-1)[0].liquidity.defichain)
+  const ethereumTokens = Object.keys(history.slice(-1)[0].liquidity.ethereum)
   switch (type) {
-    case QuantumChartDataType.NUMBER_OF_TXS:
-      entries.push({
-        label: 'to ETH',
-        data: history.map((entry) =>
-          entry.txsInBlocks[2880].map((txStats) => txStats.txsIn).reduce((prev, curr) => prev + curr, 0),
-        ),
-        color: colorBasedOn('ETH'),
-      })
-      entries.push({
-        label: 'to defichain',
-        data: history.map((entry) =>
-          entry.txsInBlocks[2880].map((txStats) => txStats.txsOut).reduce((prev, curr) => prev + curr, 0),
-        ),
-        color: colorBasedOn('DFI'),
-      })
-      break
-    case QuantumChartDataType.LIQUIDITY:
+    case QuantumChartDataType.LIQUIDITY_DFC:
       entries.push(
-        ...tokens.map((token) => ({
+        ...defichainTokens.map((token) => ({
           label: token,
           data: history
-            .filter((entry) => entry.liquidity.hotwallet !== undefined)
+            .filter((entry) => entry.liquidity.defichain !== undefined && entry.liquidity.defichain[token])
             .map((entry) =>
-              new BigNumber(entry.liquidity.hotwallet![token].amount)
-                .multipliedBy(entry.liquidity.hotwallet![token].oraclePrice)
-                .toNumber(),
+              new BigNumber(entry.liquidity.defichain[token]).multipliedBy(getPriceOf(token, entry)).toNumber(),
             ),
           color: colorBasedOn(token),
         })),
       )
       break
-    case QuantumChartDataType.LIQUIDITY_COINS:
+    case QuantumChartDataType.LIQUIDITY_ETH:
       entries.push(
-        ...tokens.map((token) => ({
+        ...ethereumTokens.map((token) => ({
           label: token,
           data: history
-            .filter((entry) => entry.liquidity.hotwallet !== undefined)
-            .map((entry) => new BigNumber(entry.liquidity.hotwallet![token].amount).toNumber()),
+            .filter((entry) => entry.liquidity.ethereum !== undefined && entry.liquidity.ethereum[token])
+            .map((entry) =>
+              new BigNumber(entry.liquidity.ethereum[token]).multipliedBy(getPriceOf(token, entry)).toNumber(),
+            ),
           color: colorBasedOn(token),
         })),
       )
       break
-    case QuantumChartDataType.MAX_IN_SWAP:
-    case QuantumChartDataType.MAX_OUT_SWAP:
+    case QuantumChartDataType.VOLUME_DFC:
       entries.push(
-        ...tokens.map((token) => ({
+        ...defichainTokens.map((token) => ({
           label: token,
-          data: history.map((entry) =>
-            entry.txsInBlocks[2880]
-              .filter((txStats) => txStats.tokenName === token)
-              .map((txStats) => +(type === QuantumChartDataType.MAX_IN_SWAP ? txStats.maxIn : txStats.maxOut))
-              .reduce((prev, curr) => prev + curr, 0),
-          ),
-          color: colorBasedOn(token),
-        })),
-      )
-      console.log(entries)
-      break
-    case QuantumChartDataType.VOLUME_IN:
-    case QuantumChartDataType.VOLUME_OUT:
-      entries.push(
-        ...tokens.map((token) => ({
-          label: token,
-          data: history.map((entry) =>
-            entry.txsInBlocks[2880]
-              .filter((txStats) => txStats.tokenName === token)
-              .map((txStats) =>
-                new BigNumber(type === QuantumChartDataType.VOLUME_IN ? txStats.coinsIn : txStats.coinsOut)
-                  .multipliedBy(txStats.oraclePrice)
-                  .toNumber(),
-              )
-              .reduce((prev, curr) => prev + curr, 0),
-          ),
+          data: history.map((entry) => {
+            const tokenTxs = entry.txs.find(
+              (quantumTx) => quantumTx.tokenName === token && quantumTx.txsToDefichain > 0,
+            )
+            return tokenTxs
+              ? new BigNumber(tokenTxs?.coinsToDefichain).multipliedBy(getPriceOf(token, entry)).toNumber()
+              : 0
+          }),
           color: colorBasedOn(token),
         })),
       )
       break
-    case QuantumChartDataType.VOLUME_IN_VS_OUT:
-      entries.push({
-        label: 'to ETH',
-        data: history.map((entry) =>
-          entry.txsInBlocks[2880]
-            .map((txStats) => new BigNumber(txStats.coinsIn).multipliedBy(txStats.oraclePrice).toNumber())
-            .reduce((prev, curr) => prev + curr, 0),
-        ),
-        color: colorBasedOn('ETH'),
-      })
-      entries.push({
-        label: 'to defichain',
-        data: history.map((entry) =>
-          entry.txsInBlocks[2880]
-            .map((txStats) => new BigNumber(txStats.coinsOut).multipliedBy(txStats.oraclePrice).toNumber())
-            .reduce((prev, curr) => prev + curr, 0),
-        ),
-        color: colorBasedOn('DFI'),
-      })
-      break
-    case QuantumChartDataType.COINS_IN:
-    case QuantumChartDataType.COINS_OUT:
+    case QuantumChartDataType.VOLUME_ETH:
       entries.push(
-        ...tokens.map((token) => ({
+        ...ethereumTokens.map((token) => ({
           label: token,
-          data: history.map((entry) =>
-            entry.txsInBlocks[2880]
-              .filter((txStats) => txStats.tokenName === token)
-              .map((txStats) =>
-                new BigNumber(type === QuantumChartDataType.COINS_IN ? txStats.coinsIn : txStats.coinsOut).toNumber(),
-              )
-              .reduce((prev, curr) => prev + curr, 0),
-          ),
+          data: history.map((entry) => {
+            const tokenTxs = entry.txs.find((quantumTx) => quantumTx.tokenName === token && quantumTx.txsToEthereum > 0)
+            return tokenTxs
+              ? new BigNumber(tokenTxs?.coinsToEthereum).multipliedBy(getPriceOf(token, entry)).toNumber()
+              : 0
+          }),
           color: colorBasedOn(token),
         })),
       )
