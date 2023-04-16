@@ -43,7 +43,7 @@ const Quantum: NextPage<QuantumProps> = ({ statistics, history }: QuantumProps) 
       showTable: false,
     },
     {
-      title: 'Volume to ETH',
+      title: 'Volume to Ethereum',
       type: QuantumChartDataType.VOLUME_ETH,
       inDollar: true,
       sort: true,
@@ -60,9 +60,11 @@ const Quantum: NextPage<QuantumProps> = ({ statistics, history }: QuantumProps) 
 
   const historyItems = [
     { label: 'Liquidity on defichain in $', type: QuantumChartDataType.LIQUIDITY_DFC },
-    { label: 'Liquidity on ETH in $', type: QuantumChartDataType.LIQUIDITY_ETH },
-    { label: 'Volume to ETH', type: QuantumChartDataType.VOLUME_ETH },
+    { label: 'Liquidity on Ethereum in $', type: QuantumChartDataType.LIQUIDITY_ETH },
     { label: 'Volume to defichain', type: QuantumChartDataType.VOLUME_DFC },
+    { label: 'Volume to Ethereum', type: QuantumChartDataType.VOLUME_ETH },
+    { label: 'Total volume to defichain', type: QuantumChartDataType.TOTAL_VOLUME_DFC },
+    { label: 'Total volume to Ethereum', type: QuantumChartDataType.TOTAL_VOLUME_ETH },
   ]
 
   const infoText = `Displayed values were taken at block ${statistics.meta.analysedAt}. Technically the last 24 hours are 2880 blocks and 30 days are 86400 blocks. It is important to understand that we are only analyzing the defichain side of Quantum. Prices are taken from defichain oracles'`
