@@ -1,11 +1,10 @@
-import BigNumber from 'bignumber.js'
 import { NextPage } from 'next'
 import DonutChart from '../../components/base/donut-chart'
 import { StaticEntry } from '../../components/base/static-entry'
 import Layout from '../../components/core/layout'
 import HistoryChart from '../../components/statistic/history-chart'
 import { QuantumStats } from '../../dtos/quantum-stats.dto'
-import { formatNumber, generateTableContent } from '../../lib/chart.lib'
+import { generateTableContent } from '../../lib/chart.lib'
 import { historyDaysToLoad, QuantumChartDataType, toChartData, toLineChartData, toScales } from '../../lib/quantum.lib'
 
 export async function getStaticProps(): Promise<{ props: QuantumProps; revalidate: number }> {

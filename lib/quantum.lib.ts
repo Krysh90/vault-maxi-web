@@ -14,7 +14,7 @@ export enum QuantumChartDataType {
 }
 
 export function historyDaysToLoad(): string[] {
-  return getDates('2023-03-09').map((date) => date.toISOString().slice(0, 10))
+  return getDates('2023-04-16').map((date) => date.toISOString().slice(0, 10))
 }
 
 export function getAllSymbols(stats: QuantumStats): string[] {
