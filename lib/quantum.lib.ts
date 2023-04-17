@@ -68,23 +68,21 @@ export function toChartData(stats: QuantumStats, { type, sort }: ChartInfo): Cha
       )
       break
     case QuantumChartDataType.VOLUME_ETH:
-      entries = Object.entries(stats.quantumData.txsToEth.amountBridged)
-        .map(([token, amount]) => ({ token, amount }))
-        .filter((entry) => +entry.amount > 0)
+      entries = stats.txs
+        .filter((quantumTx) => quantumTx.txsToEthereum > 0)
         .map((entry) => ({
-          label: entry.token,
-          data: new BigNumber(entry.amount).multipliedBy(getPriceOf(entry.token, stats)).toNumber(),
-          color: colorBasedOn(entry.token),
+          label: entry.tokenName,
+          data: new BigNumber(entry.coinsToEthereum).multipliedBy(getPriceOf(entry.tokenName, stats)).toNumber(),
+          color: colorBasedOn(entry.tokenName),
         }))
       break
     case QuantumChartDataType.VOLUME_DFC:
-      entries = Object.entries(stats.quantumData.txsToDfc.amountBridged)
-        .map(([token, amount]) => ({ token, amount }))
-        .filter((entry) => +entry.amount > 0)
+      entries = stats.txs
+        .filter((quantumTx) => quantumTx.txsToDefichain > 0)
         .map((entry) => ({
-          label: entry.token,
-          data: new BigNumber(entry.amount).multipliedBy(getPriceOf(entry.token, stats)).toNumber(),
-          color: colorBasedOn(entry.token),
+          label: entry.tokenName,
+          data: new BigNumber(entry.coinsToDefichain).multipliedBy(getPriceOf(entry.tokenName, stats)).toNumber(),
+          color: colorBasedOn(entry.tokenName),
         }))
       break
   }
@@ -103,8 +101,8 @@ export function toChartData(stats: QuantumStats, { type, sort }: ChartInfo): Cha
 
 export function toLineChartData(history: QuantumStats[], { type, timeFrame }: LineChartInfo): ChartData {
   const entries: LineChartEntry[] = []
-  const defichainTokens = Object.keys(history.slice(-1)[0].quantumData.txsToDfc.totalBridgedAmount)
-  const ethereumTokens = Object.keys(history.slice(-1)[0].quantumData.txsToEth.totalBridgedAmount)
+  const defichainTokens = Object.keys(history.slice(-1)[0].liquidity.defichain)
+  const ethereumTokens = Object.keys(history.slice(-1)[0].liquidity.ethereum)
   switch (type) {
     case QuantumChartDataType.LIQUIDITY_DFC:
       entries.push(
@@ -136,17 +134,14 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
       entries.push(
         ...defichainTokens.map((token) => ({
           label: token,
-          data: history
-            .filter(
-              (entry) =>
-                entry.quantumData.txsToDfc.amountBridged !== undefined &&
-                entry.quantumData.txsToDfc.amountBridged[token],
+          data: history.map((entry) => {
+            const tokenTxs = entry.txs.find(
+              (quantumTx) => quantumTx.tokenName === token && quantumTx.txsToDefichain > 0,
             )
-            .map((entry) =>
-              new BigNumber(entry.quantumData.txsToDfc.amountBridged[token])
-                .multipliedBy(getPriceOf(token, entry))
-                .toNumber(),
-            ),
+            return tokenTxs
+              ? new BigNumber(tokenTxs?.coinsToDefichain).multipliedBy(getPriceOf(token, entry)).toNumber()
+              : 0
+          }),
           color: colorBasedOn(token),
         })),
       )
@@ -155,17 +150,12 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
       entries.push(
         ...ethereumTokens.map((token) => ({
           label: token,
-          data: history
-            .filter(
-              (entry) =>
-                entry.quantumData.txsToEth.amountBridged !== undefined &&
-                entry.quantumData.txsToEth.amountBridged[token],
-            )
-            .map((entry) =>
-              new BigNumber(entry.quantumData.txsToEth.amountBridged[token])
-                .multipliedBy(getPriceOf(token, entry))
-                .toNumber(),
-            ),
+          data: history.map((entry) => {
+            const tokenTxs = entry.txs.find((quantumTx) => quantumTx.tokenName === token && quantumTx.txsToEthereum > 0)
+            return tokenTxs
+              ? new BigNumber(tokenTxs?.coinsToEthereum).multipliedBy(getPriceOf(token, entry)).toNumber()
+              : 0
+          }),
           color: colorBasedOn(token),
         })),
       )
