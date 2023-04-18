@@ -6,6 +6,7 @@ import HistoryChart from '../../components/statistic/history-chart'
 import { QuantumStats } from '../../dtos/quantum-stats.dto'
 import { generateTableContent } from '../../lib/chart.lib'
 import { historyDaysToLoad, QuantumChartDataType, toChartData, toLineChartData, toScales } from '../../lib/quantum.lib'
+import { useMemo, useState } from 'react'
 
 export async function getStaticProps(): Promise<{ props: QuantumProps; revalidate: number }> {
   const res = await fetch('https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/quantum/latest.json')
@@ -34,46 +35,79 @@ interface QuantumProps {
 }
 
 const Quantum: NextPage<QuantumProps> = ({ statistics, history }: QuantumProps) => {
-  const charts = [
-    {
-      title: 'Liquidity in $',
-      type: QuantumChartDataType.LIQUIDITY,
-      inDollar: true,
-      sort: false,
-      showTable: false,
-    },
-    {
-      title: 'Volume to Ethereum',
-      type: QuantumChartDataType.VOLUME_ETH,
-      inDollar: true,
-      sort: true,
-      showTable: true,
-    },
-    {
-      title: 'Volume to defichain',
-      type: QuantumChartDataType.VOLUME_DFC,
-      inDollar: true,
-      sort: true,
-      showTable: true,
-    },
-  ]
+  const [showsQuantumData, setShowsQuantumData] = useState(false)
 
-  const historyItems = [
-    { label: 'Liquidity on defichain in $', type: QuantumChartDataType.LIQUIDITY_DFC },
-    { label: 'Liquidity on Ethereum in $', type: QuantumChartDataType.LIQUIDITY_ETH },
-    { label: 'Volume to defichain', type: QuantumChartDataType.VOLUME_DFC },
-    { label: 'Volume to Ethereum', type: QuantumChartDataType.VOLUME_ETH },
-    { label: 'Total volume to defichain', type: QuantumChartDataType.TOTAL_VOLUME_DFC },
-    { label: 'Total volume to Ethereum', type: QuantumChartDataType.TOTAL_VOLUME_ETH },
-  ]
+  const charts = useMemo(
+    () => [
+      {
+        title: 'Liquidity in $',
+        type: showsQuantumData ? QuantumChartDataType.QUANTUM_LIQUIDITY : QuantumChartDataType.LIQUIDITY,
+        inDollar: true,
+        sort: false,
+        showTable: false,
+      },
+      {
+        title: 'Volume to Ethereum',
+        type: showsQuantumData ? QuantumChartDataType.QUANTUM_VOLUME_ETH : QuantumChartDataType.VOLUME_ETH,
+        inDollar: true,
+        sort: true,
+        showTable: true,
+      },
+      {
+        title: 'Volume to defichain',
+        type: showsQuantumData ? QuantumChartDataType.QUANTUM_VOLUME_DFC : QuantumChartDataType.VOLUME_DFC,
+        inDollar: true,
+        sort: true,
+        showTable: true,
+      },
+    ],
+    [showsQuantumData],
+  )
 
-  const infoText = `Displayed values were taken at block ${statistics.meta.analysedAt}. Technically the last 24 hours are 2880 blocks and 30 days are 86400 blocks. It is important to understand that we are only analyzing the defichain side of Quantum. Prices are taken from defichain oracles'`
+  const historyItems = useMemo(() => {
+    const entries = [
+      {
+        label: 'Liquidity on defichain in $',
+        type: showsQuantumData ? QuantumChartDataType.QUANTUM_LIQUIDITY_DFC : QuantumChartDataType.LIQUIDITY_DFC,
+      },
+      {
+        label: 'Liquidity on Ethereum in $',
+        type: showsQuantumData ? QuantumChartDataType.QUANTUM_LIQUIDITY_ETH : QuantumChartDataType.LIQUIDITY_ETH,
+      },
+      {
+        label: 'Volume to defichain in $',
+        type: showsQuantumData ? QuantumChartDataType.QUANTUM_VOLUME_DFC : QuantumChartDataType.VOLUME_DFC,
+      },
+      {
+        label: 'Volume to Ethereum in $',
+        type: showsQuantumData ? QuantumChartDataType.QUANTUM_VOLUME_ETH : QuantumChartDataType.VOLUME_ETH,
+      },
+    ]
+    return entries.concat(
+      showsQuantumData
+        ? [
+            { label: 'Total volume to defichain in $', type: QuantumChartDataType.QUANTUM_TOTAL_VOLUME_DFC },
+            { label: 'Total volume to Ethereum in $', type: QuantumChartDataType.QUANTUM_TOTAL_VOLUME_ETH },
+          ]
+        : [],
+    )
+  }, [showsQuantumData])
+
+  const infoText = `Displayed values were taken at block ${statistics.meta.analysedAt}. Technically the last 24 hours are 2880 blocks and 30 days are 86400 blocks. Prices are taken from defichain oracles'`
 
   return (
     <Layout page="Quantum" full maxWidth withoutSupport>
-      <h1>Quantum</h1>
+      <h1 className="pb-8">Quantum</h1>
+      <StaticEntry type="info" text={infoText} variableHeight />
+      <div className="py-8">
+        <Slider
+          value={showsQuantumData}
+          titleOff="Analysed data"
+          titleOn="Quantum data"
+          onChange={setShowsQuantumData}
+        />
+      </div>
       <div className="flex flex-row flex-wrap py-8 gap-16 flex-grow justify-center items-start w-full">
-        <StaticEntry type="info" text={infoText} variableHeight />
         {charts.map((info, index) => {
           const data = toChartData(statistics, info)
           const { content, labels, percentages, colors } = generateTableContent(data, info)
@@ -123,3 +157,41 @@ const Quantum: NextPage<QuantumProps> = ({ statistics, history }: QuantumProps) 
 }
 
 export default Quantum
+
+function Slider({
+  value,
+  titleOff,
+  titleOn,
+  onChange,
+}: {
+  value: boolean
+  titleOff: string
+  titleOn: string
+  onChange: (value: boolean) => void
+}): JSX.Element {
+  const [isOn, setIsOn] = useState(value)
+
+  function getTextColor(type: 'on' | 'off'): string {
+    return (type === 'on' && isOn) || (type === 'off' && !isOn) ? 'text-white' : 'text-light'
+  }
+
+  return (
+    <button
+      className="flex flex-row gap-2 items-center"
+      onClick={() => {
+        onChange(!isOn)
+        setIsOn(!isOn)
+      }}
+    >
+      <p className={getTextColor('off')}>{titleOff}</p>
+      <div
+        className={`rounded-full bg-main h-3 w-6 flex flex-row items-center px-0.5 ${
+          isOn ? 'justify-end' : 'justify-start'
+        }`}
+      >
+        <div className="rounded-full bg-dark h-2 w-2" />
+      </div>
+      <p className={getTextColor('on')}>{titleOn}</p>
+    </button>
+  )
+}
