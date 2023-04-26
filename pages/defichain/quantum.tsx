@@ -45,6 +45,7 @@ const Quantum: NextPage<QuantumProps> = ({ statistics, history }: QuantumProps) 
         inDollar: true,
         sort: false,
         showTable: false,
+        showOverlay: true,
       },
       {
         title: 'Volume to Ethereum',
@@ -52,6 +53,7 @@ const Quantum: NextPage<QuantumProps> = ({ statistics, history }: QuantumProps) 
         inDollar: true,
         sort: true,
         showTable: true,
+        showOverlay: false,
       },
       {
         title: 'Volume to defichain',
@@ -59,6 +61,7 @@ const Quantum: NextPage<QuantumProps> = ({ statistics, history }: QuantumProps) 
         inDollar: true,
         sort: true,
         showTable: true,
+        showOverlay: false,
       },
     ],
     [showsQuantumData],
@@ -114,7 +117,16 @@ const Quantum: NextPage<QuantumProps> = ({ statistics, history }: QuantumProps) 
           return (
             <div key={index} className="flex flex-col items-center gap-4">
               <h3>{info.title}</h3>
-              <DonutChart chartData={data} />
+              <div className="relative">
+                <DonutChart chartData={data} />
+                {info.showOverlay && (
+                  <>
+                    <p className="absolute top-28 right-[8.25rem] text-end">Ethereum</p>
+                    <div className="bg-white w-[1px] absolute inset-0 left-32" />
+                    <p className="absolute top-28 left-[8.25rem] text-start">DeFiChain</p>
+                  </>
+                )}
+              </div>
               {info.showTable && (
                 <div className="table table-fixed min-w-full">
                   {content.map((entry, index) => (
