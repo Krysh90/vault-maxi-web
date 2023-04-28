@@ -30,21 +30,13 @@ export function toChartData(stats: RealYieldStats, { type, sort }: ChartInfo): C
   let entries: ChartEntry[] = []
   switch (type) {
     case RealYieldChartDataType.FEE:
-      const feeLimit = stats.totalUSD.fee * 0.005
-      const allTokenFees = Object.entries(stats.tokens).map(([symbol, info]) => ({
-        label: symbol,
-        data: info.feeInUSD,
-        color: colorBasedOn(symbol),
-      }))
-      entries = allTokenFees.filter((entry) => entry.data > feeLimit)
-      entries = entries.concat({
-        label: 'Others',
-        data: sumAllBelowLimit(
-          allTokenFees.map((entry) => entry.data),
-          feeLimit,
-        ),
-        color: '#42f9c2',
-      })
+      entries = Object.entries(stats.tokens)
+        .map(([symbol, info]) => ({
+          label: symbol,
+          data: info.feeInUSD,
+          color: colorBasedOn(symbol),
+        }))
+        .filter((value) => value.data > 0)
       break
     case RealYieldChartDataType.COMMISSION_CRYPTO:
     case RealYieldChartDataType.COMMISSION_TOKEN:
@@ -131,13 +123,15 @@ export function toLineChartData(history: RealYieldStats[], { type, timeFrame }: 
     labels: history
       .map((entry) => moment(entry.meta.tstamp).utc().format('DD-MM-YYYY'))
       .slice(valueOfTimeFrame[timeFrame]),
-    datasets: entries.map((entry) => ({
-      label: entry.label,
-      data: entry.data.slice(valueOfTimeFrame[timeFrame]),
-      borderColor: [entry.color],
-      backgroundColor: [entry.color],
-      hoverOffset: 4,
-    })),
+    datasets: entries
+      .filter((entry) => !entry.data.slice(-30).every((value) => value < 100))
+      .map((entry) => ({
+        label: entry.label,
+        data: entry.data.slice(valueOfTimeFrame[timeFrame]),
+        borderColor: [entry.color],
+        backgroundColor: [entry.color],
+        hoverOffset: 4,
+      })),
   }
 }
 
