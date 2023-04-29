@@ -14,7 +14,6 @@ export enum StatisticsChartDataType {
 
 const Color = {
   vaultMaxi: '#ff00af',
-  wizard: '#000',
   others: '#42f9c2',
   manualToken: '#0821bb',
   manualDUSD: '#42f9c2',
@@ -33,7 +32,6 @@ export function toChartData(stats: VaultStats, { type, sort }: ChartInfo): Chart
         stats.botData.dusdSingleMintMaxi.totalVaults
 
       entries.push({ label: 'Vault Maxi', data: vaultMaxi, color: Color.vaultMaxi })
-      entries.push({ label: 'Wizard', data: stats.botData.wizard.totalVaults, color: Color.wizard })
       entries.push({ label: 'Manual vaults', data: stats.nonEmptyVaults - stats.allBotVaults, color: Color.others })
       break
     case StatisticsChartDataType.LOAN:
@@ -52,7 +50,6 @@ export function toChartData(stats: VaultStats, { type, sort }: ChartInfo): Chart
       entries.push({ label: 'Double mint', data: stats.botData.doubleMintMaxi.totalCollateral, color: Color.double })
       entries.push({ label: 'Single DFI', data: stats.botData.dfiSingleMintMaxi.totalCollateral, color: Color.DFI })
       entries.push({ label: 'Single DUSD', data: stats.botData.dusdSingleMintMaxi.totalCollateral, color: Color.DUSD })
-      entries.push({ label: 'Wizard', data: stats.botData.wizard.totalCollateral, color: Color.wizard })
       break
     case StatisticsChartDataType.STRATEGY:
       entries.push({ label: 'Double mint', data: stats.botData.doubleMintMaxi.totalVaults, color: Color.double })
@@ -91,11 +88,6 @@ export function toLineChartData(history: VaultStats[], { type, timeFrame }: Line
             entry.botData.dusdSingleMintMaxi.totalVaults,
         ),
         color: Color.vaultMaxi,
-      })
-      entries.push({
-        label: 'Wizard',
-        data: history.map((entry) => entry.botData.wizard.totalVaults),
-        color: Color.wizard,
       })
       entries.push({
         label: 'Manual vaults',

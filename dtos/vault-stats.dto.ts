@@ -20,7 +20,6 @@ export interface VaultStatsBotData {
   dusdSingleMintMaxi: VaultStatsDataEntry
   dfiSingleMintMaxi: VaultStatsDataEntry
   doubleMintMaxi: VaultStatsDataEntry
-  wizard: VaultStatsDataEntry
 }
 
 export interface VaultStatsData {
