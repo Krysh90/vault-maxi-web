@@ -1,9 +1,9 @@
-import { faMoneyBillTransfer, faBridge } from '@fortawesome/free-solid-svg-icons'
+import { faMoneyBillTransfer, faBridge, faGlobe } from '@fortawesome/free-solid-svg-icons'
 import { CardItemDto } from '../dtos/card-item.dto'
 
 export class DefichainRepository {
   static all(): CardItemDto[] {
-    return [realYield, quantum]
+    return [realYield, quantum, metaChain]
   }
 }
 
@@ -19,4 +19,14 @@ const quantum: CardItemDto = {
   description: 'Display of statistics about quantum bridge',
   icon: { definition: faBridge, color: '#666', size: '4x' },
   links: [{ url: '/defichain/quantum', display: 'Open statistics' }],
+}
+
+const metaChain: CardItemDto = {
+  name: 'MetaChain',
+  description: 'Connect to MetaChain networks',
+  icon: { definition: faGlobe, color: '#666', size: '4x' },
+  links: [
+    { url: '/defichain/meta-chain', display: 'Open page' },
+    { url: 'https://meta.defichain.com/', display: 'About' },
+  ],
 }
