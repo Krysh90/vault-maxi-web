@@ -66,7 +66,9 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
   ]
 
   const historyItems = [
-    { label: 'Distribution', type: DTokenStatsChartDataType.DISTRIBUTION },
+    { label: 'Algo', type: DTokenStatsChartDataType.ALGO },
+    { label: 'Backed', type: DTokenStatsChartDataType.BACKED },
+    { label: 'Algo Ratio', type: DTokenStatsChartDataType.RATIO },
     { label: 'FutureSwap', type: DTokenStatsChartDataType.FUTURESWAP },
   ]
 
