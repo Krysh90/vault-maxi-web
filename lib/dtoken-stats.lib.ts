@@ -130,6 +130,13 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         ),
         color: colorBasedOn('dToken'),
       })
+      entries.push({
+        label: 'Algo combined',
+        data: history.map((day) =>
+          day.dTokens.map((entry) => calculateAlgoTokens(entry) * entry.price).reduce((prev, curr) => prev + curr, 0),
+        ),
+        color: '#fff',
+      })
       break
     case DTokenStatsChartDataType.BACKED:
       entries.push({
@@ -146,6 +153,13 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
             .reduce((prev, curr) => prev + curr, 0),
         ),
         color: colorBasedOn('dToken'),
+      })
+      entries.push({
+        label: 'Backed combined',
+        data: history.map((day) =>
+          day.dTokens.map((entry) => entry.minted.loans * entry.price).reduce((prev, curr) => prev + curr, 0),
+        ),
+        color: '#fff',
       })
       break
     case DTokenStatsChartDataType.RATIO:
@@ -178,6 +192,24 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
             .toNumber()
         }),
         color: colorBasedOn('dToken'),
+      })
+
+      entries.push({
+        label: 'Combined',
+        data: history.map((day) => {
+          const algo = day.dTokens
+            .map((entry) => calculateAlgoTokens(entry) * entry.price)
+            .reduce((prev, curr) => prev + curr, 0)
+          const backed = day.dTokens
+            .map((entry) => entry.minted.loans * entry.price)
+            .reduce((prev, curr) => prev + curr, 0)
+          return new BigNumber(algo)
+            .dividedBy(algo + backed)
+            .multipliedBy(100)
+            .decimalPlaces(2)
+            .toNumber()
+        }),
+        color: '#fff',
       })
       break
     case DTokenStatsChartDataType.FUTURESWAP:
