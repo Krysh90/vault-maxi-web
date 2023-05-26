@@ -1,0 +1,214 @@
+import BigNumber from 'bignumber.js'
+import { ChartData } from '../dtos/chart-data.dto'
+import { DTokenStats, DTokenStatsEntry } from '../dtos/dtoken-stats.dto'
+import { ChartEntry, ChartInfo, LineChartInfo, getDates } from './chart.lib'
+import { colorBasedOn } from './colors.lib'
+import { LineChartEntry } from './chart.lib'
+import moment from 'moment'
+import { valueOfTimeFrame } from './chart.lib'
+
+export enum DTokenStatsChartDataType {
+  DISTRIBUTION = 'DISTRIBUTION',
+  FUTURESWAP = 'FUTURESWAP',
+}
+
+export function historyDaysToLoad(): string[] {
+  return getDates('2023-05-24').map((date) => date.toISOString().slice(0, 10))
+}
+
+function calculateAlgoTokens(entry?: DTokenStatsEntry): number {
+  if (!entry) return 0
+  return entry.minted.chainReported - entry.minted.loans - entry.burn.futureswap - entry.burn.other
+}
+
+export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): ChartData {
+  let entries: ChartEntry[] = []
+  switch (type) {
+    case DTokenStatsChartDataType.DISTRIBUTION: {
+      const dUSD = stats.dTokens.find((entry) => entry.key === 'DUSD')
+      const algoDUSD = calculateAlgoTokens(dUSD)
+      const backedDUSD = dUSD?.minted.loans ?? 0
+      const algoEverythingElse = stats.dTokens
+        .filter((entry) => entry.key !== 'DUSD')
+        .map((entry) => calculateAlgoTokens(entry) * entry.price)
+        .reduce((prev, curr) => prev + curr, 0)
+      const backedEverythingElse = stats.dTokens
+        .filter((entry) => entry.key !== 'DUSD')
+        .map((entry) => entry.minted.loans * entry.price)
+        .reduce((prev, curr) => prev + curr, 0)
+      entries.push({
+        label: 'algo DUSD',
+        data: algoDUSD,
+        color: colorBasedOn('DUSD'),
+      })
+      entries.push({
+        label: 'algo dToken',
+        data: algoEverythingElse,
+        color: colorBasedOn('dToken'),
+      })
+      entries.push({
+        label: '',
+        data: Math.abs(algoDUSD + algoEverythingElse - (backedDUSD + backedEverythingElse)),
+        color: '#111',
+      })
+      entries.push({
+        label: 'backed dToken',
+        data: backedEverythingElse,
+        color: colorBasedOn('dToken'),
+      })
+      entries.push({
+        label: 'backed DUSD',
+        data: backedDUSD,
+        color: colorBasedOn('DUSD'),
+      })
+      break
+    }
+    case DTokenStatsChartDataType.FUTURESWAP:
+      const dUSD = stats.dTokens.find((entry) => entry.key === 'DUSD')
+      const everythingElse = stats.dTokens.filter((entry) => entry.key !== 'DUSD')
+      entries.push({
+        label: 'Minted dUSD',
+        data: dUSD?.minted.futureswap ?? 0,
+        color: Color.light.mint,
+      })
+      entries.push({
+        label: 'Minted dToken',
+        data: everythingElse
+          .map((entry) => entry.minted.futureswap * entry.price)
+          .reduce((prev, curr) => prev + curr, 0),
+        color: Color.dark.mint,
+      })
+      entries.push({
+        label: 'Burned dUSD',
+        data: dUSD?.burn.futureswap ?? 0,
+        color: Color.light.burn,
+      })
+      entries.push({
+        label: 'Burned dToken',
+        data: everythingElse.map((entry) => entry.burn.futureswap * entry.price).reduce((prev, curr) => prev + curr, 0),
+        color: Color.dark.burn,
+      })
+      break
+  }
+  if (sort) entries = entries.sort((a, b) => b.data - a.data)
+  return {
+    labels: entries.map((entry) => entry.label),
+    datasets: [
+      {
+        data: entries.map((entry) => entry.data),
+        backgroundColor: entries.map((entry) => entry.color),
+        hoverOffset: 4,
+      },
+    ],
+  }
+}
+
+const Color = {
+  light: { mint: '#00eeee', burn: '#ff2e22' },
+  dark: { mint: '#00aaaa', burn: '#cc241b' },
+}
+
+export function toLineChartData(history: DTokenStats[], { type, timeFrame }: LineChartInfo): ChartData {
+  const entries: LineChartEntry[] = []
+  switch (type) {
+    case DTokenStatsChartDataType.DISTRIBUTION:
+      entries.push({
+        label: 'Algo DUSD',
+        data: history.map((day) => calculateAlgoTokens(day.dTokens.find((entry) => entry.key === 'DUSD'))),
+        color: colorBasedOn('DUSD'),
+      })
+      entries.push({
+        label: 'Backed DUSD',
+        data: history.map((day) => day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0),
+        color: colorBasedOn('DUSD'),
+      })
+      entries.push({
+        label: 'Algo dToken',
+        data: history.map((day) =>
+          day.dTokens
+            .filter((entry) => entry.key !== 'DUSD')
+            .map((entry) => calculateAlgoTokens(entry) * entry.price)
+            .reduce((prev, curr) => prev + curr, 0),
+        ),
+        color: colorBasedOn('dToken'),
+      })
+      entries.push({
+        label: 'Backed dToken',
+        data: history.map((day) =>
+          day.dTokens
+            .filter((entry) => entry.key !== 'DUSD')
+            .map((entry) => entry.minted.loans * entry.price)
+            .reduce((prev, curr) => prev + curr, 0),
+        ),
+        color: colorBasedOn('dToken'),
+      })
+      break
+    case DTokenStatsChartDataType.FUTURESWAP:
+      entries.push({
+        label: 'Minted DUSD',
+        data: history.map((day) => day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.futureswap ?? 0),
+        color: Color.light.mint,
+      })
+      entries.push({
+        label: 'Minted dToken',
+        data: history.map((day) =>
+          day.dTokens
+            .filter((entry) => entry.key !== 'DUSD')
+            .map((entry) => entry.minted.futureswap * entry.price)
+            .reduce((prev, curr) => prev + curr, 0),
+        ),
+        color: Color.dark.mint,
+      })
+      entries.push({
+        label: 'Burned DUSD',
+        data: history.map((day) => day.dTokens.find((entry) => entry.key === 'DUSD')?.burn.futureswap ?? 0),
+        color: Color.light.burn,
+      })
+      entries.push({
+        label: 'Burned dToken',
+        data: history.map((day) =>
+          day.dTokens
+            .filter((entry) => entry.key !== 'DUSD')
+            .map((entry) => entry.burn.futureswap * entry.price)
+            .reduce((prev, curr) => prev + curr, 0),
+        ),
+        color: Color.dark.burn,
+      })
+      entries.push({
+        label: 'Delta',
+        data: history.map((day) => {
+          const dUSD = day.dTokens.find((entry) => entry.key === 'DUSD')
+          const everythingElseMinted = day.dTokens
+            .filter((entry) => entry.key !== 'DUSD')
+            .map((entry) => entry.minted.futureswap * entry.price)
+            .reduce((prev, curr) => prev + curr, 0)
+          const everythingElseBurned = day.dTokens
+            .filter((entry) => entry.key !== 'DUSD')
+            .map((entry) => entry.burn.futureswap * entry.price)
+            .reduce((prev, curr) => prev + curr, 0)
+          return (
+            (dUSD?.minted.futureswap ?? 0) + everythingElseMinted - (dUSD?.burn.futureswap ?? 0) - everythingElseBurned
+          )
+        }),
+        color: '#fff',
+      })
+      break
+  }
+
+  return {
+    labels: history
+      .map((entry) => moment(entry.meta.tstamp).utc().format('DD-MM-YYYY'))
+      .slice(valueOfTimeFrame[timeFrame]),
+    datasets: entries.map((entry) => ({
+      label: entry.label,
+      data: entry.data.slice(valueOfTimeFrame[timeFrame]),
+      borderColor: [entry.color],
+      backgroundColor: [entry.color],
+      hoverOffset: 4,
+    })),
+  }
+}
+
+export function toScales(type: string): any {
+  return undefined
+}

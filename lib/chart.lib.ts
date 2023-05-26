@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { ChartData } from '../dtos/chart-data.dto'
 
 export interface ChartEntry {
@@ -19,7 +20,41 @@ interface TableData {
   colors: string[]
 }
 
-export function generateTableContent(chartData: ChartData, { inDollar }: ChartInfo): TableData {
+export function generateTableContent(
+  chartData: ChartData,
+  { inDollar }: ChartInfo,
+  showTotal = true,
+  buildCustomAlgo = false,
+  calculateDelta = false,
+): TableData {
+  if (buildCustomAlgo) {
+    const algoIndex = chartData.labels
+      .filter((value) => value.includes('algo'))
+      .map((needle) => chartData.labels.findIndex((value) => value === needle))
+    const backedIndex = chartData.labels
+      .filter((value) => value.includes('backed'))
+      .map((needle) => chartData.labels.findIndex((value) => value === needle))
+    const algo = algoIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
+    const backed = backedIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
+    return {
+      content: ['', formatNumber(algo).concat(inDollar ? '$' : ''), formatNumber(backed).concat(inDollar ? '$' : '')],
+      labels: ['', 'Sum Algo', 'Sum Backed'],
+      percentages: [
+        '',
+        new BigNumber(algo)
+          .dividedBy(algo + backed)
+          .multipliedBy(100)
+          .decimalPlaces(1)
+          .toString(),
+        new BigNumber(backed)
+          .dividedBy(algo + backed)
+          .multipliedBy(100)
+          .decimalPlaces(1)
+          .toString(),
+      ],
+      colors: [],
+    }
+  }
   const total = chartData.datasets[0].data.reduce((curr, prev) => curr + prev, 0)
   const contentNumber = [total].concat(chartData.datasets[0].data)
   const content = contentNumber.map((entry) => formatNumber(entry).concat(inDollar ? '$' : ''))
@@ -27,17 +62,36 @@ export function generateTableContent(chartData: ChartData, { inDollar }: ChartIn
   const labels = ['Total'].concat(chartData.labels)
   const colors = [''].concat(chartData.datasets[0].backgroundColor)
 
+  if (!showTotal) {
+    labels[0] = ''
+    content[0] = ''
+  }
+
+  if (calculateDelta) {
+    const mintedIndex = chartData.labels
+      .filter((value) => value.includes('Mint'))
+      .map((needle) => chartData.labels.findIndex((value) => value === needle))
+    const burnedIndex = chartData.labels
+      .filter((value) => value.includes('Burn'))
+      .map((needle) => chartData.labels.findIndex((value) => value === needle))
+    const minted = mintedIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
+    const burned = burnedIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
+    content.push(formatNumber(minted - burned).concat(inDollar ? '$' : ''))
+    percentages.push('')
+    labels.push('Delta')
+  }
+
   return { content, labels, percentages, colors }
 }
 
 export function formatNumber(value: number): string {
   let postfix = ''
   let fixed = 0
-  if (value > 1e6) {
+  if (Math.abs(value) > 1e6) {
     value = value / 1e6
     postfix = 'M'
     fixed = 2
-  } else if (value > 1e3) {
+  } else if (Math.abs(value) > 1e3) {
     value = value / 1e3
     postfix = 'k'
     fixed = 2
