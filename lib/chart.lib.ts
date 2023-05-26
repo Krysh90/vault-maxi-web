@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { ChartData } from '../dtos/chart-data.dto'
 
 export interface ChartEntry {
@@ -19,13 +20,51 @@ interface TableData {
   colors: string[]
 }
 
-export function generateTableContent(chartData: ChartData, { inDollar }: ChartInfo): TableData {
+export function generateTableContent(
+  chartData: ChartData,
+  { inDollar }: ChartInfo,
+  showTotal = true,
+  buildCustomAlgo = false,
+): TableData {
+  if (buildCustomAlgo) {
+    const algoIndex = chartData.labels
+      .filter((value) => value.includes('algo'))
+      .map((needle) => chartData.labels.findIndex((value) => value === needle))
+    const backedIndex = chartData.labels
+      .filter((value) => value.includes('backed'))
+      .map((needle) => chartData.labels.findIndex((value) => value === needle))
+    const algo = algoIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
+    const backed = backedIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
+    return {
+      content: ['', formatNumber(algo).concat(inDollar ? '$' : ''), formatNumber(backed).concat(inDollar ? '$' : '')],
+      labels: ['', 'Sum Algo', 'Sum Backed'],
+      percentages: [
+        '',
+        new BigNumber(algo)
+          .dividedBy(algo + backed)
+          .multipliedBy(100)
+          .decimalPlaces(1)
+          .toString(),
+        new BigNumber(backed)
+          .dividedBy(algo + backed)
+          .multipliedBy(100)
+          .decimalPlaces(1)
+          .toString(),
+      ],
+      colors: [],
+    }
+  }
   const total = chartData.datasets[0].data.reduce((curr, prev) => curr + prev, 0)
   const contentNumber = [total].concat(chartData.datasets[0].data)
   const content = contentNumber.map((entry) => formatNumber(entry).concat(inDollar ? '$' : ''))
   const percentages = contentNumber.map((entry) => ((entry / total) * 100).toFixed(1))
   const labels = ['Total'].concat(chartData.labels)
   const colors = [''].concat(chartData.datasets[0].backgroundColor)
+
+  if (!showTotal) {
+    labels[0] = ''
+    content[0] = ''
+  }
 
   return { content, labels, percentages, colors }
 }
