@@ -10,6 +10,9 @@ import { valueOfTimeFrame } from './chart.lib'
 export enum DTokenStatsChartDataType {
   DISTRIBUTION = 'DISTRIBUTION',
   FUTURESWAP = 'FUTURESWAP',
+  ALGO = 'ALGO',
+  BACKED = 'BACKED',
+  RATIO = 'RATIO',
 }
 
 export function historyDaysToLoad(): string[] {
@@ -111,15 +114,10 @@ const Color = {
 export function toLineChartData(history: DTokenStats[], { type, timeFrame }: LineChartInfo): ChartData {
   const entries: LineChartEntry[] = []
   switch (type) {
-    case DTokenStatsChartDataType.DISTRIBUTION:
+    case DTokenStatsChartDataType.ALGO:
       entries.push({
         label: 'Algo DUSD',
         data: history.map((day) => calculateAlgoTokens(day.dTokens.find((entry) => entry.key === 'DUSD'))),
-        color: colorBasedOn('DUSD'),
-      })
-      entries.push({
-        label: 'Backed DUSD',
-        data: history.map((day) => day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0),
         color: colorBasedOn('DUSD'),
       })
       entries.push({
@@ -132,6 +130,13 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         ),
         color: colorBasedOn('dToken'),
       })
+      break
+    case DTokenStatsChartDataType.BACKED:
+      entries.push({
+        label: 'Backed DUSD',
+        data: history.map((day) => day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0),
+        color: colorBasedOn('DUSD'),
+      })
       entries.push({
         label: 'Backed dToken',
         data: history.map((day) =>
@@ -140,6 +145,38 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
             .map((entry) => entry.minted.loans * entry.price)
             .reduce((prev, curr) => prev + curr, 0),
         ),
+        color: colorBasedOn('dToken'),
+      })
+      break
+    case DTokenStatsChartDataType.RATIO:
+      entries.push({
+        label: 'DUSD',
+        data: history.map((day) => {
+          const dUSD = day.dTokens.find((entry) => entry.key === 'DUSD')
+          const algo = calculateAlgoTokens(dUSD)
+          const backed = dUSD?.minted.loans ?? 0
+          return new BigNumber(algo)
+            .dividedBy(algo + backed)
+            .multipliedBy(100)
+            .decimalPlaces(2)
+            .toNumber()
+        }),
+        color: colorBasedOn('DUSD'),
+      })
+      entries.push({
+        label: 'dToken',
+        data: history.map((day) => {
+          const tokens = day.dTokens.filter((entry) => entry.key !== 'DUSD')
+          const algo = tokens
+            .map((entry) => calculateAlgoTokens(entry) * entry.price)
+            .reduce((prev, curr) => prev + curr, 0)
+          const backed = tokens.map((entry) => entry.minted.loans * entry.price).reduce((prev, curr) => prev + curr, 0)
+          return new BigNumber(algo)
+            .dividedBy(algo + backed)
+            .multipliedBy(100)
+            .decimalPlaces(2)
+            .toNumber()
+        }),
         color: colorBasedOn('dToken'),
       })
       break
