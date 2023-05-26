@@ -25,6 +25,7 @@ export function generateTableContent(
   { inDollar }: ChartInfo,
   showTotal = true,
   buildCustomAlgo = false,
+  calculateDelta = false,
 ): TableData {
   if (buildCustomAlgo) {
     const algoIndex = chartData.labels
@@ -66,17 +67,31 @@ export function generateTableContent(
     content[0] = ''
   }
 
+  if (calculateDelta) {
+    const mintedIndex = chartData.labels
+      .filter((value) => value.includes('Mint'))
+      .map((needle) => chartData.labels.findIndex((value) => value === needle))
+    const burnedIndex = chartData.labels
+      .filter((value) => value.includes('Burn'))
+      .map((needle) => chartData.labels.findIndex((value) => value === needle))
+    const minted = mintedIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
+    const burned = burnedIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
+    content.push(formatNumber(minted - burned).concat(inDollar ? '$' : ''))
+    percentages.push('')
+    labels.push('Delta')
+  }
+
   return { content, labels, percentages, colors }
 }
 
 export function formatNumber(value: number): string {
   let postfix = ''
   let fixed = 0
-  if (value > 1e6) {
+  if (Math.abs(value) > 1e6) {
     value = value / 1e6
     postfix = 'M'
     fixed = 2
-  } else if (value > 1e3) {
+  } else if (Math.abs(value) > 1e3) {
     value = value / 1e3
     postfix = 'k'
     fixed = 2

@@ -174,6 +174,24 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         ),
         color: Color.dark.burn,
       })
+      entries.push({
+        label: 'Delta',
+        data: history.map((day) => {
+          const dUSD = day.dTokens.find((entry) => entry.key === 'DUSD')
+          const everythingElseMinted = day.dTokens
+            .filter((entry) => entry.key !== 'DUSD')
+            .map((entry) => entry.minted.futureswap * entry.price)
+            .reduce((prev, curr) => prev + curr, 0)
+          const everythingElseBurned = day.dTokens
+            .filter((entry) => entry.key !== 'DUSD')
+            .map((entry) => entry.burn.futureswap * entry.price)
+            .reduce((prev, curr) => prev + curr, 0)
+          return (
+            (dUSD?.minted.futureswap ?? 0) + everythingElseMinted - (dUSD?.burn.futureswap ?? 0) - everythingElseBurned
+          )
+        }),
+        color: '#fff',
+      })
       break
   }
 

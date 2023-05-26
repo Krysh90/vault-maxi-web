@@ -50,6 +50,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
       showOverlay: true,
       showTotal: false,
       showLine: false,
+      calculateDelta: false,
     },
     {
       title: 'FutureSwap',
@@ -60,6 +61,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
       showOverlay: false,
       showTotal: false,
       showLine: true,
+      calculateDelta: true,
     },
   ]
 
@@ -68,7 +70,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
     { label: 'FutureSwap', type: DTokenStatsChartDataType.FUTURESWAP },
   ]
 
-  const infoText = `Displayed values were taken at block ${statistics.meta.analysedAt}. Shown values are measured in respective oracles prices (1 DUSD = 1$). Displayed future swap prices are also current oracle prices and not at the time where the mint or burn occurred.`
+  const infoText = `Displayed values were taken at block ${statistics.meta.analysedAt}. Shown values are measured in respective oracles prices (1 DUSD = 1$). Displayed future swap prices are current oracle prices and not at the time where the mint or burn occurred. If delta is positive for FutureSwap it means that it created (minted) additional tokens. If delta is negative it means that it destroyed (burned) additional tokens.`
 
   return (
     <Layout page="dToken stats" full maxWidth withoutSupport>
@@ -82,6 +84,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
             info,
             info.showTotal,
             info.customAlgo,
+            info.calculateDelta,
           )
           return (
             <div key={index} className="flex flex-col items-center gap-4">
@@ -152,7 +155,7 @@ function TableRow({
           .concat(isLast ? '' : ' border-b border-b-light')
           .concat(index > 0 ? ' border-r border-r-light' : '')}
       >
-        {index > 0 ? `${percentages[index]}%` : ''}
+        {index > 0 && percentages[index].length > 0 ? `${percentages[index]}%` : ''}
       </div>
       <div className={'table-cell text-right align-middle'.concat(isLast ? '' : ' border-b border-b-light')}>
         {entry}
