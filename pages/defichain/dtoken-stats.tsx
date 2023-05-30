@@ -10,7 +10,7 @@ import {
 } from '../../lib/dtoken-stats.lib'
 import DonutChart from '../../components/base/donut-chart'
 import { StaticEntry } from '../../components/base/static-entry'
-import { generateTableContent } from '../../lib/chart.lib'
+import { formatNumber, generateTableContent } from '../../lib/chart.lib'
 import HistoryChart from '../../components/statistic/history-chart'
 
 export async function getStaticProps(): Promise<{ props: DTokenStatsProps; revalidate: number }> {
@@ -78,6 +78,31 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
     <Layout page="dToken stats" full maxWidth withoutSupport>
       <h1>dToken stats</h1>
       <div className="flex flex-row flex-wrap py-8 gap-16 flex-grow justify-center items-start w-full">
+        <div className="max-w-lg flex flex-col gap-2">
+          <p>
+            As a short explanation on how we as a community and blockchain drifted into such a situation with such high
+            algo ratios.
+          </p>
+          <p>
+            In the beginning of the dToken system we had a big premium of 25 to 50% on dUSD and dToken. In order to
+            reduce this premium, the community decided via Twitter Spaces that we should use DFI to payback dUSD loans.
+            DFI at this time was between 3 and 5$.
+          </p>
+          <p>
+            Those DFI got burned and created the first algo dUSD. Total created dUSD via this mechanism were{' '}
+            {formatNumber(statistics.dTokens.find((entry) => entry.key === 'DUSD')?.minted.dfipayback ?? 0)}. This
+            mechanism got turned off.
+          </p>
+          <p>
+            To keep the dToken premium within a range of +/-5%, the FutureSwap (FS) was created which swaps dUSD to
+            dToken and back. Since this could create algo DUSD (more DUSD minted than burned) over time, we created this
+            page to show the current state.
+          </p>
+          <p>
+            In the following graphs if the delta of FS shows a positive number it means it created more algo tokens than
+            it burned. If the delta of FS shows a negative number it means it burned more token than it created.
+          </p>
+        </div>
         <StaticEntry type="info" text={infoText} variableHeight />
         {charts.map((info, index) => {
           const data = toChartData(statistics, info)
