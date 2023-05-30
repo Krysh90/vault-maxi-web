@@ -95,7 +95,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
           </p>
           <p>
             To keep the dToken premium within a range of +/-5%, the FutureSwap (FS) was created which swaps dUSD to
-            dToken and back. Since this could create algo DUSD (more DUSD minted than burned) over time, we created this
+            dToken and back. Since this could create algo dUSD (more dUSD minted than burned) over time, we created this
             page to show the current state.
           </p>
           <p>
