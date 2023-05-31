@@ -330,7 +330,7 @@ export function toLineChartData(
         color: Color.dark.burn,
       })
       entries.push({
-        label: 'Automated sells',
+        label: 'Delta',
         data:
           dUsdHistory?.map((day) =>
             new BigNumber(day.organic.buying)
