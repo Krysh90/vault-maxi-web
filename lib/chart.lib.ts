@@ -26,6 +26,7 @@ export function generateTableContent(
   showTotal = true,
   buildCustomAlgo = false,
   calculateDelta = false,
+  keywords = ['Mint', 'Burn'],
 ): TableData {
   if (buildCustomAlgo) {
     const algoIndex = chartData.labels
@@ -69,10 +70,10 @@ export function generateTableContent(
 
   if (calculateDelta) {
     const mintedIndex = chartData.labels
-      .filter((value) => value.includes('Mint'))
+      .filter((value) => value.includes(keywords[0]))
       .map((needle) => chartData.labels.findIndex((value) => value === needle))
     const burnedIndex = chartData.labels
-      .filter((value) => value.includes('Burn'))
+      .filter((value) => value.includes(keywords[1]))
       .map((needle) => chartData.labels.findIndex((value) => value === needle))
     const minted = mintedIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
     const burned = burnedIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
