@@ -9,11 +9,18 @@ import Selection from '../base/selection'
 interface HistoryChartProps {
   history: any[]
   items: HistoryChartItem[]
-  toLineChartData: (history: any[], { type, timeFrame }: LineChartInfo) => ChartData
+  toLineChartData: (history: any[], { type, timeFrame }: LineChartInfo, additionalHistory?: any[]) => ChartData
   toScales: (type: string) => any
+  additionalHistory?: any[]
 }
 
-export default function HistoryChart({ history, items, toLineChartData, toScales }: HistoryChartProps): JSX.Element {
+export default function HistoryChart({
+  history,
+  items,
+  toLineChartData,
+  toScales,
+  additionalHistory,
+}: HistoryChartProps): JSX.Element {
   const [currentChartData, setCurrentChartData] = useState<HistoryChartItem>(items[0])
   const [currentTimeFrame, setCurrentTimeFrame] = useState<LineChartTimeFrame>(LineChartTimeFrame.ALL)
 
@@ -30,7 +37,11 @@ export default function HistoryChart({ history, items, toLineChartData, toScales
       <div className="flex flex-row flex-wrap items-start justify-between">
         <Line
           className="self-center"
-          data={toLineChartData(history, { type: currentChartData.type, timeFrame: currentTimeFrame })}
+          data={toLineChartData(
+            history,
+            { type: currentChartData.type, timeFrame: currentTimeFrame },
+            additionalHistory,
+          )}
           options={{
             responsive: true,
             plugins: {
