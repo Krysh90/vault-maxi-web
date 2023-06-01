@@ -40,7 +40,7 @@ export async function getStaticProps(): Promise<{ props: DTokenStatsProps; reval
           .then((res) => res.json())
           .catch(() => {}),
       ),
-  )
+  ).then((stats) => stats.filter((stat) => stat !== undefined))
   return {
     props: {
       statistics,
