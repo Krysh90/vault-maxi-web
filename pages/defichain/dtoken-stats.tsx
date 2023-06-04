@@ -93,7 +93,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({
     {
       title: 'dUSD Volume',
       type: DUSDStatsChartDataType.VOLUME,
-      inDollar: true,
+      inDollar: false,
       sort: false,
       customAlgo: false,
       showOverlay: false,
