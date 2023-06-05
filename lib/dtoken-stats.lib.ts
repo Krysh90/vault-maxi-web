@@ -25,7 +25,7 @@ export function historyDaysToLoad(): string[] {
 }
 
 export function dusdHistoryDaysToLoad(): string[] {
-  return getDates('2023-05-22').map((date) => date.toISOString().slice(0, 10))
+  return getDates('2023-01-02').map((date) => date.toISOString().slice(0, 10))
 }
 
 function calculateAlgoTokens(entry?: DTokenStatsEntry): number {
