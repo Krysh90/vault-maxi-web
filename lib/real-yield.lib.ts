@@ -1,7 +1,15 @@
 import moment from 'moment'
 import { ChartData } from '../dtos/chart-data.dto'
 import { RealYieldStats } from '../dtos/real-yield-stats.dto'
-import { ChartEntry, ChartInfo, getDates, LineChartEntry, LineChartInfo, valueOfTimeFrame } from './chart.lib'
+import {
+  ChartEntry,
+  ChartInfo,
+  filterDates,
+  getDates,
+  LineChartEntry,
+  LineChartInfo,
+  valueOfTimeFrame,
+} from './chart.lib'
 import { adjustColor, colorBasedOn } from './colors.lib'
 
 export enum RealYieldChartDataType {
@@ -13,7 +21,7 @@ export enum RealYieldChartDataType {
 }
 
 export function historyDaysToLoad(): string[] {
-  return getDates('2023-01-30').map((date) => date.toISOString().slice(0, 10))
+  return filterDates(getDates('2023-01-30')).map((date) => date.toISOString().slice(0, 10))
 }
 
 export function getAllSymbols(stats: RealYieldStats): string[] {
