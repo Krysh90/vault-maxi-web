@@ -4,7 +4,7 @@ import Layout from '../../components/core/layout'
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { MetaMaskChainInterface, useMetaMask } from '../../hooks/metamask.hook'
-import { floppy } from '../../lib/meta-chain-network.lib'
+import { changi } from '../../lib/meta-chain-network.lib'
 import { Button } from '../../components/base/button'
 import { ThemedIconButton } from '../../components/base/themed-icon-button'
 import { faClipboard } from '@fortawesome/free-solid-svg-icons'
@@ -32,10 +32,10 @@ function MetaChainContent(): JSX.Element {
         />
       </div> */}
       <div className="pt-16">
-        {chain !== floppy.chainId ? (
-          <AddNetworkManual chain={floppy} />
+        {chain !== changi.chainId ? (
+          <AddNetworkManual chain={changi} />
         ) : (
-          <p>Congrats you have successfully added Floppy network of MetaChain to your MetaMask</p>
+          <p>Congrats you have successfully added Changi network of MetaChain to your MetaMask</p>
         )}
       </div>
     </Layout>
@@ -72,7 +72,7 @@ function AddNetworkManual({ chain }: { chain: MetaMaskChainInterface }): JSX.Ele
                 0ptim_
               </a>
             </p>
-            <p>His twitter thread about how to add Floppynet </p>
+            <p>His twitter thread about how to add a new network</p>
             <a
               className="hover:text-main ease-in duration-100"
               href="https://twitter.com/0ptim_/status/1658398518686490626"
