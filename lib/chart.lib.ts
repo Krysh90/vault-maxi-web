@@ -111,10 +111,11 @@ export function getDates(start: string) {
 }
 
 export function filterDates(dates: Date[]): Date[] {
-  return dates.filter(
-    (_date, index) =>
-      index >= dates.length - 30 || (index > 0 && index % 7 === 0) || (index - 365 > 0 && index % 30 === 0),
-  )
+  return dates
+  // return dates.filter(
+  //   (_date, index) =>
+  //     index >= dates.length - 30 || (index > 0 && index % 7 === 0) || (index - 365 > 0 && index % 30 === 0),
+  // )
 }
 
 export interface HistoryChartItem {
