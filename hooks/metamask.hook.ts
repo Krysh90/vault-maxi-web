@@ -6,7 +6,7 @@ import { floppy } from '../lib/meta-chain-network.lib'
 
 export interface MetaMaskInterface {
   isInstalled: boolean
-  register: (onAccountChanged: (account?: string) => void, onChainChanged: (chain?: number) => void) => void
+  verifyAccount: (accounts: string[]) => string | undefined
   requestAccount: () => Promise<string | undefined>
   requestChain: () => Promise<number | undefined>
   requestChangeToChain: (chain?: number) => Promise<void>
@@ -33,26 +33,6 @@ export function useMetaMask(): MetaMaskInterface {
   const web3 = new Web3(Web3.givenProvider)
 
   const isInstalled = Boolean(ethereum && ethereum.isMetaMask)
-
-  function register(onAccountChanged: (account?: string) => void, onChainChanged: (chain?: number) => void) {
-    web3.eth.getAccounts((_err, accounts) => {
-      onAccountChanged(verifyAccount(accounts))
-    })
-    web3.eth.getChainId((_err, chainId) => {
-      onChainChanged(chainId)
-    })
-    ethereum?.on('accountsChanged', (accounts: string[]) => {
-      onAccountChanged(verifyAccount(accounts))
-    })
-    ethereum?.on('chainChanged', (chainId: string) => {
-      onChainChanged(Number(chainId))
-      // Following is a recommendation of metamask documentation. I am not sure, if we will need it.
-      // Handle the new chain.
-      // Correctly handling chain changes can be complicated.
-      // We recommend reloading the page unless you have good reason not to.
-      // window.location.reload();
-    })
-  }
 
   async function requestAccount(): Promise<string | undefined> {
     return verifyAccount(await web3.eth.requestAccounts())
@@ -132,7 +112,7 @@ export function useMetaMask(): MetaMaskInterface {
   return useMemo(
     () => ({
       isInstalled,
-      register,
+      verifyAccount,
       requestAccount,
       requestChain,
       requestChangeToChain,
