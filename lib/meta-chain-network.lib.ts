@@ -17,11 +17,11 @@ export const changi: MetaMaskChainInterface = {
   chainName: 'MetaChain (Changi)',
   nativeCurrency: {
     name: 'DFI',
-    symbol: 'dfi',
-    decimals: 8,
+    symbol: 'DFI',
+    decimals: 18,
   },
-  rpcUrls: ['http://35.187.53.161:20551'],
-  blockExplorerUrls: [],
+  rpcUrls: ['https://testnet-dmc.mydefichain.com:20551/'],
+  blockExplorerUrls: ['https://testnet-dmc.mydefichain.com:8444'],
 }
 
 // TODO: add testnet and mainnet DMC as soon as ready

@@ -2,14 +2,15 @@ import Web3 from 'web3'
 import { Buffer } from 'buffer'
 import ERC20_ABI from '../lib/erc20.abi.json'
 import { useMemo } from 'react'
-import { floppy } from '../lib/meta-chain-network.lib'
+import { changi } from '../lib/meta-chain-network.lib'
 
 export interface MetaMaskInterface {
   isInstalled: boolean
-  register: (onAccountChanged: (account?: string) => void, onChainChanged: (chain?: number) => void) => void
+  verifyAccount: (accounts: string[]) => string | undefined
   requestAccount: () => Promise<string | undefined>
   requestChain: () => Promise<number | undefined>
   requestChangeToChain: (chain?: number) => Promise<void>
+  requestAddChainId: () => Promise<void>
   requestBalance: (account: string) => Promise<string | undefined>
   sign: (address: string, message: string) => Promise<string>
   addContract: (address: string, svgData: string) => Promise<boolean>
@@ -34,26 +35,6 @@ export function useMetaMask(): MetaMaskInterface {
 
   const isInstalled = Boolean(ethereum && ethereum.isMetaMask)
 
-  function register(onAccountChanged: (account?: string) => void, onChainChanged: (chain?: number) => void) {
-    web3.eth.getAccounts((_err, accounts) => {
-      onAccountChanged(verifyAccount(accounts))
-    })
-    web3.eth.getChainId((_err, chainId) => {
-      onChainChanged(chainId)
-    })
-    ethereum?.on('accountsChanged', (accounts: string[]) => {
-      onAccountChanged(verifyAccount(accounts))
-    })
-    ethereum?.on('chainChanged', (chainId: string) => {
-      onChainChanged(Number(chainId))
-      // Following is a recommendation of metamask documentation. I am not sure, if we will need it.
-      // Handle the new chain.
-      // Correctly handling chain changes can be complicated.
-      // We recommend reloading the page unless you have good reason not to.
-      // window.location.reload();
-    })
-  }
-
   async function requestAccount(): Promise<string | undefined> {
     return verifyAccount(await web3.eth.requestAccounts())
   }
@@ -74,9 +55,7 @@ export function useMetaMask(): MetaMaskInterface {
           },
           (e?: MetaMaskError) => {
             // 4902 chain is not yet added to MetaMask, therefore add chainId to MetaMask
-            if (e && e.code === 4902 && id === 1132) {
-              reject('could not switch')
-            }
+            reject('could not switch')
           },
         )
         ?.then(resolve)
@@ -84,9 +63,10 @@ export function useMetaMask(): MetaMaskInterface {
   }
 
   async function requestAddChainId(): Promise<void> {
+    const obj = toChainObject()
     return ethereum.sendAsync({
       method: 'wallet_addEthereumChain',
-      params: [toChainObject()],
+      params: [{ ...obj, chainId: web3.utils.toHex(obj.chainId) }],
     })
   }
 
@@ -126,16 +106,17 @@ export function useMetaMask(): MetaMaskInterface {
   }
 
   function toChainObject(): MetaMaskChainInterface {
-    return floppy
+    return changi
   }
 
   return useMemo(
     () => ({
       isInstalled,
-      register,
+      verifyAccount,
       requestAccount,
       requestChain,
       requestChangeToChain,
+      requestAddChainId,
       requestBalance,
       sign,
       addContract,

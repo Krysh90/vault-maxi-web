@@ -110,6 +110,14 @@ export function getDates(start: string) {
   return arr
 }
 
+export function filterDates(dates: Date[]): Date[] {
+  return dates
+  // return dates.filter(
+  //   (_date, index) =>
+  //     index >= dates.length - 30 || (index > 0 && index % 7 === 0) || (index - 365 > 0 && index % 30 === 0),
+  // )
+}
+
 export interface HistoryChartItem {
   label: string
   type: string
@@ -130,7 +138,7 @@ export enum LineChartTimeFrame {
 
 export const valueOfTimeFrame: Record<LineChartTimeFrame, number> = {
   [LineChartTimeFrame.ALL]: 0,
-  [LineChartTimeFrame.THREE_MONTHS]: -90,
+  [LineChartTimeFrame.THREE_MONTHS]: -39,
   [LineChartTimeFrame.MONTH]: -30,
   [LineChartTimeFrame.WEEK]: -7,
 }

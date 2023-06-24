@@ -1,8 +1,15 @@
-import BigNumber from 'bignumber.js'
-
 export interface DTokenStats {
-  meta: { tstamp: string; analysedAt: number }
+  meta: { tstamp: string; analysedAt: number; startHeight: number; endHeight: number }
   dTokens: DTokenStatsEntry[]
+  dusdVolume: {
+    bots: DUSDVolume
+    organic: DUSDVolume
+  }
+}
+
+export interface DUSDVolume {
+  buying: string
+  selling: string
 }
 
 export interface DTokenStatsEntry {

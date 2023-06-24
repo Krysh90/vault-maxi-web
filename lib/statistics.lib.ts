@@ -1,7 +1,15 @@
 import moment from 'moment'
 import { ChartData } from '../dtos/chart-data.dto'
 import { VaultStats } from '../dtos/vault-stats.dto'
-import { ChartEntry, ChartInfo, getDates, LineChartEntry, LineChartInfo, valueOfTimeFrame } from './chart.lib'
+import {
+  ChartEntry,
+  ChartInfo,
+  filterDates,
+  getDates,
+  LineChartEntry,
+  LineChartInfo,
+  valueOfTimeFrame,
+} from './chart.lib'
 
 export enum StatisticsChartDataType {
   NUMBER_OF_VAULTS = 'NUMBER_OF_VAULTS',
@@ -71,7 +79,7 @@ export function toChartData(stats: VaultStats, { type, sort }: ChartInfo): Chart
 }
 
 export function historyDaysToLoad(): string[] {
-  return getDates('2022-11-28').map((date) => date.toISOString().slice(0, 10))
+  return filterDates(getDates('2022-11-28')).map((date) => date.toISOString().slice(0, 10))
 }
 
 export function toLineChartData(history: VaultStats[], { type, timeFrame }: LineChartInfo): ChartData {

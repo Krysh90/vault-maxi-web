@@ -8,6 +8,11 @@ import { changi } from '../../lib/meta-chain-network.lib'
 import { Button } from '../../components/base/button'
 import { ThemedIconButton } from '../../components/base/themed-icon-button'
 import { faClipboard } from '@fortawesome/free-solid-svg-icons'
+import { WTIAAbout } from '../../components/wtia/wtia-about'
+import { WTIAOverview } from '../../components/wtia/wtia-overview'
+import { WTIAGamble } from '../../components/wtia/wtia-gamble'
+import { WTIAClaim } from '../../components/wtia/wtia-claim'
+import Link from 'next/link'
 
 const MetaChain: NextPage = () => {
   return (
@@ -19,31 +24,39 @@ const MetaChain: NextPage = () => {
 
 function MetaChainContent(): JSX.Element {
   const { chain } = useWalletContext()
+  const { isConnected, connect } = useWalletContext()
 
   return (
     <Layout page="MetaChain" full maxWidth withoutSupport>
       <h1 className="mx-auto">MetaChain</h1>
-      {/* <div className="relative w-full">
+      <div className="relative w-full">
         <Button
           className="absolute bottom-0 right-0"
           disabled={isConnected}
           onClick={connect}
           label={isConnected ? 'Connected' : 'Connect'}
         />
-      </div> */}
+      </div>
       <div className="pt-16">
         {chain !== changi.chainId ? (
           <AddNetworkManual chain={changi} />
         ) : (
-          <p>Congrats you have successfully added Changi network of MetaChain to your MetaMask</p>
+          <div className="flex flex-col gap-4 items-center">
+            <p>Congrats you have successfully added Changi network of MetaChain to your MetaMask</p>
+            <p>If you need Test DFI please visit the faucet and click &apos;DMC Faucet Testnet changi&apos;</p>
+            <Link href="https://mydeficha.in/en/index.php?site=faucet">
+              https://mydeficha.in/en/index.php?site=faucet
+            </Link>
+          </div>
         )}
+        {isConnected && <WinnerTakesItAllDemo />}
       </div>
     </Layout>
   )
 }
 
 function AddNetworkManual({ chain }: { chain: MetaMaskChainInterface }): JSX.Element {
-  const { requestChangeToChain } = useMetaMask()
+  const { requestChangeToChain, requestAddChainId } = useMetaMask()
   const [showsAddInfo, setShowsAddInfo] = useState(false)
 
   return (
@@ -85,7 +98,7 @@ function AddNetworkManual({ chain }: { chain: MetaMaskChainInterface }): JSX.Ele
         <div className="flex flex-col gap-2">
           <Button
             label={`Change to ${chain.chainName}`}
-            onClick={() => requestChangeToChain(chain.chainId).catch(() => setShowsAddInfo(true))}
+            onClick={() => requestChangeToChain(chain.chainId).catch(() => requestAddChainId())}
           />
           <Button label="Show how to add manually" onClick={() => setShowsAddInfo(true)} secondary />
         </div>
@@ -114,6 +127,39 @@ function ManualEntry({ label, value }: { label: string; value: string }): JSX.El
           onClick={() => copyToClipboard(value)}
           useCheckmarkAnimation
         />
+      </div>
+    </div>
+  )
+}
+
+function WinnerTakesItAllDemo(): JSX.Element {
+  type Page = 'Overview' | 'Gamble' | 'Claim' | 'About'
+  const [currentPage, setCurrentPage] = useState<Page>('Overview')
+  const pages: Page[] = ['Overview', 'Gamble', 'Claim', 'About']
+
+  const pageToElement: Record<Page, JSX.Element> = {
+    Overview: <WTIAOverview />,
+    Gamble: <WTIAGamble />,
+    Claim: <WTIAClaim />,
+    About: <WTIAAbout />,
+  }
+
+  return (
+    <div className="pt-16 flex flex-col gap-2 items-center">
+      <div className="flex flex-col gap-2 w-96">
+        <h1>Demo Winner takes it all</h1>
+        <div className="flex flex-row justify-evenly p-1 my-4 rounded-lg border border-white">
+          {pages.map((page) => (
+            <button
+              key={page}
+              className={'rounded-md flex-grow'.concat(currentPage === page ? ' bg-main' : '')}
+              onClick={() => setCurrentPage(page)}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+        {pageToElement[currentPage]}
       </div>
     </div>
   )

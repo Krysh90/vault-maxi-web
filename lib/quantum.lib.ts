@@ -2,7 +2,15 @@ import BigNumber from 'bignumber.js'
 import moment from 'moment'
 import { ChartData } from '../dtos/chart-data.dto'
 import { QuantumStats } from '../dtos/quantum-stats.dto'
-import { ChartEntry, ChartInfo, getDates, LineChartEntry, LineChartInfo, valueOfTimeFrame } from './chart.lib'
+import {
+  ChartEntry,
+  ChartInfo,
+  filterDates,
+  getDates,
+  LineChartEntry,
+  LineChartInfo,
+  valueOfTimeFrame,
+} from './chart.lib'
 import { colorBasedOn } from './colors.lib'
 
 export enum QuantumChartDataType {
@@ -21,7 +29,7 @@ export enum QuantumChartDataType {
 }
 
 export function historyDaysToLoad(): string[] {
-  return getDates('2023-04-16').map((date) => date.toISOString().slice(0, 10))
+  return filterDates(getDates('2023-04-16')).map((date) => date.toISOString().slice(0, 10))
 }
 
 export function getAllSymbols(stats: QuantumStats): string[] {

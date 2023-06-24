@@ -1,10 +1,13 @@
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react'
 import { useMetaMask } from '../hooks/metamask.hook'
+import BigNumber from 'bignumber.js'
+import Web3 from 'web3'
 
 interface WalletInterface {
   address?: string
   chain?: number
-  balance?: string
+  block?: number
+  balance?: BigNumber
   isInstalled: boolean
   isConnected: boolean
   connect: () => Promise<string>
@@ -20,13 +23,38 @@ export function useWalletContext(): WalletInterface {
 export function WalletContextProvider(props: PropsWithChildren): JSX.Element {
   const [address, setAddress] = useState<string>()
   const [chain, setChain] = useState<number>()
-  const [balance, setBalance] = useState<string>()
-  const { isInstalled, register, requestAccount, requestChain, requestBalance, sign } = useMetaMask()
+  const [block, setBlock] = useState<number>()
+  const [balance, setBalance] = useState<BigNumber>()
+  const { isInstalled, verifyAccount, requestAccount, requestChain, requestBalance, sign } = useMetaMask()
+  const web3 = new Web3(Web3.givenProvider)
+  const { ethereum } = window as any
 
   const isConnected = address !== undefined
 
   useEffect(() => {
-    register(setAddress, setChain)
+    web3.eth.getAccounts((_err, accounts) => {
+      setAddress(verifyAccount(accounts))
+    })
+    web3.eth.getChainId((_err, chainId) => {
+      setChain(chainId)
+    })
+    web3.eth.getBlockNumber((_err, block) => {
+      setBlock(block)
+    })
+    ethereum?.on('accountsChanged', (accounts: string[]) => {
+      setAddress(verifyAccount(accounts))
+    })
+    ethereum?.on('chainChanged', (chainId: string) => {
+      setChain(Number(chainId))
+      // Following is a recommendation of metamask documentation. I am not sure, if we will need it.
+      // Handle the new chain.
+      // Correctly handling chain changes can be complicated.
+      // We recommend reloading the page unless you have good reason not to.
+      // window.location.reload();
+    })
+    web3.eth.subscribe('newBlockHeaders', (_err, blockHeader) => {
+      setBlock(blockHeader.number)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -34,7 +62,7 @@ export function WalletContextProvider(props: PropsWithChildren): JSX.Element {
     if (address) {
       requestBalance(address).then((balance) => {
         if (balance && chain) {
-          setBalance(`${balance} DFI`)
+          setBalance(new BigNumber(web3.utils.fromWei(balance, 'ether')).decimalPlaces(8))
         } else {
           setBalance(undefined)
         }
@@ -69,13 +97,14 @@ export function WalletContextProvider(props: PropsWithChildren): JSX.Element {
       address,
       balance,
       chain,
+      block,
       isInstalled,
       isConnected,
       connect,
       signMessage,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [address, balance, chain, isInstalled, isConnected],
+    [address, balance, chain, block, isInstalled, isConnected],
   )
 
   return <WalletContext.Provider value={context}>{props.children}</WalletContext.Provider>

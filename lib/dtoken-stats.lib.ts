@@ -1,12 +1,17 @@
 import BigNumber from 'bignumber.js'
 import { ChartData } from '../dtos/chart-data.dto'
 import { DTokenStats, DTokenStatsEntry } from '../dtos/dtoken-stats.dto'
-import { ChartEntry, ChartInfo, LineChartInfo, getDates } from './chart.lib'
+import {
+  ChartEntry,
+  ChartInfo,
+  LineChartInfo,
+  getDates,
+  LineChartEntry,
+  valueOfTimeFrame,
+  filterDates,
+} from './chart.lib'
 import { colorBasedOn } from './colors.lib'
-import { LineChartEntry } from './chart.lib'
 import moment from 'moment'
-import { valueOfTimeFrame } from './chart.lib'
-import { DUSDVolumeStats } from '../dtos/dusd-volumes.dto'
 
 export enum DTokenStatsChartDataType {
   DISTRIBUTION = 'DISTRIBUTION',
@@ -21,11 +26,7 @@ export enum DUSDStatsChartDataType {
 }
 
 export function historyDaysToLoad(): string[] {
-  return getDates('2023-05-24').map((date) => date.toISOString().slice(0, 10))
-}
-
-export function dusdHistoryDaysToLoad(): string[] {
-  return getDates('2023-01-02').map((date) => date.toISOString().slice(0, 10))
+  return filterDates(getDates('2023-01-02')).map((date) => date.toISOString().slice(0, 10))
 }
 
 function calculateAlgoTokens(entry?: DTokenStatsEntry): number {
@@ -33,7 +34,7 @@ function calculateAlgoTokens(entry?: DTokenStatsEntry): number {
   return entry.minted.chainReported - entry.minted.loans - entry.burn.futureswap - entry.burn.other
 }
 
-export function toChartData(stats: DTokenStats, dUsdStats: DUSDVolumeStats, { type, sort }: ChartInfo): ChartData {
+export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): ChartData {
   let entries: ChartEntry[] = []
   switch (type) {
     case DTokenStatsChartDataType.DISTRIBUTION: {
@@ -104,20 +105,20 @@ export function toChartData(stats: DTokenStats, dUsdStats: DUSDVolumeStats, { ty
     case DUSDStatsChartDataType.VOLUME:
       entries.push({
         label: 'Organic buys',
-        data: new BigNumber(dUsdStats.organic.buying).decimalPlaces(2).toNumber(),
+        data: new BigNumber(stats.dusdVolume.organic.buying).decimalPlaces(2).toNumber(),
         color: Color.light.mint,
       })
       entries.push({
         label: 'Automated buys',
-        data: new BigNumber(dUsdStats.bots.buying).decimalPlaces(2).toNumber(),
+        data: new BigNumber(stats.dusdVolume.bots.buying).decimalPlaces(2).toNumber(),
         color: Color.dark.mint,
       })
       entries.push({
         label: '',
-        data: new BigNumber(dUsdStats.organic.buying)
-          .plus(dUsdStats.bots.buying)
-          .minus(dUsdStats.organic.selling)
-          .minus(dUsdStats.bots.selling)
+        data: new BigNumber(stats.dusdVolume.organic.buying)
+          .plus(stats.dusdVolume.bots.buying)
+          .minus(stats.dusdVolume.organic.selling)
+          .minus(stats.dusdVolume.bots.selling)
           .abs()
           .decimalPlaces(2)
           .toNumber(),
@@ -125,12 +126,12 @@ export function toChartData(stats: DTokenStats, dUsdStats: DUSDVolumeStats, { ty
       })
       entries.push({
         label: 'Organic sells',
-        data: new BigNumber(dUsdStats.organic.selling).decimalPlaces(2).toNumber(),
+        data: new BigNumber(stats.dusdVolume.organic.selling).decimalPlaces(2).toNumber(),
         color: Color.light.burn,
       })
       entries.push({
         label: 'Automated sells',
-        data: new BigNumber(dUsdStats.bots.selling).decimalPlaces(2).toNumber(),
+        data: new BigNumber(stats.dusdVolume.bots.selling).decimalPlaces(2).toNumber(),
         color: Color.dark.burn,
       })
       break
@@ -153,11 +154,7 @@ const Color = {
   dark: { mint: '#00aaaa', burn: '#cc241b' },
 }
 
-export function toLineChartData(
-  history: DTokenStats[],
-  { type, timeFrame }: LineChartInfo,
-  dUsdHistory?: DUSDVolumeStats[],
-): ChartData {
+export function toLineChartData(history: DTokenStats[], { type, timeFrame }: LineChartInfo): ChartData {
   const entries: LineChartEntry[] = []
   switch (type) {
     case DTokenStatsChartDataType.ALGO:
@@ -311,32 +308,32 @@ export function toLineChartData(
     case DUSDStatsChartDataType.VOLUME:
       entries.push({
         label: 'Organic buys',
-        data: dUsdHistory?.map((day) => new BigNumber(day.organic.buying).decimalPlaces(2).toNumber()) ?? [],
+        data: history?.map((day) => new BigNumber(day.dusdVolume.organic.buying).decimalPlaces(2).toNumber()) ?? [],
         color: Color.light.mint,
       })
       entries.push({
         label: 'Automated buys',
-        data: dUsdHistory?.map((day) => new BigNumber(day.bots.buying).decimalPlaces(2).toNumber()) ?? [],
+        data: history?.map((day) => new BigNumber(day.dusdVolume.bots.buying).decimalPlaces(2).toNumber()) ?? [],
         color: Color.dark.mint,
       })
       entries.push({
         label: 'Organic sells',
-        data: dUsdHistory?.map((day) => new BigNumber(day.organic.selling).decimalPlaces(2).toNumber()) ?? [],
+        data: history?.map((day) => new BigNumber(day.dusdVolume.organic.selling).decimalPlaces(2).toNumber()) ?? [],
         color: Color.light.burn,
       })
       entries.push({
         label: 'Automated sells',
-        data: dUsdHistory?.map((day) => new BigNumber(day.bots.selling).decimalPlaces(2).toNumber()) ?? [],
+        data: history?.map((day) => new BigNumber(day.dusdVolume.bots.selling).decimalPlaces(2).toNumber()) ?? [],
         color: Color.dark.burn,
       })
       entries.push({
         label: 'Delta',
         data:
-          dUsdHistory?.map((day) =>
-            new BigNumber(day.organic.buying)
-              .plus(day.bots.buying)
-              .minus(day.organic.selling)
-              .minus(day.bots.selling)
+          history?.map((day) =>
+            new BigNumber(day.dusdVolume.organic.buying)
+              .plus(day.dusdVolume.bots.buying)
+              .minus(day.dusdVolume.organic.selling)
+              .minus(day.dusdVolume.bots.selling)
               .decimalPlaces(2)
               .toNumber(),
           ) ?? [],
@@ -346,10 +343,9 @@ export function toLineChartData(
   }
 
   return {
-    labels:
-      (type === DUSDStatsChartDataType.VOLUME ? dUsdHistory : history)
-        ?.map((entry) => moment(entry.meta.tstamp).utc().format('DD-MM-YYYY'))
-        .slice(valueOfTimeFrame[timeFrame]) ?? [],
+    labels: history
+      .map((entry) => moment(entry.meta.tstamp).utc().format('DD-MM-YYYY'))
+      .slice(valueOfTimeFrame[timeFrame]),
     datasets: entries.map((entry) => ({
       label: entry.label,
       data: entry.data.slice(valueOfTimeFrame[timeFrame]),

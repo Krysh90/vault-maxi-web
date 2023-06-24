@@ -4,7 +4,6 @@ import { DTokenStats } from '../../dtos/dtoken-stats.dto'
 import {
   DTokenStatsChartDataType,
   DUSDStatsChartDataType,
-  dusdHistoryDaysToLoad,
   historyDaysToLoad,
   toChartData,
   toLineChartData,
@@ -14,27 +13,13 @@ import DonutChart from '../../components/base/donut-chart'
 import { StaticEntry } from '../../components/base/static-entry'
 import { formatNumber, generateTableContent } from '../../lib/chart.lib'
 import HistoryChart from '../../components/statistic/history-chart'
-import { DUSDVolumeStats } from '../../dtos/dusd-volumes.dto'
 
 export async function getStaticProps(): Promise<{ props: DTokenStatsProps; revalidate: number }> {
-  const [res, dusdRes] = await Promise.all([
-    fetch('https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/dToken/latest.json'),
-    fetch('https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/dusdVolumes/latest.json'),
-  ])
+  const res = await fetch('https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/dToken/latest.json')
   const statistics: DTokenStats = await res.json()
-  const dUsdStatistics: DUSDVolumeStats = await dusdRes.json()
   const history = await Promise.all<DTokenStats>(
     historyDaysToLoad()
       .map((date) => `https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/dToken/${date}.json`)
-      .map((url) =>
-        fetch(url)
-          .then((res) => res.json())
-          .catch(() => {}),
-      ),
-  ).then((stats) => stats.filter((stat) => stat !== undefined))
-  const dUsdHistory = await Promise.all<DUSDVolumeStats>(
-    dusdHistoryDaysToLoad()
-      .map((date) => `https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/dusdVolumes/${date}.json`)
       .map((url) =>
         fetch(url)
           .then((res) => res.json())
@@ -45,8 +30,6 @@ export async function getStaticProps(): Promise<{ props: DTokenStatsProps; reval
     props: {
       statistics,
       history,
-      dUsdStatistics,
-      dUsdHistory,
     },
     revalidate: 3600,
   }
@@ -55,16 +38,9 @@ export async function getStaticProps(): Promise<{ props: DTokenStatsProps; reval
 interface DTokenStatsProps {
   statistics: DTokenStats
   history: DTokenStats[]
-  dUsdStatistics: DUSDVolumeStats
-  dUsdHistory: DUSDVolumeStats[]
 }
 
-const DTokenStatsPage: NextPage<DTokenStatsProps> = ({
-  statistics,
-  history,
-  dUsdStatistics,
-  dUsdHistory,
-}: DTokenStatsProps) => {
+const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DTokenStatsProps) => {
   const charts = [
     {
       title: 'Distribution',
@@ -112,7 +88,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({
     { label: 'dUSD Volume', type: DUSDStatsChartDataType.VOLUME },
   ]
 
-  const infoText = `Displayed values were taken at block ${statistics.meta.analysedAt}. Shown values are measured in respective oracles prices (1 DUSD = 1$). Displayed future swap prices are current oracle prices and not at the time where the mint or burn occurred. If delta is positive for FutureSwap it means that it created (minted) additional tokens. If delta is negative it means that it destroyed (burned) additional tokens. Additional the dUSD volume was  gathered between blocks ${dUsdStatistics.meta.startHeight} and ${dUsdStatistics.meta.endHeight}. Automated buys are performed by Buy and Burn Bot (BBB) and automated sells are performed by CAKEs' Yield Vault, everything else is counted as organic, means that a user bought or sold dUSD.`
+  const infoText = `Displayed values were taken at block ${statistics.meta.analysedAt}. Shown values are measured in respective oracles prices (1 DUSD = 1$). Displayed future swap prices are current oracle prices and not at the time where the mint or burn occurred. If delta is positive for FutureSwap it means that it created (minted) additional tokens. If delta is negative it means that it destroyed (burned) additional tokens. Additional the dUSD volume was  gathered between blocks ${statistics.meta.startHeight} and ${statistics.meta.endHeight}. Automated buys are performed by Buy and Burn Bot (BBB) and automated sells are performed by CAKEs' Yield Vault, everything else is counted as organic, means that a user bought or sold dUSD.`
 
   return (
     <Layout page="dToken stats" full maxWidth withoutSupport>
@@ -145,7 +121,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({
         </div>
         <StaticEntry type="info" text={infoText} variableHeight />
         {charts.map((info, index) => {
-          const data = toChartData(statistics, dUsdStatistics, info)
+          const data = toChartData(statistics, info)
           const { content, labels, percentages, colors } = generateTableContent(
             data,
             info,
@@ -189,13 +165,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({
           )
         })}
       </div>
-      <HistoryChart
-        history={history}
-        items={historyItems}
-        toLineChartData={toLineChartData}
-        toScales={toScales}
-        additionalHistory={dUsdHistory}
-      />
+      <HistoryChart history={history} items={historyItems} toLineChartData={toLineChartData} toScales={toScales} />
     </Layout>
   )
 }
