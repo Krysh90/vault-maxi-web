@@ -27,7 +27,7 @@ export function useWTIA(): WTIAInterface {
   const [nextMinAmount, setNextMinAmount] = useState<BigNumber>()
 
   function createContract(): Contract {
-    return new web3.eth.Contract(WTIA_ABI as any, '0x67488912788Bf6C634909f4411047aE0136C801A')
+    return new web3.eth.Contract(WTIA_ABI as any, '0x4dB18a1B290Af4Aa9440892b0b7B7c54F15d7D2f')
   }
 
   function reload() {
