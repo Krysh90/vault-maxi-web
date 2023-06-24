@@ -12,6 +12,7 @@ import { WTIAAbout } from '../../components/wtia/wtia-about'
 import { WTIAOverview } from '../../components/wtia/wtia-overview'
 import { WTIAGamble } from '../../components/wtia/wtia-gamble'
 import { WTIAClaim } from '../../components/wtia/wtia-claim'
+import Link from 'next/link'
 
 const MetaChain: NextPage = () => {
   return (
@@ -40,9 +41,13 @@ function MetaChainContent(): JSX.Element {
         {chain !== changi.chainId ? (
           <AddNetworkManual chain={changi} />
         ) : (
-          <p className="text-center">
-            Congrats you have successfully added Changi network of MetaChain to your MetaMask
-          </p>
+          <div className="flex flex-col gap-4 items-center">
+            <p>Congrats you have successfully added Changi network of MetaChain to your MetaMask</p>
+            <p>If you need Test DFI please visit the faucet and click &apos;DMC Faucet Testnet changi&apos;</p>
+            <Link href="https://mydeficha.in/en/index.php?site=faucet">
+              https://mydeficha.in/en/index.php?site=faucet
+            </Link>
+          </div>
         )}
         {isConnected && <WinnerTakesItAllDemo />}
       </div>
