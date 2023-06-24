@@ -51,7 +51,7 @@ function MetaChainContent(): JSX.Element {
 }
 
 function AddNetworkManual({ chain }: { chain: MetaMaskChainInterface }): JSX.Element {
-  const { requestChangeToChain } = useMetaMask()
+  const { requestChangeToChain, requestAddChainId } = useMetaMask()
   const [showsAddInfo, setShowsAddInfo] = useState(false)
 
   return (
@@ -93,7 +93,7 @@ function AddNetworkManual({ chain }: { chain: MetaMaskChainInterface }): JSX.Ele
         <div className="flex flex-col gap-2">
           <Button
             label={`Change to ${chain.chainName}`}
-            onClick={() => requestChangeToChain(chain.chainId).catch(() => setShowsAddInfo(true))}
+            onClick={() => requestChangeToChain(chain.chainId).catch(() => requestAddChainId())}
           />
           <Button label="Show how to add manually" onClick={() => setShowsAddInfo(true)} secondary />
         </div>
