@@ -1,6 +1,6 @@
 import { ApiPagedResponse, WhaleApiClient } from '@defichain/whale-api-client'
 import { PoolPairData } from '@defichain/whale-api-client/dist/api/poolpairs'
-import { CollateralToken } from '@defichain/whale-api-client/dist/api/loan'
+import { CollateralToken, LoanToken } from '@defichain/whale-api-client/dist/api/loan'
 
 export function createClient(): WhaleApiClient {
   return new WhaleApiClient({
@@ -14,8 +14,12 @@ export async function getPoolPairs(client: WhaleApiClient): Promise<PoolPairData
   return getAll(() => client.poolpairs.list(200), client)
 }
 
-export async function getTokens(client: WhaleApiClient): Promise<CollateralToken[]> {
+export async function getCollateralTokens(client: WhaleApiClient): Promise<CollateralToken[]> {
   return getAll(() => client.loan.listCollateralToken(200), client)
+}
+
+export async function getLoanTokens(client: WhaleApiClient): Promise<LoanToken[]> {
+  return getAll(() => client.loan.listLoanToken(200), client)
 }
 
 async function getAll<T>(method: () => Promise<ApiPagedResponse<T>>, client: WhaleApiClient): Promise<T[]> {

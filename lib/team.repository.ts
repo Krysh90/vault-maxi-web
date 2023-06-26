@@ -29,7 +29,7 @@ const krysh: TeamDto = {
   name: 'Krysh',
   image: imgKrysh,
   imageAlt: 'Profile picture of Krysh',
-  description: ['Developer @ DFX', 'Defichain bot creator'],
+  description: ['Developer', 'Defichain bot creator'],
   handles: [
     {
       type: HandleType.TWITTER,

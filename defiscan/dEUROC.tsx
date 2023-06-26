@@ -31,8 +31,8 @@ export function dEUROC(props: SVGProps<SVGSVGElement>): JSX.Element {
       </mask>
       <g mask="url(#mask0_4212_33579)">
         <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M5.12695 23.9996C5.12695 13.5764 13.5767 5.12671 23.9999 5.12671C34.4231 5.12671 42.8728 13.5764 42.8728 23.9996C42.8728 34.4228 34.4231 42.8726 23.9999 42.8726C13.5767 42.8726 5.12695 34.4228 5.12695 23.9996Z"
           fill="url(#paint0_linear_4212_33579)"
         ></path>
