@@ -1,6 +1,6 @@
 import { CollateralToken, LoanToken } from '@defichain/whale-api-client/dist/api/loan'
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { createClient, getCollateralTokens, getLoanTokens } from '../api/whale-api'
+import { createClient, getCollateralTokens, getLoanTokens, getVault } from '../api/whale-api'
 import BigNumber from 'bignumber.js'
 
 export type VaultTokenType = 'Collateral' | 'Loan'
@@ -32,8 +32,10 @@ interface VaultContextInterface {
   vaultCollateralTokens: VaultToken[]
   vaultLoanTokens: VaultToken[]
 
+  importVault: (vaultID: string) => Promise<void>
   resetVault: () => void
   setToken: (token: VaultToken, amount: BigNumber) => void
+  getAmount: (token: VaultToken) => BigNumber
 
   collateralValue: BigNumber
   loanValue: BigNumber
@@ -76,9 +78,37 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
     return a.token.symbol.localeCompare(b.token.symbol)
   }
 
+  async function importVault(vaultID: string): Promise<void> {
+    const vault = await getVault(client, vaultID)
+    if (vault.state === 'ACTIVE') {
+      const importedCollateralTokens = new Map<string, VaultTokenAmount>()
+      for (var collateralToken of vault.collateralAmounts) {
+        const token = collateralTokens.find((token) => token.token.id === collateralToken.id)
+        if (token)
+          importedCollateralTokens.set(token.token.id, { token, amount: new BigNumber(collateralToken.amount) })
+      }
+      setVaultCollateralTokens(importedCollateralTokens)
+
+      const importedLoanTokens = new Map<string, VaultTokenAmount>()
+      for (var loanToken of vault.loanAmounts) {
+        const token = loanTokens.find((token) => token.token.id === loanToken.id)
+        if (token) importedLoanTokens.set(token.token.id, { token, amount: new BigNumber(loanToken.amount) })
+      }
+      setVaultLoanTokens(importedLoanTokens)
+    }
+  }
+
   function resetVault() {
     setVaultCollateralTokens(new Map())
     setVaultLoanTokens(new Map())
+  }
+
+  function getAmount(token: VaultToken): BigNumber {
+    return (
+      ('interest' in token
+        ? vaultLoanTokens.get(token.token.id)?.amount
+        : vaultCollateralTokens.get(token.token.id)?.amount) ?? new BigNumber(1)
+    )
   }
 
   function setToken(token: VaultToken, amount: BigNumber) {
@@ -119,6 +149,8 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
       vaultCollateralTokens: Array.from(vaultCollateralTokens.values()).map((value) => value.token),
       vaultLoanTokens: Array.from(vaultLoanTokens.values()).map((value) => value.token),
       setToken,
+      getAmount,
+      importVault,
       resetVault,
       collateralValue,
       loanValue,
