@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { VaultToken } from '../../../contexts/vault.context'
+import { VaultToken, useVaultContext } from '../../../contexts/vault.context'
 import { getAssetIcon } from '../../../defiscan'
 import ThemedInput from '../../base/themed-input'
 import BigNumber from 'bignumber.js'
@@ -9,11 +9,18 @@ interface VaultEntryProps {
 }
 
 export function VaultEntry({ token }: VaultEntryProps): JSX.Element {
+  const { setToken, vaultInterest } = useVaultContext()
   const AssetIcon = getAssetIcon(token.token.symbol)
   const [amount, setAmount] = useState<number>(1)
 
   function getCollateralFactor(token: VaultToken): BigNumber {
     return new BigNumber('interest' in token ? '1' : token.factor)
+  }
+
+  function onChange(value: string) {
+    const v = Number(value)
+    setAmount(v)
+    setToken(token, new BigNumber(v))
   }
 
   return (
@@ -23,13 +30,18 @@ export function VaultEntry({ token }: VaultEntryProps): JSX.Element {
         <p>{token.token.symbol}</p>
       </div>
       <ThemedInput
-        className="bg-dark text-center w-16 rounded-lg pointer-events-auto"
+        className="bg-dark text-center w-40 rounded-lg pointer-events-auto"
         type="number"
         value={'' + amount}
         enterKeyHint="done"
-        onChange={(s) => setAmount(+(s ?? '0'))}
+        onChange={onChange}
         noSubmit
       />
+      {'interest' in token && (
+        <p className="text-right w-24">
+          {new BigNumber(token.interest).plus(vaultInterest).decimalPlaces(2).toString()}%
+        </p>
+      )}
       <p className="px-2 flex-grow text-right">
         {new BigNumber(token.activePrice?.active?.amount ?? '1')
           .multipliedBy(getCollateralFactor(token))
