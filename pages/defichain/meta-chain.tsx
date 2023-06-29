@@ -13,6 +13,7 @@ import { WTIAOverview } from '../../components/wtia/wtia-overview'
 import { WTIAGamble } from '../../components/wtia/wtia-gamble'
 import { WTIAClaim } from '../../components/wtia/wtia-claim'
 import Link from 'next/link'
+import { Pager } from '../../components/base/pager'
 
 const MetaChain: NextPage = () => {
   return (
@@ -134,32 +135,18 @@ function ManualEntry({ label, value }: { label: string; value: string }): JSX.El
 
 function WinnerTakesItAllDemo(): JSX.Element {
   type Page = 'Overview' | 'Gamble' | 'Claim' | 'About'
-  const [currentPage, setCurrentPage] = useState<Page>('Overview')
-  const pages: Page[] = ['Overview', 'Gamble', 'Claim', 'About']
-
-  const pageToElement: Record<Page, JSX.Element> = {
-    Overview: <WTIAOverview />,
-    Gamble: <WTIAGamble />,
-    Claim: <WTIAClaim />,
-    About: <WTIAAbout />,
-  }
+  const pageToElement: Map<Page, JSX.Element> = new Map([
+    ['Overview', <WTIAOverview key={0} />],
+    ['Gamble', <WTIAGamble key={1} />],
+    ['Claim', <WTIAClaim key={2} />],
+    ['About', <WTIAAbout key={3} />],
+  ])
 
   return (
     <div className="pt-16 flex flex-col gap-2 items-center">
       <div className="flex flex-col gap-2 w-96">
         <h1>Demo Winner takes it all</h1>
-        <div className="flex flex-row justify-evenly p-1 my-4 rounded-lg border border-white">
-          {pages.map((page) => (
-            <button
-              key={page}
-              className={'rounded-md flex-grow'.concat(currentPage === page ? ' bg-main' : '')}
-              onClick={() => setCurrentPage(page)}
-            >
-              {page}
-            </button>
-          ))}
-        </div>
-        {pageToElement[currentPage]}
+        <Pager pages={pageToElement} initialPage="Overview" />
       </div>
     </div>
   )

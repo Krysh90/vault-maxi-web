@@ -42,6 +42,7 @@ function CustomInput({
         }
       }}
       onSubmit={() => onSubmit?.()}
+      onWheel={(e) => type === 'number' && e.currentTarget.blur()}
       autoFocus={true}
       className={`${className} text-white focus:outline-none`}
     />
