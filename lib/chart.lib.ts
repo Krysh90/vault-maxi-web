@@ -138,7 +138,7 @@ export enum LineChartTimeFrame {
 
 export const valueOfTimeFrame: Record<LineChartTimeFrame, number> = {
   [LineChartTimeFrame.ALL]: 0,
-  [LineChartTimeFrame.THREE_MONTHS]: -39,
+  [LineChartTimeFrame.THREE_MONTHS]: -90,
   [LineChartTimeFrame.MONTH]: -30,
   [LineChartTimeFrame.WEEK]: -7,
 }
