@@ -26,7 +26,6 @@ function VaultSimulatorContent(): JSX.Element {
       <h1>Vault simulator</h1>
       <div className="flex flex-col gap-4 pt-8 items-center">
         {/* add a small info text and link to wiki page https://defichain-wiki.com/wiki/Vaults_and_Loans */}
-        <p>TODO vault explanation</p>
         <div className="flex flex-row gap-4 my-4">
           <ThemedInput
             className="bg-dark w-60 px-2 rounded-lg border border-white pointer-events-auto"
