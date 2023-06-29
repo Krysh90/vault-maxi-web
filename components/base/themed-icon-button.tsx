@@ -11,6 +11,7 @@ export interface ThemedIconButtonProps {
   onClick: () => void
   useCheckmarkAnimation?: boolean
   disabled?: boolean
+  small?: boolean
 }
 
 export function ThemedIconButton({
@@ -22,6 +23,7 @@ export function ThemedIconButton({
   onClick,
   useCheckmarkAnimation,
   disabled,
+  small,
 }: ThemedIconButtonProps): JSX.Element {
   const [hover, setHover] = useState(false)
   const [changeToCheckmark, setChangeToCheckmark] = useState(false)
@@ -52,7 +54,7 @@ export function ThemedIconButton({
     >
       <FontAwesomeIcon
         icon={changeToCheckmark ? faCheck : icon}
-        size={changeToCheckmark ? 'lg' : 'xl'}
+        size={changeToCheckmark ? 'lg' : small ? 'lg' : 'xl'}
         color={receiveColor()}
       />
     </button>

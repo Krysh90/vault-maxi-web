@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { createClient, getPoolPairs, getTokens } from '../api/whale-api'
+import { createClient, getPoolPairs, getCollateralTokens } from '../api/whale-api'
 import { Token } from '../dtos/token.dto'
 import { toTokens } from '../lib/token.lib'
 
@@ -18,7 +18,7 @@ export function useTokens(): TokensInterface {
   useEffect(() => {
     if (dataFetchedRef.current) return
     dataFetchedRef.current = true
-    Promise.all([getPoolPairs(client), getTokens(client)]).then(([poolpairs, collateralTokens]) => {
+    Promise.all([getPoolPairs(client), getCollateralTokens(client)]).then(([poolpairs, collateralTokens]) => {
       setTokens(toTokens(poolpairs, collateralTokens))
       setLoading(false)
     })

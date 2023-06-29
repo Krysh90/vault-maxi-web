@@ -21,5 +21,13 @@ module.exports = {
       warn: { base: '#ffcc00', dark: '#cca300' },
       info: { base: '#5bc0de', dark: '#40869b' },
     },
+    extend: {
+      width: {
+        half: '47%',
+      },
+      minHeight: {
+        drop: '128px',
+      },
+    },
   },
 }

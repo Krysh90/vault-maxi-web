@@ -5,9 +5,10 @@ import { ChartData } from '../../dtos/chart-data.dto'
 interface DonutChartProps {
   chartData: ChartData
   disabled?: boolean
+  small?: boolean
 }
 
-export default function DonutChart({ disabled, chartData }: DonutChartProps): JSX.Element {
+export default function DonutChart({ disabled, chartData, small }: DonutChartProps): JSX.Element {
   function getChartData(): ChartData {
     const data = chartData
     if (disabled) {
@@ -20,7 +21,7 @@ export default function DonutChart({ disabled, chartData }: DonutChartProps): JS
   }
 
   return (
-    <div className="flex flex-col gap-8 items-center w-64">
+    <div className={`flex flex-col gap-8 items-center ${small ? 'w-32' : 'w-64'}`}>
       <Doughnut
         className="self-center"
         data={getChartData()}
