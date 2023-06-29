@@ -1,6 +1,6 @@
 import { DragEvent, useState } from 'react'
 import { VaultToken, VaultTokenType, useVaultContext } from '../../contexts/vault.context'
-import { useVaultSim } from '../../hooks/vault-sim.hook'
+import { useVaultSimulator } from '../../hooks/vault-simulator.hook'
 import { VaultEntry } from './tokens/vault-entry'
 import BigNumber from 'bignumber.js'
 
@@ -10,7 +10,7 @@ interface TokenDropZoneProps {
 
 export function TokenDropZone({ type }: TokenDropZoneProps): JSX.Element {
   const { setToken, vaultCollateralTokens, vaultLoanTokens, collateralValue, loanValue } = useVaultContext()
-  const { decode } = useVaultSim()
+  const { decode } = useVaultSimulator()
   const [isOverZone, setIsOverZone] = useState(false)
 
   function handleDrop(event: DragEvent<HTMLDivElement>) {

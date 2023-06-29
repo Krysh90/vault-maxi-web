@@ -2,7 +2,7 @@ import { DragEvent, useEffect, useState } from 'react'
 import { getAssetIcon } from '../../../defiscan'
 import BigNumber from 'bignumber.js'
 import { VaultTokenType } from '../../../contexts/vault.context'
-import { useVaultSim } from '../../../hooks/vault-sim.hook'
+import { useVaultSimulator } from '../../../hooks/vault-simulator.hook'
 
 interface TokenProps {
   id: string
@@ -12,7 +12,7 @@ interface TokenProps {
 }
 
 export function Token({ id, symbol, type, price }: TokenProps): JSX.Element {
-  const { encode } = useVaultSim()
+  const { encode } = useVaultSimulator()
   const AssetIcon = getAssetIcon(symbol)
   const [isDragging, setDragging] = useState(false)
 

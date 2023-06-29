@@ -5,7 +5,7 @@ interface VaultSim {
   decode: (data: string) => VaultToken | undefined
 }
 
-export function useVaultSim(): VaultSim {
+export function useVaultSimulator(): VaultSim {
   const { collateralTokens, loanTokens } = useVaultContext()
 
   function encode(type: VaultTokenType, id: string): string {

@@ -1,5 +1,7 @@
+import { faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { VaultToken, useVaultContext } from '../../../contexts/vault.context'
 import { getAssetIcon } from '../../../defiscan'
+import { ThemedIconButton } from '../../base/themed-icon-button'
 import ThemedInput from '../../base/themed-input'
 import BigNumber from 'bignumber.js'
 
@@ -8,7 +10,7 @@ interface VaultEntryProps {
 }
 
 export function VaultEntry({ token }: VaultEntryProps): JSX.Element {
-  const { setToken, getAmount, vaultInterest } = useVaultContext()
+  const { setToken, removeToken, getAmount, vaultInterest } = useVaultContext()
   const AssetIcon = getAssetIcon(token.token.symbol)
 
   function getCollateralFactor(token: VaultToken): BigNumber {
@@ -42,6 +44,14 @@ export function VaultEntry({ token }: VaultEntryProps): JSX.Element {
           .toString()}
         $
       </p>
+      <ThemedIconButton
+        className="pointer-events-auto"
+        icon={faTrashCan}
+        color="#ccc"
+        hoverColor="#ff00af"
+        onClick={() => removeToken(token)}
+        small
+      />
     </div>
   )
 }
