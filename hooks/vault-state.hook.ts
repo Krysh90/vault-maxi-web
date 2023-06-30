@@ -2,7 +2,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import { useVaultContext } from '../contexts/vault.context'
 import { faCheckCircle, faExclamationCircle, faWarning } from '@fortawesome/free-solid-svg-icons'
 
-export type VaultState = 'inactive' | 'safe' | 'at risk' | 'in liquidation' | 'invalid'
+export type VaultState = 'inactive' | 'safe' | 'at risk' | 'in liquidation'
 
 interface VaultStateHook {
   state: VaultState
@@ -11,13 +11,12 @@ interface VaultStateHook {
 }
 
 export function useVaultState(): VaultStateHook {
-  const { vaultScheme, currentRatio, vaultCollateralTokens, vaultLoanTokens, vaultRules } = useVaultContext()
+  const { vaultScheme, currentRatio, vaultCollateralTokens, vaultLoanTokens } = useVaultContext()
 
   function getVaultState(): VaultState {
     if (vaultCollateralTokens.length === 0 || vaultLoanTokens.length === 0) {
       return 'inactive'
     }
-    if (!Array.from(vaultRules.values()).includes(true)) return 'invalid'
     const scheme = Number(vaultScheme)
     if (currentRatio < scheme) {
       return 'in liquidation'
