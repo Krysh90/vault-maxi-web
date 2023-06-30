@@ -48,7 +48,8 @@ interface VaultContextInterface {
   currentRatio: number
   nextRatio: number
 
-  vaultRules: Map<string, boolean>
+  takeLoanRules: Map<string, boolean>
+  withdrawCollateralRules: Map<string, boolean>
 }
 
 const VaultContext = createContext<VaultContextInterface>(undefined as any)
@@ -180,7 +181,7 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
     [vaultLoanTokens],
   )
 
-  const unlocksAllLoansViaDFI = useMemo(() => {
+  const unlocksDUSDLoansViaDFI = useMemo(() => {
     const collateralDFI = collateralTokens.find((token) => token.token.symbol === 'DFI')
     if (!collateralDFI) return false
     return (
@@ -191,32 +192,73 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
     )
   }, [collateralTokens, vaultCollateralTokens, loanValue, vaultScheme])
 
-  const unlocksAllLoansViaDUSD = useMemo(() => {
-    const collateralDUSD = collateralTokens.find((token) => token.token.symbol === 'DUSD')
-    return vaultCollateralTokens.size === 1 && vaultCollateralTokens.has(collateralDUSD?.token.id ?? '')
-  }, [collateralTokens, vaultCollateralTokens])
+  // const unlocksAllLoansViaDUSD = useMemo(() => {
+  //   const collateralDUSD = collateralTokens.find((token) => token.token.symbol === 'DUSD')
+  //   return vaultCollateralTokens.size === 1 && vaultCollateralTokens.has(collateralDUSD?.token.id ?? '')
+  // }, [collateralTokens, vaultCollateralTokens])
 
   const unlocksDTokenLoans = useMemo(() => {
     const collateralDFI = collateralTokens.find((token) => token.token.symbol === 'DFI')
     const collateralDUSD = collateralTokens.find((token) => token.token.symbol === 'DUSD')
     if (!collateralDFI || !collateralDUSD) return false
-    const combinedCollateralValue = vaultCollateralTokens
-      .get(collateralDFI.token.id)
-      ?.amount.multipliedBy(collateralDFI.activePrice?.active?.amount ?? '1')
-      .plus(
-        vaultCollateralTokens
-          .get(collateralDUSD.token.id)
-          ?.amount.multipliedBy(collateralDUSD.activePrice?.active?.amount ?? '1') ?? '0',
-      )
+    const combinedCollateralValue = (
+      vaultCollateralTokens
+        .get(collateralDFI.token.id)
+        ?.amount.multipliedBy(collateralDFI.activePrice?.active?.amount ?? '1') ?? new BigNumber(0)
+    ).plus(
+      vaultCollateralTokens
+        .get(collateralDUSD.token.id)
+        ?.amount.multipliedBy(collateralDUSD.activePrice?.active?.amount ?? '1') ?? '0',
+    )
     return (
       combinedCollateralValue?.isGreaterThan(loanValue.multipliedBy(Number(vaultScheme) / 100).dividedBy(2)) ?? false
     )
   }, [collateralTokens, vaultCollateralTokens, loanValue, vaultScheme])
 
-  const vaultRules: Map<string, boolean> = new Map([
-    ['all loans: minimum 50% DFI', unlocksAllLoansViaDFI],
-    ['all loans: 100% DUSD', unlocksAllLoansViaDUSD],
+  const takeLoanRules: Map<string, boolean> = new Map([
+    ['DUSD loans: minimum 50% DFI', unlocksDUSDLoansViaDFI],
+    //['DUSD loans: 100% DUSD', unlocksAllLoansViaDUSD], only enable if gov variable is set
     ['dToken loans: minimum 50% DFI or DUSD', unlocksDTokenLoans],
+  ])
+
+  const hasDUSDLoansAndHalfDFICollateral = useMemo(() => {
+    const collateralDFI = collateralTokens.find((token) => token.token.symbol === 'DFI')
+    const loanDUSD = loanTokens.find((token) => token.token.symbol === 'DUSD')
+    if (!collateralDFI || !loanDUSD) return false
+    return (
+      (vaultCollateralTokens
+        .get(collateralDFI.token.id)
+        ?.amount.multipliedBy(collateralDFI.activePrice?.active?.amount ?? '1')
+        .isGreaterThan(loanValue.multipliedBy(Number(vaultScheme) / 100).dividedBy(2)) &&
+        vaultLoanTokens.has(loanDUSD?.token.id)) ??
+      false
+    )
+  }, [collateralTokens, vaultCollateralTokens, loanTokens, vaultLoanTokens, loanValue, vaultScheme])
+
+  const hasHalfCombinedCollateralValue = useMemo(() => {
+    const collateralDFI = collateralTokens.find((token) => token.token.symbol === 'DFI')
+    const collateralDUSD = collateralTokens.find((token) => token.token.symbol === 'DUSD')
+    const loanDUSD = loanTokens.find((token) => token.token.symbol === 'DUSD')
+    if (!collateralDFI || !collateralDUSD || !loanDUSD) return false
+    const combinedCollateralValue = (
+      vaultCollateralTokens
+        .get(collateralDFI.token.id)
+        ?.amount.multipliedBy(collateralDFI.activePrice?.active?.amount ?? '1') ?? new BigNumber(0)
+    ).plus(
+      vaultCollateralTokens
+        .get(collateralDUSD.token.id)
+        ?.amount.multipliedBy(collateralDUSD.activePrice?.active?.amount ?? '1') ?? '0',
+    )
+    return (
+      (combinedCollateralValue?.isGreaterThan(loanValue.multipliedBy(Number(vaultScheme) / 100).dividedBy(2)) &&
+        !vaultLoanTokens.has(loanDUSD?.token.id)) ??
+      false
+    )
+  }, [collateralTokens, vaultCollateralTokens, loanTokens, vaultLoanTokens, loanValue, vaultScheme])
+
+  const withdrawCollateralRules: Map<string, boolean> = new Map([
+    ['only dToken loans: minimum 50% DFI or DUSD collateral', hasHalfCombinedCollateralValue],
+    ['has DUSD loans: minimum 50% DFI collateral', hasDUSDLoansAndHalfDFICollateral],
   ])
 
   const context: VaultContextInterface = useMemo(
@@ -242,7 +284,8 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
         .multipliedBy(100)
         .decimalPlaces(2)
         .toNumber(),
-      vaultRules,
+      takeLoanRules,
+      withdrawCollateralRules,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [

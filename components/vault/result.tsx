@@ -16,7 +16,8 @@ export function Result(): JSX.Element {
     collateralValue,
     loanValue,
     getAmount,
-    vaultRules,
+    takeLoanRules,
+    withdrawCollateralRules,
   } = useVaultContext()
   const { state, getColorForVaultState, getIconForVaultState } = useVaultState()
 
@@ -107,6 +108,8 @@ export function Result(): JSX.Element {
           },
         ]
 
+  const isWithdrawPossible = !Array.from(withdrawCollateralRules.values()).every((value) => value === false)
+
   return (
     <div>
       {vaultCollateralTokens.length === 0 ? (
@@ -116,53 +119,63 @@ export function Result(): JSX.Element {
         </>
       ) : (
         <div className="flex flex-col gap-2 w-full">
+          <div className="flex flex-row justify-evenly">
+            {charts.map((entry) => (
+              <div key={entry.id} className="flex flex-col gap-2 items-center">
+                <p>{entry.title}</p>
+                <div className="relative">
+                  <DonutChart chartData={entry.data} small />
+                </div>
+              </div>
+            ))}
+          </div>
           <h3>Rules</h3>
-          <p>At least one rule must be checked for a valid vault</p>
-          {Array.from(vaultRules.entries()).map(([rule, isMet], index) => (
+          <h4>Take loans</h4>
+          {Array.from(takeLoanRules.entries()).map(([rule, isMet], index) => (
             <div key={index} className="flex flex-row justify-between">
               <p>- {rule}</p>
               {isMet && <FontAwesomeIcon icon={faCheckCircle} size="sm" color="#32D74B" />}
             </div>
           ))}
-          {Array.from(vaultRules.values()).includes(true) && (
-            <>
-              <h3>Result</h3>
-              {general.map((entry) => {
-                const icon = getIconForVaultState(entry.value)
-                return (
-                  <div key={entry.id} className="flex flex-row justify-between">
-                    <p>{entry.title}</p>
-                    <div className="flex flex-row gap-2 items-center">
-                      <p style={{ color: getColorForVaultState(entry.value) }}>{entry.value}</p>
-                      {icon && <FontAwesomeIcon icon={icon} size="sm" color={getColorForVaultState(entry.value)} />}
-                    </div>
-                  </div>
-                )
-              })}
-              <div className="flex flex-row justify-evenly">
-                {charts.map((entry) => (
-                  <div key={entry.id} className="flex flex-col gap-2 items-center">
-                    <p>{entry.title}</p>
-                    <div className="relative">
-                      <DonutChart chartData={entry.data} small />
-                    </div>
-                  </div>
-                ))}
+          <h4>Withdraw collateral</h4>
+          <div className="flex flex-row justify-between">
+            <p style={{ color: isWithdrawPossible ? '#32D74B' : '#FF453A' }}>
+              {isWithdrawPossible
+                ? 'You can withdraw as long as at least one rule is checked'
+                : 'At least one rule must be checked to withdraw collateral'}
+            </p>
+          </div>
+          {Array.from(withdrawCollateralRules.entries()).map(([rule, isMet], index) => (
+            <div key={index} className="flex flex-row justify-between">
+              <p>- {rule}</p>
+              {isMet && <FontAwesomeIcon icon={faCheckCircle} size="sm" color="#32D74B" />}
+            </div>
+          ))}
+          <h3>Infos</h3>
+          {general.map((entry) => {
+            const icon = getIconForVaultState(entry.value)
+            return (
+              <div key={entry.id} className="flex flex-row justify-between">
+                <p>{entry.title}</p>
+                <div className="flex flex-row gap-2 items-center">
+                  <p style={{ color: getColorForVaultState(entry.value) }}>{entry.value}</p>
+                  {icon && <FontAwesomeIcon icon={icon} size="sm" color={getColorForVaultState(entry.value)} />}
+                </div>
               </div>
-              {liquidation.length > 0 && (
-                <>
-                  <h4>Liquidation infos</h4>
-                  {liquidation.map((entry) => (
-                    <div key={entry.id} className="flex flex-row justify-between">
-                      <p>{entry.title}</p>
-                      <div className="flex flex-row">
-                        <p>{entry.absolute}</p>
-                        <p className="w-24 text-right">{entry.percentage}</p>
-                      </div>
-                    </div>
-                  ))}
-                </>
-              )}
+            )
+          })}
+          {liquidation.length > 0 && (
+            <>
+              <h4>Liquidation infos</h4>
+              {liquidation.map((entry) => (
+                <div key={entry.id} className="flex flex-row justify-between">
+                  <p>{entry.title}</p>
+                  <div className="flex flex-row">
+                    <p>{entry.absolute}</p>
+                    <p className="w-24 text-right">{entry.percentage}</p>
+                  </div>
+                </div>
+              ))}
             </>
           )}
         </div>
