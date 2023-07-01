@@ -26,16 +26,16 @@ function VaultSimulatorContent(): JSX.Element {
       <h1>Vault simulator</h1>
       <div className="flex flex-col gap-4 pt-8 items-center">
         {/* add a small info text and link to wiki page https://defichain-wiki.com/wiki/Vaults_and_Loans */}
-        <div className="flex flex-row gap-4 my-4">
+        <div className="flex flex-row flex-wrap gap-4 my-4">
           <ThemedInput
-            className="bg-dark w-60 px-2 rounded-lg border border-white pointer-events-auto"
+            className="bg-dark w-full lg:w-60 px-2 h-11 rounded-lg border border-white pointer-events-auto"
             noSubmit
             value={vaultID}
             onChange={setVaultID}
             type="text"
           />
-          <Button className="w-32" label="Import" onClick={() => importVault(vaultID)} />
-          <Button className="w-32" label="Reset" onClick={resetVault} />
+          <Button className="w-full lg:w-32" label="Import" onClick={() => importVault(vaultID)} />
+          <Button className="w-full lg:w-32" label="Reset" onClick={resetVault} />
         </div>
       </div>
       <div className="w-full flex flex-row flex-wrap gap-8 py-8">

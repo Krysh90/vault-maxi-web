@@ -115,7 +115,7 @@ export function Result(): JSX.Element {
       {vaultCollateralTokens.length === 0 ? (
         <>
           <h3>Result</h3>
-          <p className="text-code">Please add tokens to your collateral</p>
+          <p className="text-code">Please add tokens to your collateral by either clicking or drag & drop</p>
         </>
       ) : (
         <div className="flex flex-col gap-2 w-full">

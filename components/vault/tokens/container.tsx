@@ -1,4 +1,3 @@
-import { CollateralToken, LoanToken } from '@defichain/whale-api-client/dist/api/loan'
 import { Token } from './token'
 import BigNumber from 'bignumber.js'
 import { VaultToken, VaultTokenType } from '../../../contexts/vault.context'
