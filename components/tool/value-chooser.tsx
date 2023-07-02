@@ -2,30 +2,42 @@ import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useState } from 'react'
 import ThemedInput from '../base/themed-input'
+import BigNumber from 'bignumber.js'
 
 export interface ValueChooserProps {
   value: number
   onChange: (value: number) => void
   boundary: { min: number; max: number }
-  special: { on: number; text: string }
+  special?: { on: number; text: string }
+  postfix?: string
+  step?: number
+  big?: boolean
 }
 
-export default function ValueChooser({ value, onChange, boundary, special }: ValueChooserProps): JSX.Element {
+export default function ValueChooser({
+  value,
+  postfix = '%',
+  step = 1,
+  onChange,
+  boundary,
+  special,
+  big,
+}: ValueChooserProps): JSX.Element {
   const [isEdit, setIsEdit] = useState(false)
 
   const decrease = () => {
-    if (value > boundary.min) onChange(value - 1)
+    onChange(new BigNumber(value - step > boundary.min ? value - step : boundary.min).decimalPlaces(2).toNumber())
   }
 
   const increase = () => {
-    if (value < boundary.max) onChange(value + 1)
+    onChange(new BigNumber(value + step > boundary.min ? value + step : boundary.max).decimalPlaces(2).toNumber())
   }
 
   return (
-    <div className="flex flex-row items-center w-24 justify-between">
+    <div className={`flex flex-row items-center ${big ? 'w-48' : 'w-24'} justify-between`}>
       {isEdit ? (
         <ThemedInput
-          className="bg-light w-8 ml-8"
+          className={`bg-light ${big ? 'w-full' : 'w-8'} ml-8`}
           type="number"
           value={''}
           enterKeyHint="done"
@@ -40,8 +52,15 @@ export default function ValueChooser({ value, onChange, boundary, special }: Val
           <button className="h-6 w-6" onClick={decrease}>
             <FontAwesomeIcon icon={faMinus} size={'sm'} />
           </button>
-          <button onClick={() => setIsEdit(true)}>
-            {special.on === value ? <p>{special.text}</p> : <p>{value}%</p>}
+          <button className="w-full" onClick={() => setIsEdit(true)}>
+            {special?.on === value ? (
+              <p>{special.text}</p>
+            ) : (
+              <p>
+                {value}
+                {postfix}
+              </p>
+            )}
           </button>
           <button className="h-6 w-6" onClick={increase}>
             <FontAwesomeIcon icon={faPlus} size={'sm'} />

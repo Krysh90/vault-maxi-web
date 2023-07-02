@@ -1,7 +1,6 @@
-import { CollateralToken, LoanToken } from '@defichain/whale-api-client/dist/api/loan'
 import { Token } from './token'
 import BigNumber from 'bignumber.js'
-import { VaultToken, VaultTokenType } from '../../../contexts/vault.context'
+import { VaultToken, VaultTokenType, useVaultContext } from '../../../contexts/vault.context'
 
 interface TokenContainerProps {
   title: string
@@ -10,6 +9,7 @@ interface TokenContainerProps {
 }
 
 export function TokenContainer({ title, tokens, type }: TokenContainerProps): JSX.Element {
+  const { getPriceOfToken } = useVaultContext()
   return (
     <div className="flex flex-col flex-wrap">
       <h1 className="text-2xl text-code">{title}</h1>
@@ -20,7 +20,7 @@ export function TokenContainer({ title, tokens, type }: TokenContainerProps): JS
             id={token.tokenId}
             symbol={token.token.symbol}
             type={type}
-            price={new BigNumber(token.activePrice?.active?.amount ?? '1')}
+            price={new BigNumber(getPriceOfToken(token))}
           />
         ))}
       </div>

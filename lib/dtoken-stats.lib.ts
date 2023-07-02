@@ -344,6 +344,17 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
           ) ?? [],
         color: '#fff',
       })
+      entries.push({
+        label: 'Delta organic',
+        data:
+          historyToCheck?.map((day) =>
+            new BigNumber(day.dusdVolume.organic.buying)
+              .minus(day.dusdVolume.organic.selling)
+              .decimalPlaces(2)
+              .toNumber(),
+          ) ?? [],
+        color: '#999',
+      })
       break
   }
 

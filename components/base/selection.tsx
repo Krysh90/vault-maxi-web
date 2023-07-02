@@ -36,7 +36,7 @@ export default function Selection({ items, onChanged, selectedItem, border }: Se
 
   return (
     <div
-      className={'flex flex-row gap-2 '.concat(
+      className={'flex flex-row flex-wrap gap-2 '.concat(
         border ? 'justify-evenly p-1 rounded-lg border border-white' : 'justify-start',
       )}
     >
