@@ -9,7 +9,7 @@ interface TokenDropZoneProps {
 }
 
 export function TokenDropZone({ type }: TokenDropZoneProps): JSX.Element {
-  const { setToken, vaultCollateralTokens, vaultLoanTokens, collateralValue, loanValue } = useVaultContext()
+  const { setToken, getAmount, vaultCollateralTokens, vaultLoanTokens, collateralValue, loanValue } = useVaultContext()
   const { decode } = useVaultSimulator()
   const [isOverZone, setIsOverZone] = useState(false)
 
@@ -19,7 +19,7 @@ export function TokenDropZone({ type }: TokenDropZoneProps): JSX.Element {
     if (data.startsWith(type)) {
       const token = decode(data)
       if (token) {
-        setToken(token, new BigNumber(1))
+        setToken(token, getAmount(token))
       }
     }
     setIsOverZone(false)

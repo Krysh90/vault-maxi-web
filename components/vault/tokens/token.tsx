@@ -12,7 +12,7 @@ interface TokenProps {
 }
 
 export function Token({ id, symbol, type, price }: TokenProps): JSX.Element {
-  const { setToken, collateralTokens, loanTokens, hasCustomPrice } = useVaultContext()
+  const { setToken, getAmount, collateralTokens, loanTokens, hasCustomPrice } = useVaultContext()
   const { encode } = useVaultSimulator()
   const AssetIcon = getAssetIcon(symbol)
   const [isDragging, setDragging] = useState(false)
@@ -40,7 +40,7 @@ export function Token({ id, symbol, type, price }: TokenProps): JSX.Element {
       }`}
       onClick={() => {
         const token = getToken()
-        if (token) setToken(token, new BigNumber(1))
+        if (token) setToken(token, getAmount(token))
       }}
       onDragStart={handleDragStart}
       onDragEnd={() => setDragging(false)}

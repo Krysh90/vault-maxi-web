@@ -288,7 +288,7 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
   }
 
   function addCustomPrice() {
-    const token = priceTokens.find((token) => token.symbol === 'DFI')
+    const token = priceTokens[entries.length]
     if (!token) return
     entries.push({ id: entries.length, token, value: formatPrice(token.price) })
     setEntries(Array.from(entries))
