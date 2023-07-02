@@ -18,6 +18,7 @@ export function Result(): JSX.Element {
     getAmount,
     takeLoanRules,
     withdrawCollateralRules,
+    getPriceOfToken,
   } = useVaultContext()
   const { state, getColorForVaultState, getIconForVaultState } = useVaultState()
 
@@ -37,7 +38,7 @@ export function Result(): JSX.Element {
         datasets: [
           {
             data: vaultCollateralTokens.map((token) =>
-              new BigNumber(token.activePrice?.active?.amount ?? 1).multipliedBy(getAmount(token)).toNumber(),
+              new BigNumber(getPriceOfToken(token)).multipliedBy(getAmount(token)).toNumber(),
             ),
             backgroundColor: vaultCollateralTokens.map((token) => colorBasedOn(token.token.symbol)),
             hoverOffset: 4,
@@ -53,7 +54,7 @@ export function Result(): JSX.Element {
         datasets: [
           {
             data: vaultLoanTokens.map((token) =>
-              new BigNumber(token.activePrice?.active?.amount ?? 1).multipliedBy(getAmount(token)).toNumber(),
+              new BigNumber(getPriceOfToken(token)).multipliedBy(getAmount(token)).toNumber(),
             ),
             backgroundColor: vaultLoanTokens.map((token) => colorBasedOn(token.token.symbol)),
             hoverOffset: 4,

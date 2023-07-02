@@ -10,7 +10,7 @@ interface VaultEntryProps {
 }
 
 export function VaultEntry({ token }: VaultEntryProps): JSX.Element {
-  const { setToken, removeToken, getAmount, vaultInterest } = useVaultContext()
+  const { setToken, removeToken, getAmount, vaultInterest, getPriceOfToken } = useVaultContext()
   const AssetIcon = getAssetIcon(token.token.symbol)
 
   function getCollateralFactor(token: VaultToken): BigNumber {
@@ -37,7 +37,7 @@ export function VaultEntry({ token }: VaultEntryProps): JSX.Element {
         </p>
       )}
       <p className="px-2 flex-grow text-right">
-        {new BigNumber(token.activePrice?.active?.amount ?? '1')
+        {new BigNumber(getPriceOfToken(token))
           .multipliedBy(getCollateralFactor(token))
           .multipliedBy(getAmount(token))
           .decimalPlaces(2)

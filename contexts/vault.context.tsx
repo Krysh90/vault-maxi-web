@@ -2,10 +2,17 @@ import { CollateralToken, LoanToken } from '@defichain/whale-api-client/dist/api
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { createClient, getCollateralTokens, getLoanTokens, getVault } from '../api/whale-api'
 import BigNumber from 'bignumber.js'
+import { TokenData } from '@defichain/whale-api-client/dist/api/tokens'
 
 export type VaultTokenType = 'Collateral' | 'Loan'
 export type VaultToken = CollateralToken | LoanToken
 export type VaultTokenAmount = { token: VaultToken; amount: BigNumber }
+export type VaultTokenPrice = TokenData & { price?: string }
+export interface CustomPriceEntry {
+  id: number
+  token: TokenData & { price?: string }
+  value: number
+}
 export enum VaultScheme {
   V150 = '150', // 5
   V175 = '175', // 3
@@ -50,6 +57,14 @@ interface VaultContextInterface {
 
   takeLoanRules: Map<string, boolean>
   withdrawCollateralRules: Map<string, boolean>
+
+  priceTokens: VaultTokenPrice[]
+  customizedPrices: CustomPriceEntry[]
+  addCustomPrice: () => void
+  updateCustomPrice: (id: number, values: Partial<CustomPriceEntry>) => void
+  removeCustomPrice: (index: number) => void
+
+  getPriceOfToken: (token: VaultToken) => string
 }
 
 const VaultContext = createContext<VaultContextInterface>(undefined as any)
@@ -65,7 +80,10 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
   const [vaultScheme, setVaultScheme] = useState<VaultScheme>(VaultScheme.V150)
   const [vaultCollateralTokens, setVaultCollateralTokens] = useState<Map<string, VaultTokenAmount>>(new Map())
   const [vaultLoanTokens, setVaultLoanTokens] = useState<Map<string, VaultTokenAmount>>(new Map())
+  const [entries, setEntries] = useState<CustomPriceEntry[]>([])
   const dataFetchedRef = useRef(false)
+
+  const stables = ['DUSD', 'USDC', 'USDT']
 
   const client = createClient()
 
@@ -261,6 +279,48 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
     ['has DUSD loans: minimum 50% DFI collateral', hasDUSDLoansAndHalfDFICollateral],
   ])
 
+  const priceTokens = collateralTokens
+    .filter((token) => !stables.includes(token.token.symbol))
+    .map((token) => ({ ...token.token, price: token.activePrice?.active?.amount }))
+    .concat(
+      loanTokens
+        .filter((token) => !stables.includes(token.token.symbol))
+        .map((token) => ({ ...token.token, price: token.activePrice?.active?.amount })),
+    )
+
+  function formatPrice(price?: string): number {
+    return new BigNumber(price ?? 1).decimalPlaces(2).toNumber()
+  }
+
+  function addCustomPrice() {
+    const token = priceTokens.find((token) => token.symbol === 'DFI')
+    if (!token) return
+    entries.push({ id: entries.length, token, value: formatPrice(token.price) })
+    setEntries(Array.from(entries))
+  }
+
+  function updateCustomPrice(id: number, values: Partial<CustomPriceEntry>) {
+    const entry = entries[id]
+    if (values.token) {
+      entry.token = values.token
+      entry.value = formatPrice(priceTokens.find((token) => token.id === values.token?.id)?.price)
+    }
+    if (values.value) {
+      entry.value = values.value
+    }
+    setEntries(Array.from(entries))
+  }
+
+  function removeCustomPrice(index: number) {
+    entries.splice(index, 1)
+    setEntries(Array.from(entries))
+  }
+
+  function getPriceOfToken(token: VaultToken): string {
+    const customPrice = entries.find((e) => e.token.id === token.token.id)
+    return customPrice ? '' + formatPrice('' + customPrice.value) : token.activePrice?.active?.amount ?? '1'
+  }
+
   const context: VaultContextInterface = useMemo(
     () => ({
       isLoading,
@@ -286,6 +346,12 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
         .toNumber(),
       takeLoanRules,
       withdrawCollateralRules,
+      priceTokens,
+      customizedPrices: entries,
+      addCustomPrice,
+      updateCustomPrice,
+      removeCustomPrice,
+      getPriceOfToken,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -297,6 +363,8 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
       vaultLoanTokens,
       collateralValue,
       loanValue,
+      priceTokens,
+      entries,
     ],
   )
 

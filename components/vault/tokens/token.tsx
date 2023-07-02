@@ -35,7 +35,6 @@ export function Token({ id, symbol, type, price }: TokenProps): JSX.Element {
       }`}
       onClick={() => {
         const token = getToken()
-        console.log(token)
         if (token) setToken(token, new BigNumber(1))
       }}
       onDragStart={handleDragStart}
