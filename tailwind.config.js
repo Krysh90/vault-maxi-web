@@ -28,6 +28,12 @@ module.exports = {
       minHeight: {
         drop: '128px',
       },
+      lineHeight: {
+        '2xs': '0.25rem',
+      },
+      fontSize: {
+        '2xs': '0.625rem',
+      },
     },
   },
 }

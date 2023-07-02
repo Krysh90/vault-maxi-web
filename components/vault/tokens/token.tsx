@@ -12,7 +12,7 @@ interface TokenProps {
 }
 
 export function Token({ id, symbol, type, price }: TokenProps): JSX.Element {
-  const { setToken, collateralTokens, loanTokens } = useVaultContext()
+  const { setToken, collateralTokens, loanTokens, hasCustomPrice } = useVaultContext()
   const { encode } = useVaultSimulator()
   const AssetIcon = getAssetIcon(symbol)
   const [isDragging, setDragging] = useState(false)
@@ -28,6 +28,11 @@ export function Token({ id, symbol, type, price }: TokenProps): JSX.Element {
       : loanTokens.find((token) => token.tokenId === id)
   }
 
+  function isCustomized(): boolean {
+    const token = getToken()
+    return token ? hasCustomPrice(token) : false
+  }
+
   return (
     <div
       className={`bg-light flex flex-row gap-2 rounded-lg px-2 py-1.5 ${
@@ -35,7 +40,6 @@ export function Token({ id, symbol, type, price }: TokenProps): JSX.Element {
       }`}
       onClick={() => {
         const token = getToken()
-        console.log(token)
         if (token) setToken(token, new BigNumber(1))
       }}
       onDragStart={handleDragStart}
@@ -44,9 +48,9 @@ export function Token({ id, symbol, type, price }: TokenProps): JSX.Element {
     >
       <div className="flex flex-row gap-1">
         <AssetIcon width={24} height={24} />
-        <p>{symbol}</p>
+        <p className={isCustomized() ? 'text-main' : 'text-white'}>{symbol}</p>
       </div>
-      <p>{price.decimalPlaces(2).toString()}$</p>
+      <p className={isCustomized() ? 'text-main' : 'text-white'}>{price.decimalPlaces(2).toString()}$</p>
     </div>
   )
 }

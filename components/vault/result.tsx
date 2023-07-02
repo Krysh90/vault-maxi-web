@@ -18,6 +18,8 @@ export function Result(): JSX.Element {
     getAmount,
     takeLoanRules,
     withdrawCollateralRules,
+    customizedPrices,
+    getPriceOfToken,
   } = useVaultContext()
   const { state, getColorForVaultState, getIconForVaultState } = useVaultState()
 
@@ -25,8 +27,7 @@ export function Result(): JSX.Element {
     { id: 0, title: 'Vault state', value: `${state}` },
     { id: 1, title: 'Minimum collateral ratio', value: `${vaultScheme}%` },
     { id: 2, title: 'Current collateral ratio', value: `${currentRatio}%` },
-    { id: 3, title: 'Next collateral ratio', value: `${nextRatio}%` },
-  ]
+  ].concat(customizedPrices.length === 0 ? [{ id: 3, title: 'Next collateral ratio', value: `${nextRatio}%` }] : [])
 
   const charts = [
     {
@@ -37,7 +38,7 @@ export function Result(): JSX.Element {
         datasets: [
           {
             data: vaultCollateralTokens.map((token) =>
-              new BigNumber(token.activePrice?.active?.amount ?? 1).multipliedBy(getAmount(token)).toNumber(),
+              new BigNumber(getPriceOfToken(token)).multipliedBy(getAmount(token)).toNumber(),
             ),
             backgroundColor: vaultCollateralTokens.map((token) => colorBasedOn(token.token.symbol)),
             hoverOffset: 4,
@@ -53,7 +54,7 @@ export function Result(): JSX.Element {
         datasets: [
           {
             data: vaultLoanTokens.map((token) =>
-              new BigNumber(token.activePrice?.active?.amount ?? 1).multipliedBy(getAmount(token)).toNumber(),
+              new BigNumber(getPriceOfToken(token)).multipliedBy(getAmount(token)).toNumber(),
             ),
             backgroundColor: vaultLoanTokens.map((token) => colorBasedOn(token.token.symbol)),
             hoverOffset: 4,
