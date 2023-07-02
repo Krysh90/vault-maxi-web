@@ -12,7 +12,7 @@ interface TokenProps {
 }
 
 export function Token({ id, symbol, type, price }: TokenProps): JSX.Element {
-  const { setToken, collateralTokens, loanTokens } = useVaultContext()
+  const { setToken, collateralTokens, loanTokens, hasCustomPrice } = useVaultContext()
   const { encode } = useVaultSimulator()
   const AssetIcon = getAssetIcon(symbol)
   const [isDragging, setDragging] = useState(false)
@@ -26,6 +26,11 @@ export function Token({ id, symbol, type, price }: TokenProps): JSX.Element {
     return type === 'Collateral'
       ? collateralTokens.find((token) => token.tokenId === id)
       : loanTokens.find((token) => token.tokenId === id)
+  }
+
+  function isCustomized(): boolean {
+    const token = getToken()
+    return token ? hasCustomPrice(token) : false
   }
 
   return (
@@ -43,9 +48,9 @@ export function Token({ id, symbol, type, price }: TokenProps): JSX.Element {
     >
       <div className="flex flex-row gap-1">
         <AssetIcon width={24} height={24} />
-        <p>{symbol}</p>
+        <p className={isCustomized() ? 'text-main' : 'text-white'}>{symbol}</p>
       </div>
-      <p>{price.decimalPlaces(2).toString()}$</p>
+      <p className={isCustomized() ? 'text-main' : 'text-white'}>{price.decimalPlaces(2).toString()}$</p>
     </div>
   )
 }

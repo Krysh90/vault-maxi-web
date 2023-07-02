@@ -7,10 +7,10 @@ import { TokenData } from '@defichain/whale-api-client/dist/api/tokens'
 export type VaultTokenType = 'Collateral' | 'Loan'
 export type VaultToken = CollateralToken | LoanToken
 export type VaultTokenAmount = { token: VaultToken; amount: BigNumber }
-export type VaultTokenPrice = TokenData & { price?: string }
+export type VaultTokenPrice = TokenData & { price?: string; nextPrice?: string }
 export interface CustomPriceEntry {
   id: number
-  token: TokenData & { price?: string }
+  token: VaultTokenPrice
   value: number
 }
 export enum VaultScheme {
@@ -53,7 +53,7 @@ interface VaultContextInterface {
   vaultInterest: number
 
   currentRatio: number
-  nextRatio: number
+  nextRatio?: number
 
   takeLoanRules: Map<string, boolean>
   withdrawCollateralRules: Map<string, boolean>
@@ -65,6 +65,7 @@ interface VaultContextInterface {
   removeCustomPrice: (index: number) => void
 
   getPriceOfToken: (token: VaultToken) => string
+  hasCustomPrice: (token: VaultToken) => boolean
 }
 
 const VaultContext = createContext<VaultContextInterface>(undefined as any)
@@ -155,12 +156,12 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
     () =>
       Array.from(vaultCollateralTokens.values())
         .map((value) => {
-          return new BigNumber(value.token.activePrice?.active?.amount ?? '1')
+          return new BigNumber(getPriceOfToken(value.token))
             .multipliedBy('factor' in value.token ? value.token.factor : '1')
             .multipliedBy(value.amount)
         })
         .reduce((prev, curr) => prev.plus(curr), new BigNumber(0)),
-    [vaultCollateralTokens],
+    [vaultCollateralTokens, getPriceOfToken],
   )
 
   const nextCollateralValue = useMemo(
@@ -179,12 +180,12 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
     () =>
       Array.from(vaultLoanTokens.values())
         .map((value) => {
-          return new BigNumber(value.token.activePrice?.active?.amount ?? '1')
+          return new BigNumber(getPriceOfToken(value.token))
             .multipliedBy('factor' in value.token ? value.token.factor : '1')
             .multipliedBy(value.amount)
         })
         .reduce((prev, curr) => prev.plus(curr), new BigNumber(0)),
-    [vaultLoanTokens],
+    [vaultLoanTokens, getPriceOfToken],
   )
 
   const nextLoanValue = useMemo(
@@ -205,10 +206,10 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
     return (
       vaultCollateralTokens
         .get(collateralDFI.token.id)
-        ?.amount.multipliedBy(collateralDFI.activePrice?.active?.amount ?? '1')
+        ?.amount.multipliedBy(getPriceOfToken(collateralDFI))
         .isGreaterThan(loanValue.multipliedBy(Number(vaultScheme) / 100).dividedBy(2)) ?? false
     )
-  }, [collateralTokens, vaultCollateralTokens, loanValue, vaultScheme])
+  }, [collateralTokens, vaultCollateralTokens, loanValue, vaultScheme, getPriceOfToken])
 
   // const unlocksAllLoansViaDUSD = useMemo(() => {
   //   const collateralDUSD = collateralTokens.find((token) => token.token.symbol === 'DUSD')
@@ -220,18 +221,15 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
     const collateralDUSD = collateralTokens.find((token) => token.token.symbol === 'DUSD')
     if (!collateralDFI || !collateralDUSD) return false
     const combinedCollateralValue = (
-      vaultCollateralTokens
-        .get(collateralDFI.token.id)
-        ?.amount.multipliedBy(collateralDFI.activePrice?.active?.amount ?? '1') ?? new BigNumber(0)
+      vaultCollateralTokens.get(collateralDFI.token.id)?.amount.multipliedBy(getPriceOfToken(collateralDFI)) ??
+      new BigNumber(0)
     ).plus(
-      vaultCollateralTokens
-        .get(collateralDUSD.token.id)
-        ?.amount.multipliedBy(collateralDUSD.activePrice?.active?.amount ?? '1') ?? '0',
+      vaultCollateralTokens.get(collateralDUSD.token.id)?.amount.multipliedBy(getPriceOfToken(collateralDUSD)) ?? '0',
     )
     return (
       combinedCollateralValue?.isGreaterThan(loanValue.multipliedBy(Number(vaultScheme) / 100).dividedBy(2)) ?? false
     )
-  }, [collateralTokens, vaultCollateralTokens, loanValue, vaultScheme])
+  }, [collateralTokens, vaultCollateralTokens, loanValue, vaultScheme, getPriceOfToken])
 
   const takeLoanRules: Map<string, boolean> = new Map([
     ['DUSD loans: minimum 50% DFI', unlocksDUSDLoansViaDFI],
@@ -246,12 +244,12 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
     return (
       (vaultCollateralTokens
         .get(collateralDFI.token.id)
-        ?.amount.multipliedBy(collateralDFI.activePrice?.active?.amount ?? '1')
+        ?.amount.multipliedBy(getPriceOfToken(collateralDFI))
         .isGreaterThan(loanValue.multipliedBy(Number(vaultScheme) / 100).dividedBy(2)) &&
         vaultLoanTokens.has(loanDUSD?.token.id)) ??
       false
     )
-  }, [collateralTokens, vaultCollateralTokens, loanTokens, vaultLoanTokens, loanValue, vaultScheme])
+  }, [collateralTokens, vaultCollateralTokens, loanTokens, vaultLoanTokens, loanValue, vaultScheme, getPriceOfToken])
 
   const hasHalfCombinedCollateralValue = useMemo(() => {
     const collateralDFI = collateralTokens.find((token) => token.token.symbol === 'DFI')
@@ -259,20 +257,17 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
     const loanDUSD = loanTokens.find((token) => token.token.symbol === 'DUSD')
     if (!collateralDFI || !collateralDUSD || !loanDUSD) return false
     const combinedCollateralValue = (
-      vaultCollateralTokens
-        .get(collateralDFI.token.id)
-        ?.amount.multipliedBy(collateralDFI.activePrice?.active?.amount ?? '1') ?? new BigNumber(0)
+      vaultCollateralTokens.get(collateralDFI.token.id)?.amount.multipliedBy(getPriceOfToken(collateralDFI)) ??
+      new BigNumber(0)
     ).plus(
-      vaultCollateralTokens
-        .get(collateralDUSD.token.id)
-        ?.amount.multipliedBy(collateralDUSD.activePrice?.active?.amount ?? '1') ?? '0',
+      vaultCollateralTokens.get(collateralDUSD.token.id)?.amount.multipliedBy(getPriceOfToken(collateralDUSD)) ?? '0',
     )
     return (
       (combinedCollateralValue?.isGreaterThan(loanValue.multipliedBy(Number(vaultScheme) / 100).dividedBy(2)) &&
         !vaultLoanTokens.has(loanDUSD?.token.id)) ??
       false
     )
-  }, [collateralTokens, vaultCollateralTokens, loanTokens, vaultLoanTokens, loanValue, vaultScheme])
+  }, [collateralTokens, vaultCollateralTokens, loanTokens, vaultLoanTokens, loanValue, vaultScheme, getPriceOfToken])
 
   const withdrawCollateralRules: Map<string, boolean> = new Map([
     ['only dToken loans: minimum 50% DFI or DUSD collateral', hasHalfCombinedCollateralValue],
@@ -352,6 +347,7 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
       updateCustomPrice,
       removeCustomPrice,
       getPriceOfToken,
+      hasCustomPrice: (token: VaultToken) => entries.find((e) => token.token.id === e.token.id) !== undefined,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
