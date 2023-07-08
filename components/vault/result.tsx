@@ -6,6 +6,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useVaultState } from '../../hooks/vault-state.hook'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 
+interface LiquidationEntry {
+  id: number
+  title: string
+  absolute: string
+  percentage: string
+}
+
 export function Result(): JSX.Element {
   const {
     vaultCollateralTokens,
@@ -13,8 +20,11 @@ export function Result(): JSX.Element {
     currentRatio,
     nextRatio,
     vaultScheme,
+    vaultInterest,
     collateralValue,
+    collateralValueWithoutStables,
     loanValue,
+    loanValueWithoutNegativeInterests,
     getAmount,
     takeLoanRules,
     withdrawCollateralRules,
@@ -69,12 +79,25 @@ export function Result(): JSX.Element {
     .minus(collateralValue)
     .abs()
   const collateralChangePercentage = collateralChange.dividedBy(collateralValue).multipliedBy(100)
+  const collateralChangePercentageWithoutStables = collateralChange
+    .dividedBy(collateralValueWithoutStables)
+    .multipliedBy(100)
 
   const loanChange = new BigNumber(collateralValue)
     .dividedBy(Number(vaultScheme) / 100)
     .minus(loanValue)
     .abs()
   const loanChangePercentage = loanChange.dividedBy(loanValue).multipliedBy(100)
+  const loanChangePercentageWithoutNegativeInterests = loanChange
+    .dividedBy(loanValueWithoutNegativeInterests)
+    .multipliedBy(100)
+
+  function canLoanIncrease(): boolean {
+    if (vaultLoanTokens.length > 1) return true
+    const dUSDLoan = vaultLoanTokens.find((token) => token.token.symbol === 'DUSD')
+    if (!dUSDLoan) return true
+    return 'interest' in dUSDLoan ? new BigNumber(dUSDLoan.interest).plus(vaultInterest).isGreaterThan(0) : true
+  }
 
   const liquidation =
     currentRatio < Number(vaultScheme)
@@ -93,21 +116,51 @@ export function Result(): JSX.Element {
             percentage: `${loanChangePercentage.decimalPlaces(2).toString()}%`,
           },
         ]
-      : [
-          { id: 0, title: 'Vault is active, it would liquidate if', absolute: '', percentage: '' },
-          {
-            id: 1,
-            title: '- either collateral decreases by',
-            absolute: `${collateralChange.decimalPlaces(2).toString()}$`,
-            percentage: `${collateralChangePercentage.decimalPlaces(2).toString()}%`,
-          },
-          {
-            id: 2,
-            title: '- or loans increase by',
-            absolute: `${loanChange.decimalPlaces(2).toString()}$`,
-            percentage: `${loanChangePercentage.decimalPlaces(2).toString()}%`,
-          },
-        ]
+      : getActiveLiquidationInfos()
+
+  function getActiveLiquidationInfos(): LiquidationEntry[] {
+    const result: LiquidationEntry[] = []
+    if (collateralChangePercentageWithoutStables.isLessThanOrEqualTo(100)) {
+      result.push({
+        id: 1,
+        title: '- either volatile collateral decreases by',
+        absolute: `${collateralChange.decimalPlaces(2).toString()}$`,
+        percentage: `${collateralChangePercentageWithoutStables.decimalPlaces(2).toString()}%`,
+      })
+    }
+    if (canLoanIncrease()) {
+      result.push({
+        id: 2,
+        title: '- or loans with interest increase by',
+        absolute: `${loanChange.decimalPlaces(2).toString()}$`,
+        percentage: `${loanChangePercentageWithoutNegativeInterests.decimalPlaces(2).toString()}%`,
+      })
+    }
+    if (result.length === 0) {
+      result.push({
+        id: 0,
+        title: 'Vault is active',
+        absolute: '',
+        percentage: '',
+      })
+      result.push({
+        id: 1,
+        title: '- Congrats your configuration cannot get liquidated as long as blockchain values are the same.',
+        absolute: '',
+        percentage: '',
+      })
+      result.push({
+        id: 2,
+        title:
+          '- Still regularly check your vault, as blockchain values can change on each block and enable services like Dobby',
+        absolute: '',
+        percentage: '',
+      })
+    } else {
+      result.unshift({ id: 0, title: 'Vault is active, it would liquidate if', absolute: '', percentage: '' })
+    }
+    return result
+  }
 
   const isWithdrawPossible = !Array.from(withdrawCollateralRules.values()).every((value) => value === false)
 
