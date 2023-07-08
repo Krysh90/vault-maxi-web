@@ -1,15 +1,19 @@
 export interface SpinnerProps {
-  text: string
+  text?: string
+  small?: boolean
+  white?: boolean
 }
 
-export function Spinner({ text }: SpinnerProps): JSX.Element {
+export function Spinner({ text, small, white }: SpinnerProps): JSX.Element {
   return (
     <div className="flex flex-col gap-4 justify-center items-center">
       <div
-        className="spinner-border animate-spin inline-block w-10 h-10 border-4 border-t-dark rounded-full text-main"
+        className={`spinner-border animate-spin inline-block ${
+          small ? 'w-5 h-5' : 'w-10 h-10'
+        } border-4 border-t-dark rounded-full ${white ? 'text-white' : 'text-main'}`}
         role="status"
       />
-      <h3 className="text-white">{text}</h3>
+      {text && <h3 className="text-white">{text}</h3>}
     </div>
   )
 }

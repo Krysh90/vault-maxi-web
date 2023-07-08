@@ -86,7 +86,7 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
   const [entries, setEntries] = useState<CustomPriceEntry[]>([])
   const dataFetchedRef = useRef(false)
 
-  const stables = ['DUSD', 'USDC', 'USDT']
+  const stables = useMemo(() => ['DUSD', 'USDC', 'USDT'], [])
 
   const client = createClient()
 
@@ -105,7 +105,9 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
   }
 
   async function importVault(vaultID: string): Promise<void> {
+    if (vaultID.length !== 64) return
     resetVault()
+    setLoading(true)
     const vault = await getVault(client, vaultID)
     if (vault.state === 'ACTIVE') {
       const importedCollateralTokens = new Map<string, VaultTokenAmount>()
@@ -123,6 +125,7 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
       }
       setVaultLoanTokens(importedLoanTokens)
     }
+    setLoading(false)
   }
 
   function resetVault() {
@@ -217,7 +220,7 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
             .multipliedBy(value.amount)
         })
         .reduce((prev, curr) => prev.plus(curr), new BigNumber(0)),
-    [vaultLoanTokens, getPriceOfToken],
+    [vaultLoanTokens, getPriceOfToken, vaultScheme],
   )
 
   const nextLoanValue = useMemo(

@@ -26,6 +26,7 @@ const VaultSimulator: NextPage = () => {
 
 function VaultSimulatorContent(): JSX.Element {
   const {
+    isLoading,
     importVault,
     resetVault,
     customizedPrices,
@@ -50,7 +51,13 @@ function VaultSimulatorContent(): JSX.Element {
             onChange={setVaultID}
             type="text"
           />
-          <Button className="w-full lg:w-32" label="Import" onClick={() => importVault(vaultID)} />
+          <Button
+            className="w-full lg:w-32"
+            label="Import"
+            onClick={() => importVault(vaultID)}
+            isLoading={isLoading}
+            disabled={vaultID.length !== 64}
+          />
           <Button className="w-full lg:w-32" label="Reset" onClick={resetVault} />
           <Button
             className="w-full lg:w-44"
