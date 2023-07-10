@@ -46,7 +46,9 @@ interface VaultContextInterface {
   getAmount: (token: VaultToken) => BigNumber
 
   collateralValue: BigNumber
+  collateralValueWithoutStables: BigNumber
   loanValue: BigNumber
+  loanValueWithoutNegativeInterests: BigNumber
 
   vaultScheme: VaultScheme
   setVaultScheme: (vaultScheme: VaultScheme) => void
@@ -84,7 +86,7 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
   const [entries, setEntries] = useState<CustomPriceEntry[]>([])
   const dataFetchedRef = useRef(false)
 
-  const stables = ['DUSD', 'USDC', 'USDT']
+  const stables = useMemo(() => ['DUSD', 'USDC', 'USDT'], [])
 
   const client = createClient()
 
@@ -103,9 +105,13 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
   }
 
   async function importVault(vaultID: string): Promise<void> {
+    if (vaultID.length !== 64) return
     resetVault()
+    setLoading(true)
     const vault = await getVault(client, vaultID)
     if (vault.state === 'ACTIVE') {
+      setVaultScheme(vault.loanScheme.minColRatio as VaultScheme)
+
       const importedCollateralTokens = new Map<string, VaultTokenAmount>()
       for (var collateralToken of vault.collateralAmounts) {
         const token = collateralTokens.find((token) => token.token.id === collateralToken.id)
@@ -121,6 +127,7 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
       }
       setVaultLoanTokens(importedLoanTokens)
     }
+    setLoading(false)
   }
 
   function resetVault() {
@@ -164,6 +171,19 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
     [vaultCollateralTokens, getPriceOfToken],
   )
 
+  const collateralValueWithoutStables = useMemo(
+    () =>
+      Array.from(vaultCollateralTokens.values())
+        .filter((v) => !stables.includes(v.token.token.symbol))
+        .map((value) => {
+          return new BigNumber(getPriceOfToken(value.token))
+            .multipliedBy('factor' in value.token ? value.token.factor : '1')
+            .multipliedBy(value.amount)
+        })
+        .reduce((prev, curr) => prev.plus(curr), new BigNumber(0)),
+    [vaultCollateralTokens, getPriceOfToken, stables],
+  )
+
   const nextCollateralValue = useMemo(
     () =>
       Array.from(vaultCollateralTokens.values())
@@ -186,6 +206,23 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
         })
         .reduce((prev, curr) => prev.plus(curr), new BigNumber(0)),
     [vaultLoanTokens, getPriceOfToken],
+  )
+
+  const loanValueWithoutNegativeInterests = useMemo(
+    () =>
+      Array.from(vaultLoanTokens.values())
+        .filter((v) =>
+          'interest' in v.token
+            ? new BigNumber(v.token.interest).plus(schemeToInterest[vaultScheme]).isGreaterThanOrEqualTo(0)
+            : false,
+        )
+        .map((value) => {
+          return new BigNumber(getPriceOfToken(value.token))
+            .multipliedBy('factor' in value.token ? value.token.factor : '1')
+            .multipliedBy(value.amount)
+        })
+        .reduce((prev, curr) => prev.plus(curr), new BigNumber(0)),
+    [vaultLoanTokens, getPriceOfToken, vaultScheme],
   )
 
   const nextLoanValue = useMemo(
@@ -329,7 +366,9 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
       importVault,
       resetVault,
       collateralValue,
+      collateralValueWithoutStables,
       loanValue,
+      loanValueWithoutNegativeInterests,
       vaultScheme,
       setVaultScheme,
       vaultInterest: schemeToInterest[vaultScheme],
@@ -358,7 +397,9 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
       vaultCollateralTokens,
       vaultLoanTokens,
       collateralValue,
+      collateralValueWithoutStables,
       loanValue,
+      loanValueWithoutNegativeInterests,
       priceTokens,
       entries,
     ],

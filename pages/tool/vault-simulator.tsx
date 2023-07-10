@@ -26,6 +26,7 @@ const VaultSimulator: NextPage = () => {
 
 function VaultSimulatorContent(): JSX.Element {
   const {
+    isLoading,
     importVault,
     resetVault,
     customizedPrices,
@@ -37,10 +38,14 @@ function VaultSimulatorContent(): JSX.Element {
   const [vaultID, setVaultID] = useState<string>('')
   const [showsCustomizePrices, setShowsCustomizePrices] = useState(false)
 
+  const infoText =
+    'All shown values are taken from blockchain, but are not predicting or showing future values. Means you will need to check your vault regularly and add different safety mechanism in order to avoid getting liquidated. We take no responsibility whatsoever for your vault.'
+
   return (
     <Layout page="Vault simulator" full maxWidth withoutSupport>
       <h1>Vault simulator</h1>
       <div className="flex flex-col gap-4 pt-8 items-center">
+        <StaticEntry type="info" text={infoText} variableHeight />
         {/* add a small info text and link to wiki page https://defichain-wiki.com/wiki/Vaults_and_Loans */}
         <div className="flex flex-row flex-wrap gap-4 my-4">
           <ThemedInput
@@ -50,7 +55,13 @@ function VaultSimulatorContent(): JSX.Element {
             onChange={setVaultID}
             type="text"
           />
-          <Button className="w-full lg:w-32" label="Import" onClick={() => importVault(vaultID)} />
+          <Button
+            className="w-full lg:w-32"
+            label="Import"
+            onClick={() => importVault(vaultID)}
+            isLoading={isLoading}
+            disabled={vaultID.length !== 64}
+          />
           <Button className="w-full lg:w-32" label="Reset" onClick={resetVault} />
           <Button
             className="w-full lg:w-44"
