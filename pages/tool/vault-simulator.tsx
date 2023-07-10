@@ -38,10 +38,14 @@ function VaultSimulatorContent(): JSX.Element {
   const [vaultID, setVaultID] = useState<string>('')
   const [showsCustomizePrices, setShowsCustomizePrices] = useState(false)
 
+  const infoText =
+    'All shown values are taken from blockchain, but are not predicting or showing future values. Means you will need to check your vault regularly and add different safety mechanism in order to avoid getting liquidated.'
+
   return (
     <Layout page="Vault simulator" full maxWidth withoutSupport>
       <h1>Vault simulator</h1>
       <div className="flex flex-col gap-4 pt-8 items-center">
+        <StaticEntry type="info" text={infoText} variableHeight />
         {/* add a small info text and link to wiki page https://defichain-wiki.com/wiki/Vaults_and_Loans */}
         <div className="flex flex-row flex-wrap gap-4 my-4">
           <ThemedInput

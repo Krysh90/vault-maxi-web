@@ -123,7 +123,7 @@ export function Result(): JSX.Element {
     if (collateralChangePercentageWithoutStables.isLessThanOrEqualTo(100)) {
       result.push({
         id: 1,
-        title: '- either volatile collateral decreases by',
+        title: '- no stable collateral decreases by',
         absolute: `${collateralChange.decimalPlaces(2).toString()}$`,
         percentage: `${collateralChangePercentageWithoutStables.decimalPlaces(2).toString()}%`,
       })
@@ -131,7 +131,7 @@ export function Result(): JSX.Element {
     if (canLoanIncrease()) {
       result.push({
         id: 2,
-        title: '- or loans with interest increase by',
+        title: '- loans with interest increase by',
         absolute: `${loanChange.decimalPlaces(2).toString()}$`,
         percentage: `${loanChangePercentageWithoutNegativeInterests.decimalPlaces(2).toString()}%`,
       })
@@ -145,14 +145,8 @@ export function Result(): JSX.Element {
       })
       result.push({
         id: 1,
-        title: '- Congrats your configuration cannot get liquidated as long as blockchain values are the same.',
-        absolute: '',
-        percentage: '',
-      })
-      result.push({
-        id: 2,
         title:
-          '- Still regularly check your vault, as blockchain values can change on each block and enable services like Dobby',
+          '- Regularly check your vault, as blockchain values can change on each block and enable services like Dobby',
         absolute: '',
         percentage: '',
       })
