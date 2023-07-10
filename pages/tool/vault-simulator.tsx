@@ -39,7 +39,7 @@ function VaultSimulatorContent(): JSX.Element {
   const [showsCustomizePrices, setShowsCustomizePrices] = useState(false)
 
   const infoText =
-    'All shown values are taken from blockchain, but are not predicting or showing future values. Means you will need to check your vault regularly and add different safety mechanism in order to avoid getting liquidated.'
+    'All shown values are taken from blockchain, but are not predicting or showing future values. Means you will need to check your vault regularly and add different safety mechanism in order to avoid getting liquidated. We take no responsibility whatsoever for your vault.'
 
   return (
     <Layout page="Vault simulator" full maxWidth withoutSupport>

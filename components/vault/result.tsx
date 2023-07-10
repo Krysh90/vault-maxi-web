@@ -123,7 +123,7 @@ export function Result(): JSX.Element {
     if (collateralChangePercentageWithoutStables.isLessThanOrEqualTo(100)) {
       result.push({
         id: 1,
-        title: '- no stable collateral decreases by',
+        title: '- non-stable collateral decreases by',
         absolute: `${collateralChange.decimalPlaces(2).toString()}$`,
         percentage: `${collateralChangePercentageWithoutStables.decimalPlaces(2).toString()}%`,
       })

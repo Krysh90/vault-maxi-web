@@ -110,6 +110,8 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
     setLoading(true)
     const vault = await getVault(client, vaultID)
     if (vault.state === 'ACTIVE') {
+      setVaultScheme(vault.loanScheme.minColRatio as VaultScheme)
+
       const importedCollateralTokens = new Map<string, VaultTokenAmount>()
       for (var collateralToken of vault.collateralAmounts) {
         const token = collateralTokens.find((token) => token.token.id === collateralToken.id)
