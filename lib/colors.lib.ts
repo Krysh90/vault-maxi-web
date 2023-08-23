@@ -20,6 +20,12 @@ export function colorBasedOn(symbol: string): string {
       return '#26A17B'
     case 'EUROC':
       return '#F5F5F5'
+    case 'DOT':
+      return '#E6007A'
+    case 'MATIC':
+      return '#8247E5'
+    case 'SOL':
+      return '#0C192B'
     case 'Unused':
       return '#222'
     default:

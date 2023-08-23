@@ -15,6 +15,12 @@ import { dUSDT } from './dUSDT'
 import { DUSD } from './DUSD'
 import { _TokenDefault } from './_TokenDefault'
 import { dEUROC } from './dEUROC'
+import { DOT } from './DOT'
+import { dDOT } from './dDOT'
+import { dSOL } from './dSOL'
+import { SOL } from './SOL'
+import { MATIC } from './MATIC'
+import { dMATIC } from './dMATIC'
 
 const mapping: Record<string, (props: SVGProps<SVGSVGElement>) => JSX.Element> = {
   DFI: DFI,
@@ -34,6 +40,12 @@ const mapping: Record<string, (props: SVGProps<SVGSVGElement>) => JSX.Element> =
   DUSD: DUSD,
   dEUROC: dEUROC,
   EUROC: dEUROC,
+  DOT: DOT,
+  dDOT: dDOT,
+  MATIC: MATIC,
+  dMATIC: dMATIC,
+  SOL: SOL,
+  dSOL: dSOL,
 }
 
 // TODO(@defich): move assets into it's own repo where anyone can create pull request into.
