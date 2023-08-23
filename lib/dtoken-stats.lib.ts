@@ -125,14 +125,14 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
         color: '#111',
       })
       entries.push({
-        label: 'Organic sells',
-        data: new BigNumber(stats.dusdVolume.organic.selling).decimalPlaces(2).toNumber(),
-        color: Color.light.burn,
-      })
-      entries.push({
         label: 'Automated sells',
         data: new BigNumber(stats.dusdVolume.bots.selling).decimalPlaces(2).toNumber(),
         color: Color.dark.burn,
+      })
+      entries.push({
+        label: 'Organic sells',
+        data: new BigNumber(stats.dusdVolume.organic.selling).decimalPlaces(2).toNumber(),
+        color: Color.light.burn,
       })
       break
   }
