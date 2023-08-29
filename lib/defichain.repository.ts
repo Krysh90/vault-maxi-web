@@ -27,7 +27,7 @@ const metaChain: CardItemDto = {
   icon: { definition: faGlobe, color: '#666', size: '4x' },
   links: [
     { url: '/defichain/meta-chain', display: 'Open page' },
-    { url: 'https://meta.defichain.com/', display: 'About' },
+    { url: 'https://defichain.com/de/metachain', display: 'About' },
   ],
 }
 

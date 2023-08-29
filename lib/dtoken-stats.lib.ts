@@ -23,6 +23,7 @@ export enum DTokenStatsChartDataType {
 
 export enum DUSDStatsChartDataType {
   VOLUME = 'VOLUME',
+  CIRCULATING_SUPPLY = 'CIRCULATING SUPPLY',
 }
 
 export function historyDaysToLoad(): string[] {
@@ -135,6 +136,21 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
         color: Color.light.burn,
       })
       break
+    case DUSDStatsChartDataType.CIRCULATING_SUPPLY: {
+      const dUSD = stats.dTokens.find((entry) => entry.key === 'DUSD')
+      const algoDUSD = calculateAlgoTokens(dUSD)
+      const backedDUSD = dUSD?.minted.loans ?? 0
+      entries.push({
+        label: 'backed DUSD',
+        data: backedDUSD,
+        color: colorBasedOn('DUSD'),
+      })
+      entries.push({
+        label: 'algo DUSD',
+        data: algoDUSD,
+        color: colorBasedOn('dToken'),
+      })
+    }
   }
   if (sort) entries = entries.sort((a, b) => b.data - a.data)
   return {
@@ -159,6 +175,27 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
     type === DUSDStatsChartDataType.VOLUME ? history : history.slice((getDates('2023-05-24').length - 1) * -1)
   const entries: LineChartEntry[] = []
   switch (type) {
+    case DUSDStatsChartDataType.CIRCULATING_SUPPLY:
+      entries.push({
+        label: 'Algo DUSD',
+        data: historyToCheck.map((day) => calculateAlgoTokens(day.dTokens.find((entry) => entry.key === 'DUSD'))),
+        color: colorBasedOn('dToken'),
+      })
+      entries.push({
+        label: 'Backed DUSD',
+        data: historyToCheck.map((day) => day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0),
+        color: colorBasedOn('DUSD'),
+      })
+      entries.push({
+        label: 'Total DUSD',
+        data: historyToCheck.map(
+          (day) =>
+            calculateAlgoTokens(day.dTokens.find((entry) => entry.key === 'DUSD')) +
+            (day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0),
+        ),
+        color: '#fff',
+      })
+      break
     case DTokenStatsChartDataType.ALGO:
       entries.push({
         label: 'Algo DUSD',
