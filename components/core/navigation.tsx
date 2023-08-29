@@ -37,13 +37,13 @@ export default function Navigation(): JSX.Element {
             <Link href="/tools">Tools</Link>
           </li>
           <li>
-            <Link href="/statistics">Statistics</Link>
+            <Link href="/statistics">Bot statistics</Link>
           </li>
           <li>
             <Link href="/faq">FAQ</Link>
           </li>
           <li>
-            <Link href="/defichain">defichain</Link>
+            <Link href="/defichain">defichain statistics</Link>
           </li>
         </div>
       </ul>

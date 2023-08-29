@@ -25,6 +25,7 @@
   display: flex;
   gap: 1em;
   font-size: 18px;
+  z-index: 10;
 }
 
 .menu li:hover {
