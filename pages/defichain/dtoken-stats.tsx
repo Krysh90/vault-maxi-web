@@ -13,6 +13,7 @@ import DonutChart from '../../components/base/donut-chart'
 import { StaticEntry } from '../../components/base/static-entry'
 import { formatNumber, generateTableContent } from '../../lib/chart.lib'
 import HistoryChart from '../../components/statistic/history-chart'
+import { TableRow } from '../../components/statistic/table-row'
 
 export async function getStaticProps(): Promise<{ props: DTokenStatsProps; revalidate: number }> {
   const res = await fetch('https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/dToken/latest.json')
@@ -52,7 +53,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
       showTotal: false,
       showLine: false,
       calculateDelta: false,
-      keywords: [],
+      keywords: ['algo', 'backed'],
     },
     {
       title: 'FutureSwap',
@@ -150,9 +151,9 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
                 <DonutChart chartData={data} />
                 {info.showOverlay && (
                   <>
-                    <p className="absolute top-28 right-[8.5rem] text-end">Backed</p>
+                    <p className="absolute top-28 right-[8.5rem] text-end">{info.keywords[1]}</p>
                     <div className="bg-white w-[1px] absolute inset-0 left-32" />
-                    <p className="absolute top-28 left-36 text-start">Algo</p>
+                    <p className="absolute top-28 left-36 text-start">{info.keywords[0]}</p>
                   </>
                 )}
                 {info.showLine && <div className="bg-white w-[1px] absolute inset-0 left-32" />}
@@ -180,51 +181,6 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
       </div>
       <HistoryChart history={history} items={historyItems} toLineChartData={toLineChartData} toScales={toScales} />
     </Layout>
-  )
-}
-
-function TableRow({
-  entry,
-  index,
-  labels,
-  percentages,
-  colors,
-  isLast,
-  showPercentage,
-}: {
-  entry: string
-  index: number
-  labels: string[]
-  percentages: string[]
-  colors: string[]
-  isLast: boolean
-  showPercentage: boolean
-}): JSX.Element {
-  return (
-    <div className="table-row">
-      <div
-        className={'table-cell text-left py-1'
-          .concat(isLast ? '' : ' border-b border-b-light')
-          .concat(index > 0 ? ' border-r border-r-light' : '')}
-      >
-        <div className="flex flex-row items-center gap-1">
-          {index !== 0 && <div className="w-1 h-4" style={{ backgroundColor: colors[index] }} />}
-          {labels[index]}
-        </div>
-      </div>
-      {showPercentage && (
-        <div
-          className={'table-cell text-center align-middle'
-            .concat(isLast ? '' : ' border-b border-b-light')
-            .concat(index > 0 ? ' border-r border-r-light' : '')}
-        >
-          {index > 0 && percentages[index].length > 0 ? `${percentages[index]}%` : ''}
-        </div>
-      )}
-      <div className={'table-cell text-right align-middle'.concat(isLast ? '' : ' border-b border-b-light')}>
-        {entry}
-      </div>
-    </div>
   )
 }
 

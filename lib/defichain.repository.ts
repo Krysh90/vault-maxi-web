@@ -1,9 +1,9 @@
-import { faMoneyBillTransfer, faBridge, faGlobe, faChartSimple } from '@fortawesome/free-solid-svg-icons'
+import { faMoneyBillTransfer, faBridge, faGlobe, faChartSimple, faChartLine } from '@fortawesome/free-solid-svg-icons'
 import { CardItemDto } from '../dtos/card-item.dto'
 
 export class DefichainRepository {
   static all(): CardItemDto[] {
-    return [realYield, quantum, metaChain, dTokenStats]
+    return [realYield, quantum, metaChain, dTokenStats, volumeStats]
   }
 }
 
@@ -36,4 +36,11 @@ const dTokenStats: CardItemDto = {
   description: 'Display of statistics about dTokens and FutureSwap',
   icon: { definition: faChartSimple, color: '#666', size: '4x' },
   links: [{ url: '/defichain/dtoken-stats', display: 'Open page' }],
+}
+
+const volumeStats: CardItemDto = {
+  name: 'Volume Stats',
+  description: 'Display of statistics about DFI volume',
+  icon: { definition: faChartLine, color: '#666', size: '4x' },
+  links: [{ url: '/defichain/volume', display: 'Open page' }],
 }
