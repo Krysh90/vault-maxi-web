@@ -25,7 +25,7 @@ export function colorBasedOn(symbol: string): string {
     case 'MATIC':
       return '#8247E5'
     case 'SOL':
-      return '#0C192B'
+      return '#9945FF'
     case 'SUI':
       return '#4CA2FF'
     case 'XCHF':

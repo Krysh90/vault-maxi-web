@@ -39,8 +39,12 @@ export function generateTableContent(
     const one = oneIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
     const two = twoIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
 
-    const content = ['', formatNumber(one).concat(inDollar ? '$' : ''), formatNumber(two).concat(inDollar ? '$' : '')]
-    const labels = ['', `Sum ${keywords[0]}`, `Sum ${keywords[1]}`]
+    const content = [
+      formatNumber(chartData.datasets[0].data.reduce((curr, prev) => curr + prev, 0)).concat(inDollar ? '$' : ''),
+      formatNumber(one).concat(inDollar ? '$' : ''),
+      formatNumber(two).concat(inDollar ? '$' : ''),
+    ]
+    const labels = ['Total', `Sum ${keywords[0]}`, `Sum ${keywords[1]}`]
     const percentages = [
       '',
       new BigNumber(one)
@@ -54,6 +58,10 @@ export function generateTableContent(
         .decimalPlaces(1)
         .toString(),
     ]
+    if (!showTotal) {
+      labels[0] = ''
+      content[0] = ''
+    }
     const colors = customColors ? [''].concat(...customColors) : []
 
     if (calculateDelta) {

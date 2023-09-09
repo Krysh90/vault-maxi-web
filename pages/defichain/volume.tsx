@@ -39,29 +39,45 @@ const Volume: NextPage<StatisticsProps> = ({ statistics, history }: StatisticsPr
       showLine: true,
       showTotal: false,
       calculateDelta: true,
-      deltaKeyWords: ['bought', 'sold'],
-      buildCustomVolume: true,
+      deltaKeyWords: ['Buys', 'Sells'],
+      buildCustomVolume: false,
+      customColors: [],
     },
     {
-      title: 'Volume above TODO$',
-      type: VolumeChartDataType.BIG_SWAPS_VOLUME,
+      title: 'Volume per pool',
+      type: VolumeChartDataType.POOL,
       inDollar: false,
       sort: false,
       showOverlay: true,
       showLine: true,
       showTotal: false,
-      calculateDelta: true,
-      deltaKeyWords: ['bought', 'sold'],
+      calculateDelta: false,
+      deltaKeyWords: ['Buys', 'Sells'],
       buildCustomVolume: true,
+      customColors: ['#00eeee', '#ff2e22'],
+    },
+    {
+      title: 'Total volume per pool',
+      type: VolumeChartDataType.TOTAL_POOL,
+      inDollar: false,
+      sort: false,
+      showOverlay: false,
+      showLine: false,
+      showTotal: true,
+      calculateDelta: false,
+      deltaKeyWords: [],
+      buildCustomVolume: false,
+      customColors: [],
     },
   ]
 
   const historyItems = [
     { label: 'Volume', type: VolumeChartDataType.VOLUME },
-    { label: 'Volume above TODO$', type: VolumeChartDataType.BIG_SWAPS_VOLUME },
+    { label: 'Volume delta per pool', type: VolumeChartDataType.POOL_DELTA },
+    { label: 'Total volume per pool', type: VolumeChartDataType.TOTAL_POOL },
   ]
 
-  const infoText = `Displayed volumes were gathered between blocks ${statistics.meta.startHeight} and ${statistics.meta.endHeight}. All displayed values are in DFI. Big swaps are above a value of TODO$`
+  const infoText = `Displayed volumes were gathered between blocks ${statistics.meta.startHeight} and ${statistics.meta.endHeight}. All displayed values are denominated in DFI. Big swaps are above a value of 50k DFI`
 
   return (
     <Layout page="Volume" full maxWidth withoutSupport>
@@ -77,6 +93,7 @@ const Volume: NextPage<StatisticsProps> = ({ statistics, history }: StatisticsPr
             info.buildCustomVolume,
             info.calculateDelta,
             info.deltaKeyWords,
+            info.customColors,
           )
           return (
             <div key={index} className="flex flex-col items-center gap-4">
