@@ -24,36 +24,58 @@ export function generateTableContent(
   chartData: ChartData,
   { inDollar }: ChartInfo,
   showTotal = true,
-  buildCustomAlgo = false,
+  buildCustom = false,
   calculateDelta = false,
   keywords = ['Mint', 'Burn'],
+  customColors?: string[],
 ): TableData {
-  if (buildCustomAlgo) {
-    const algoIndex = chartData.labels
-      .filter((value) => value.includes('algo'))
+  if (buildCustom) {
+    const oneIndex = chartData.labels
+      .filter((value) => value.includes(keywords[0]))
       .map((needle) => chartData.labels.findIndex((value) => value === needle))
-    const backedIndex = chartData.labels
-      .filter((value) => value.includes('backed'))
+    const twoIndex = chartData.labels
+      .filter((value) => value.includes(keywords[1]))
       .map((needle) => chartData.labels.findIndex((value) => value === needle))
-    const algo = algoIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
-    const backed = backedIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
+    const one = oneIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
+    const two = twoIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
+
+    const content = [
+      formatNumber(chartData.datasets[0].data.reduce((curr, prev) => curr + prev, 0)).concat(inDollar ? '$' : ''),
+      formatNumber(one).concat(inDollar ? '$' : ''),
+      formatNumber(two).concat(inDollar ? '$' : ''),
+    ]
+    const labels = ['Total', `Sum ${keywords[0]}`, `Sum ${keywords[1]}`]
+    const percentages = [
+      '',
+      new BigNumber(one)
+        .dividedBy(one + two)
+        .multipliedBy(100)
+        .decimalPlaces(1)
+        .toString(),
+      new BigNumber(two)
+        .dividedBy(one + two)
+        .multipliedBy(100)
+        .decimalPlaces(1)
+        .toString(),
+    ]
+    if (!showTotal) {
+      labels[0] = ''
+      content[0] = ''
+    }
+    const colors = customColors ? [''].concat(...customColors) : []
+
+    if (calculateDelta) {
+      content.push(formatNumber(new BigNumber(one).minus(two).toNumber()).concat(inDollar ? '$' : ''))
+      labels.push('Delta')
+      percentages.push('')
+      colors.push('')
+    }
+
     return {
-      content: ['', formatNumber(algo).concat(inDollar ? '$' : ''), formatNumber(backed).concat(inDollar ? '$' : '')],
-      labels: ['', 'Sum Algo', 'Sum Backed'],
-      percentages: [
-        '',
-        new BigNumber(algo)
-          .dividedBy(algo + backed)
-          .multipliedBy(100)
-          .decimalPlaces(1)
-          .toString(),
-        new BigNumber(backed)
-          .dividedBy(algo + backed)
-          .multipliedBy(100)
-          .decimalPlaces(1)
-          .toString(),
-      ],
-      colors: [],
+      content,
+      labels,
+      percentages,
+      colors,
     }
   }
   const total = chartData.datasets[0].data.reduce((curr, prev) => curr + prev, 0)
