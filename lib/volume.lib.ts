@@ -218,6 +218,16 @@ export function toLineChartData(history: VolumeStats[], { type, timeFrame }: Lin
           color: colorBasedOn(symbol),
         })),
       )
+      entries.push({
+        label: 'Total',
+        data: history.map((day) =>
+          day.dfiVolume
+            .map((i) => new BigNumber(i.totalBuying).plus(i.totalSelling))
+            .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
+            .toNumber(),
+        ),
+        color: '#fff',
+      })
       break
     case VolumeChartDataType.POOL_DELTA:
       entries.push(
