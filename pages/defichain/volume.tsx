@@ -86,7 +86,7 @@ const Volume: NextPage<StatisticsProps> = ({ statistics, history }: StatisticsPr
       <div className="py-6 text-lg">
         <div className="pb-4">
           <p>
-            Delta yesterday:{' '}
+            Delta last 24h:{' '}
             {formatNumber(
               statistics.dfiVolume
                 .map((i) => new BigNumber(i.totalBuying).minus(i.totalSelling))
