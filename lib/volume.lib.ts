@@ -141,7 +141,7 @@ export function toLineChartData(history: VolumeStats[], { type, timeFrame }: Lin
         label: 'Buys',
         data: history.map((day) => {
           const totalBuys = day.dfiVolume
-            .map((i) => new BigNumber(i.totalBuying).minus(i.buyingFromBigSwaps))
+            .map((i) => new BigNumber(i.totalBuying))
             .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
           return new BigNumber(totalBuys).decimalPlaces(2).toNumber()
         }),
@@ -161,7 +161,7 @@ export function toLineChartData(history: VolumeStats[], { type, timeFrame }: Lin
         label: 'Sells',
         data: history.map((day) => {
           const totalSells = day.dfiVolume
-            .map((i) => new BigNumber(-i.totalSelling).plus(i.sellingFromBigSwaps))
+            .map((i) => new BigNumber(-i.totalSelling))
             .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
           return new BigNumber(totalSells).decimalPlaces(2).toNumber()
         }),
