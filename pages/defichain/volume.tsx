@@ -3,10 +3,11 @@ import { VolumeStats } from '../../dtos/volume.dto'
 import { VolumeChartDataType, historyDaysToLoad, toChartData, toLineChartData, toScales } from '../../lib/volume.lib'
 import Layout from '../../components/core/layout'
 import { StaticEntry } from '../../components/base/static-entry'
-import { generateTableContent } from '../../lib/chart.lib'
+import { formatNumber, generateTableContent } from '../../lib/chart.lib'
 import DonutChart from '../../components/base/donut-chart'
 import HistoryChart from '../../components/statistic/history-chart'
 import { TableRow } from '../../components/statistic/table-row'
+import BigNumber from 'bignumber.js'
 
 export async function getStaticProps(): Promise<{ props: StatisticsProps; revalidate: number }> {
   const res = await fetch('https://defichain-maxi-public.s3.eu-central-1.amazonaws.com/dfiVolumes/latest.json')
@@ -82,6 +83,36 @@ const Volume: NextPage<StatisticsProps> = ({ statistics, history }: StatisticsPr
   return (
     <Layout page="Volume" full maxWidth withoutSupport>
       <h1>Volume</h1>
+      <div className="py-6 text-lg">
+        <div className="pb-4">
+          <p>
+            Delta yesterday:{' '}
+            {formatNumber(
+              statistics.dfiVolume
+                .map((i) => new BigNumber(i.totalBuying).minus(i.totalSelling))
+                .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
+                .toNumber(),
+            )}{' '}
+            DFI
+          </p>
+          <p>
+            Daily average delta last week:{' '}
+            {formatNumber(
+              history
+                .slice(-7)
+                .map((s) =>
+                  s.dfiVolume
+                    .map((i) => new BigNumber(i.totalBuying).minus(i.totalSelling))
+                    .reduce((prev, curr) => prev.plus(curr), new BigNumber(0)),
+                )
+                .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
+                .dividedBy(7)
+                .toNumber(),
+            )}{' '}
+            DFI
+          </p>
+        </div>
+      </div>
       <div className="flex flex-row flex-wrap py-8 gap-16 flex-grow justify-center items-start w-full">
         <StaticEntry type="info" text={infoText} variableHeight />
         {charts.map((info, index) => {
