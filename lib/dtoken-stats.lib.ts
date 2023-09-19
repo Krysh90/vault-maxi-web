@@ -359,13 +359,17 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
       entries.push({
         label: 'Organic sells',
         data:
-          historyToCheck?.map((day) => new BigNumber(day.dusdVolume.organic.selling).decimalPlaces(2).toNumber()) ?? [],
+          historyToCheck?.map((day) =>
+            new BigNumber(day.dusdVolume.organic.selling).negated().decimalPlaces(2).toNumber(),
+          ) ?? [],
         color: Color.light.burn,
       })
       entries.push({
         label: 'Automated sells',
         data:
-          historyToCheck?.map((day) => new BigNumber(day.dusdVolume.bots.selling).decimalPlaces(2).toNumber()) ?? [],
+          historyToCheck?.map((day) =>
+            new BigNumber(day.dusdVolume.bots.selling).negated().decimalPlaces(2).toNumber(),
+          ) ?? [],
         color: Color.dark.burn,
       })
       entries.push({
