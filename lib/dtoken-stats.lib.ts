@@ -32,7 +32,7 @@ export function historyDaysToLoad(): string[] {
 
 function calculateAlgoTokens(entry?: DTokenStatsEntry): number {
   if (!entry) return 0
-  return entry.minted.chainReported - entry.minted.loans - entry.burn.futureswap - entry.burn.other
+  return entry.minted.chainReported - entry.minted.loans - entry.openinterest - entry.burn.futureswap - entry.burn.other
 }
 
 export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): ChartData {
@@ -41,14 +41,14 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
     case DTokenStatsChartDataType.DISTRIBUTION: {
       const dUSD = stats.dTokens.find((entry) => entry.key === 'DUSD')
       const algoDUSD = calculateAlgoTokens(dUSD)
-      const backedDUSD = dUSD?.minted.loans ?? 0
+      const backedDUSD = (dUSD?.minted.loans ?? 0) + (dUSD?.openinterest ?? 0)
       const algoEverythingElse = stats.dTokens
         .filter((entry) => entry.key !== 'DUSD')
         .map((entry) => calculateAlgoTokens(entry) * entry.price)
         .reduce((prev, curr) => prev + curr, 0)
       const backedEverythingElse = stats.dTokens
         .filter((entry) => entry.key !== 'DUSD')
-        .map((entry) => entry.minted.loans * entry.price)
+        .map((entry) => (entry.minted.loans + entry.openinterest) * entry.price)
         .reduce((prev, curr) => prev + curr, 0)
       entries.push({
         label: 'algo DUSD',
@@ -139,7 +139,7 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
     case DUSDStatsChartDataType.CIRCULATING_SUPPLY: {
       const dUSD = stats.dTokens.find((entry) => entry.key === 'DUSD')
       const algoDUSD = calculateAlgoTokens(dUSD)
-      const backedDUSD = dUSD?.minted.loans ?? 0
+      const backedDUSD = (dUSD?.minted.loans ?? 0) + (dUSD?.openinterest ?? 0)
       entries.push({
         label: 'backed DUSD',
         data: backedDUSD,
@@ -183,7 +183,11 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
       })
       entries.push({
         label: 'Backed DUSD',
-        data: historyToCheck.map((day) => day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0),
+        data: historyToCheck.map(
+          (day) =>
+            (day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0) +
+            (day.dTokens.find((entry) => entry.key === 'DUSD')?.openinterest ?? 0),
+        ),
         color: colorBasedOn('DUSD'),
       })
       entries.push({
@@ -191,7 +195,8 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         data: historyToCheck.map(
           (day) =>
             calculateAlgoTokens(day.dTokens.find((entry) => entry.key === 'DUSD')) +
-            (day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0),
+            (day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0) +
+            (day.dTokens.find((entry) => entry.key === 'DUSD')?.openinterest ?? 0),
         ),
         color: '#fff',
       })
@@ -223,7 +228,11 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
     case DTokenStatsChartDataType.BACKED:
       entries.push({
         label: 'Backed DUSD',
-        data: historyToCheck.map((day) => day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0),
+        data: historyToCheck.map(
+          (day) =>
+            (day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0) +
+            (day.dTokens.find((entry) => entry.key === 'DUSD')?.openinterest ?? 0),
+        ),
         color: colorBasedOn('DUSD'),
       })
       entries.push({
@@ -231,7 +240,7 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         data: historyToCheck.map((day) =>
           day.dTokens
             .filter((entry) => entry.key !== 'DUSD')
-            .map((entry) => entry.minted.loans * entry.price)
+            .map((entry) => (entry.minted.loans + entry.openinterest) * entry.price)
             .reduce((prev, curr) => prev + curr, 0),
         ),
         color: colorBasedOn('dToken'),
@@ -239,7 +248,9 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
       entries.push({
         label: 'Backed combined',
         data: historyToCheck.map((day) =>
-          day.dTokens.map((entry) => entry.minted.loans * entry.price).reduce((prev, curr) => prev + curr, 0),
+          day.dTokens
+            .map((entry) => (entry.minted.loans + entry.openinterest) * entry.price)
+            .reduce((prev, curr) => prev + curr, 0),
         ),
         color: '#fff',
       })
@@ -250,7 +261,7 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         data: historyToCheck.map((day) => {
           const dUSD = day.dTokens.find((entry) => entry.key === 'DUSD')
           const algo = calculateAlgoTokens(dUSD)
-          const backed = dUSD?.minted.loans ?? 0
+          const backed = (dUSD?.minted.loans ?? 0) + (dUSD?.openinterest ?? 0)
           return new BigNumber(algo)
             .dividedBy(algo + backed)
             .multipliedBy(100)
@@ -266,7 +277,9 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
           const algo = tokens
             .map((entry) => calculateAlgoTokens(entry) * entry.price)
             .reduce((prev, curr) => prev + curr, 0)
-          const backed = tokens.map((entry) => entry.minted.loans * entry.price).reduce((prev, curr) => prev + curr, 0)
+          const backed = tokens
+            .map((entry) => (entry.minted.loans + entry.openinterest) * entry.price)
+            .reduce((prev, curr) => prev + curr, 0)
           return new BigNumber(algo)
             .dividedBy(algo + backed)
             .multipliedBy(100)
@@ -283,7 +296,7 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
             .map((entry) => calculateAlgoTokens(entry) * entry.price)
             .reduce((prev, curr) => prev + curr, 0)
           const backed = day.dTokens
-            .map((entry) => entry.minted.loans * entry.price)
+            .map((entry) => (entry.minted.loans + entry.openinterest) * entry.price)
             .reduce((prev, curr) => prev + curr, 0)
           return new BigNumber(algo)
             .dividedBy(algo + backed)
