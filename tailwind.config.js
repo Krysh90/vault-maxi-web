@@ -18,8 +18,8 @@ module.exports = {
       gdoc: '#4688f4',
       white: '#fff',
       invalid: '#c00',
-      warn: { base: '#ffcc00', dark: '#cca300' },
-      info: { base: '#5bc0de', dark: '#40869b' },
+      warnOld: { base: '#ffcc00', dark: '#cca300' },
+      infoOld: { base: '#5bc0de', dark: '#40869b' },
     },
     extend: {
       width: {
@@ -36,4 +36,21 @@ module.exports = {
       },
     },
   },
+  daisyui: {
+    themes: [
+      {
+        mytheme: {
+          primary: '#ff00af',
+          secondary: '#42f9c2',
+          accent: '#0821bb',
+          neutral: '#2a323c',
+          info: '#5bc0de',
+          success: '#32d74b', // #36d399
+          warning: '#ffcc00',
+          error: '#ff453a', // #f87272
+        },
+      },
+    ],
+  },
+  plugins: [require('daisyui')],
 }

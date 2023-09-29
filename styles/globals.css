@@ -21,6 +21,10 @@ a {
 @tailwind components;
 @tailwind utilities;
 
+.table {
+  @apply w-auto;
+}
+
 li {
   list-style: none;
 }

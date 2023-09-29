@@ -1,9 +1,16 @@
-import { faMoneyBillTransfer, faBridge, faGlobe, faChartSimple, faChartLine } from '@fortawesome/free-solid-svg-icons'
+import {
+  faMoneyBillTransfer,
+  faBridge,
+  faGlobe,
+  faChartSimple,
+  faChartLine,
+  faRightLeft,
+} from '@fortawesome/free-solid-svg-icons'
 import { CardItemDto } from '../dtos/card-item.dto'
 
 export class DefichainRepository {
   static all(): CardItemDto[] {
-    return [realYield, quantum, metaChain, dTokenStats, volumeStats]
+    return [realYield, quantum, metaChain, dTokenStats, volumeStats, dUSDSwaps]
   }
 }
 
@@ -43,4 +50,11 @@ const volumeStats: CardItemDto = {
   description: 'Display of statistics about DFI volume',
   icon: { definition: faChartLine, color: '#666', size: '4x' },
   links: [{ url: '/defichain/volume', display: 'Open page' }],
+}
+
+const dUSDSwaps: CardItemDto = {
+  name: 'dUSD swaps',
+  description: 'Analyze what happens to gateway pools if an amount of DUSD is being sold',
+  icon: { definition: faRightLeft, color: '#666', size: '4x' },
+  links: [{ url: '/defichain/dusd-swaps', display: 'Open page' }],
 }

@@ -6,6 +6,7 @@ import {
   LoanVaultActive,
   LoanVaultLiquidated,
 } from '@defichain/whale-api-client/dist/api/loan'
+import { PriceTicker } from '@defichain/whale-api-client/dist/api/prices'
 
 export function createClient(): WhaleApiClient {
   return new WhaleApiClient({
@@ -25,6 +26,10 @@ export async function getCollateralTokens(client: WhaleApiClient): Promise<Colla
 
 export async function getLoanTokens(client: WhaleApiClient): Promise<LoanToken[]> {
   return getAll(() => client.loan.listLoanToken(200), client)
+}
+
+export async function getPrices(client: WhaleApiClient): Promise<PriceTicker[]> {
+  return getAll(() => client.prices.list(200), client)
 }
 
 export async function getVault(client: WhaleApiClient, id: string): Promise<LoanVaultActive | LoanVaultLiquidated> {

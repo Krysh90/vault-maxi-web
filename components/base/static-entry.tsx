@@ -19,9 +19,9 @@ export function StaticEntry({ type, text, add, variableHeight, children }: Stati
   function backgroundColor(): string {
     switch (type) {
       case 'info':
-        return 'bg-info-base'
+        return 'bg-infoOld-base'
       case 'warn':
-        return 'bg-warn-base'
+        return 'bg-warnOld-base'
       case 'wrapper':
       case 'wrapper-between':
         return 'bg-light'
