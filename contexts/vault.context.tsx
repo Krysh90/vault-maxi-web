@@ -86,7 +86,7 @@ export function VaultContextProvider(props: PropsWithChildren): JSX.Element {
   const [entries, setEntries] = useState<CustomPriceEntry[]>([])
   const dataFetchedRef = useRef(false)
 
-  const stables = useMemo(() => ['DUSD', 'USDC', 'USDT'], [])
+  const stables = useMemo(() => ['DUSD', 'USDC', 'USDT', 'EUROC', 'XCHF'], [])
 
   const client = createClient()
 
