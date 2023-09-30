@@ -4,11 +4,13 @@ import BigNumber from 'bignumber.js'
 import { PoolPairData } from '@defichain/whale-api-client/dist/api/poolpairs'
 import { PriceTicker } from '@defichain/whale-api-client/dist/api/prices'
 import { DUSDResult } from '../dtos/dusd-result.dto'
+import { DUSDPeg } from '../dtos/dusd-peg.dto'
 
 interface DUSDContextInterface {
   isLoading: boolean
   gatewayPools: PoolPairData[]
   disabledPoolIds: string[]
+  calculatePeg: () => DUSDPeg
   analyze: (amount: BigNumber) => DUSDResult
   changePool: (poolPair: PoolPairData, shouldBeAnalyzed: boolean) => void
 }
@@ -87,9 +89,12 @@ export function DUSDContextProvider(props: PropsWithChildren): JSX.Element {
   }
 
   function neededDUSDForPeg(tradedPools: PoolPairData[]): {
-    [keys: string]: { coin: BigNumber; dusd: BigNumber }
+    neededPerToken: {
+      [keys: string]: { coin: BigNumber; dusd: BigNumber }
+    }
+    totalInUSD: BigNumber
   } {
-    if (!poolpairs || !prices) return {}
+    if (!poolpairs || !prices) return { neededPerToken: {}, totalInUSD: new BigNumber(0) }
     const pools = poolpairs.filter((p) => tradedPools.indexOf(p) > -1)
     const neededPerToken: { [keys: string]: { coin: BigNumber; dusd: BigNumber } } = {}
 
@@ -98,6 +103,7 @@ export function DUSDContextProvider(props: PropsWithChildren): JSX.Element {
       tokenPrices[p.price.token] = new BigNumber(p.price.aggregated.amount)
     })
 
+    let totalInUSD = new BigNumber(0)
     pools.forEach((p) => {
       const AtoB = p.tokenA.symbol == 'DUSD'
       const DUSDToken = AtoB ? p.tokenA : p.tokenB
@@ -110,26 +116,34 @@ export function DUSDContextProvider(props: PropsWithChildren): JSX.Element {
         coin: newOtherReserve.minus(otherToken.reserve),
         dusd: new BigNumber(DUSDToken.reserve).minus(newDusdReserve),
       }
+      totalInUSD = totalInUSD.plus(tokenPrices[otherToken.symbol].times(neededPerToken[otherToken.symbol].coin))
     })
-    return neededPerToken
+    return { neededPerToken, totalInUSD }
+  }
+
+  function calculatePeg(): DUSDPeg {
+    const poolPairs = gatewayPools.filter((p) => !disabledPoolIds.includes(p.id))
+    const peg = neededDUSDForPeg(poolPairs)
+
+    let total = new BigNumber(0)
+    for (const token in peg.neededPerToken) {
+      const v = peg.neededPerToken[token]
+      total = total.plus(v.dusd)
+    }
+
+    return { neededDUSDForPeg: peg.neededPerToken, totalDUSDNeeded: total, totalUSDNeeded: peg.totalInUSD }
   }
 
   function analyze(amountSold: BigNumber): DUSDResult {
     const poolPairs = gatewayPools.filter((p) => !disabledPoolIds.includes(p.id))
-    const neededPeg = neededDUSDForPeg(poolPairs)
-    let total = new BigNumber(0)
-    for (const token in neededPeg) {
-      const v = neededPeg[token]
-      total = total.plus(v.dusd)
-    }
 
     const newPrice = dusdPriceAfterSell(amountSold, poolPairs)
 
-    return { amountSold, neededDUSDForPeg: neededPeg, totalDUSDNeeded: total, dUSDAfterSell: newPrice }
+    return { amountSold, dUSDAfterSell: newPrice }
   }
 
   const context = useMemo(
-    () => ({ isLoading, gatewayPools, disabledPoolIds, analyze, changePool }),
+    () => ({ isLoading, gatewayPools, disabledPoolIds, calculatePeg, analyze, changePool }),
     [poolpairs, prices, isLoading, gatewayPools, disabledPoolIds],
   )
 

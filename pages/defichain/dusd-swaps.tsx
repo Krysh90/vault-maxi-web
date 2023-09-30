@@ -4,10 +4,11 @@ import { NextPage } from 'next'
 import { DUSDContextProvider, useDUSDContext } from '../../contexts/dusd.context'
 import { PoolPairData } from '@defichain/whale-api-client/dist/api/poolpairs'
 import { getAssetIcon } from '../../defiscan'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DUSDResult } from '../../dtos/dusd-result.dto'
 import { formatNumber } from '../../lib/chart.lib'
 import BigNumber from 'bignumber.js'
+import { DUSDPeg } from '../../dtos/dusd-peg.dto'
 
 const dUSDSwaps: NextPage = () => {
   return (
@@ -25,17 +26,47 @@ const rangeValues = {
 }
 
 function Content(): JSX.Element {
-  const { isLoading, gatewayPools, disabledPoolIds, analyze, changePool } = useDUSDContext()
+  const { isLoading, gatewayPools, disabledPoolIds, calculatePeg, analyze, changePool } = useDUSDContext()
   const [amount, setAmount] = useState<BigNumber>(rangeValues.defaultValue)
+  const [peg, setPeg] = useState<DUSDPeg>()
   const [result, setResult] = useState<DUSDResult>()
   const DUSD = getAssetIcon('DUSD')({ height: 24, width: 24 })
+
+  useEffect(() => {
+    if (isLoading) return
+    setPeg(calculatePeg())
+  }, [isLoading, disabledPoolIds])
+
+  function renderPeg() {
+    return (
+      <div className="card w-full lg:w-half bg-neutral text-neutral-content">
+        <div className="card-body items-center justify-center w-full">
+          <h3>to reach PEG (1 DUSD = 1$)</h3>
+          {peg ? (
+            <>
+              <div className="flex flex-row gap-2">
+                <div className="flex flex-row gap-2">
+                  {formatNumber(peg.totalDUSDNeeded.decimalPlaces(0).toNumber())} {DUSD}
+                </div>
+                <p>in total need to be bought (~{formatNumber(peg.totalUSDNeeded.decimalPlaces(0).toNumber())}$)</p>
+              </div>
+              <p>This would be split into following pools</p>
+              <NeedForPegInfo peg={peg} />
+            </>
+          ) : (
+            <span className="loading loading-spinner loading-lg text-primary" />
+          )}
+        </div>
+      </div>
+    )
+  }
 
   function renderInfo() {
     return (
       <div className="card w-full lg:w-half bg-neutral text-neutral-content">
         <div className="card-body items-center justify-center w-full">
           {result ? (
-            <div className="w-full flex flex-col gap-2">
+            <>
               <h3>dUSD prices</h3>
               <div className="flex flex-row gap-2">
                 <p className="flex-grow-0">after a sell of</p>
@@ -46,16 +77,7 @@ function Content(): JSX.Element {
               {Object.entries(result.dUSDAfterSell).map(([coin, price]) => (
                 <DUSDAfterSellInfo key={coin} coin={coin} price={price} />
               ))}
-              <h3 className="mt-4">to reach PEG (1 DUSD = 1$)</h3>
-              <div className="flex flex-row gap-2">
-                <div className="flex flex-row gap-2">
-                  {formatNumber(result.totalDUSDNeeded.decimalPlaces(0).toNumber())} {DUSD}
-                </div>
-                <p>in total need to be bought</p>
-              </div>
-              <p>This would be split into following pools</p>
-              <NeedForPegInfo result={result} />
-            </div>
+            </>
           ) : (
             <ol>
               <li className="list-decimal">Please select which gateway pools should be analyzed</li>
@@ -126,7 +148,10 @@ function Content(): JSX.Element {
   return (
     <Layout page="dUSD swaps" full maxWidth withoutSupport>
       <h1>dUSD swaps</h1>
-      <div className="w-full flex flex-col gap-4 pt-8 items-center">{renderBody()}</div>
+      <div className="w-full flex flex-col gap-4 pt-8 items-center">
+        {renderBody()}
+        {renderPeg()}
+      </div>
     </Layout>
   )
 }
@@ -152,13 +177,13 @@ function DUSDAfterSellInfo({ coin, price }: DUSDAfterSellInfoProps) {
 }
 
 interface NeedForPegInfoProps {
-  result: DUSDResult
+  peg: DUSDPeg
 }
 
-function NeedForPegInfo({ result }: NeedForPegInfoProps) {
+function NeedForPegInfo({ peg }: NeedForPegInfoProps) {
   return (
     <>
-      {Object.entries(result.neededDUSDForPeg).map(([coin, info]) => (
+      {Object.entries(peg.neededDUSDForPeg).map(([coin, info]) => (
         <NeededForPegInfoEntry key={coin} coin={coin} info={info} />
       ))}
     </>
