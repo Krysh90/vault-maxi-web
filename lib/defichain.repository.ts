@@ -53,7 +53,7 @@ const volumeStats: CardItemDto = {
 }
 
 const dUSDSwaps: CardItemDto = {
-  name: 'dUSD swaps',
+  name: 'DUSD swaps simulator',
   description: 'Analyze what happens to gateway pools if an amount of DUSD is being sold',
   icon: { definition: faRightLeft, color: '#666', size: '4x' },
   links: [{ url: '/defichain/dusd-swaps', display: 'Open page' }],
