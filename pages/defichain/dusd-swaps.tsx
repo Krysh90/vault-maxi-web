@@ -48,7 +48,10 @@ function Content(): JSX.Element {
                 <div className="flex flex-row gap-2">
                   {formatNumber(peg.totalDUSDNeeded.decimalPlaces(0).toNumber())} {DUSD}
                 </div>
-                <p>in total need to be bought (~{formatNumber(peg.totalUSDNeeded.decimalPlaces(0).toNumber())}$)</p>
+                <p>
+                  in total need to be bought, which takes about{' '}
+                  {formatNumber(peg.totalUSDNeeded.decimalPlaces(0).toNumber())}$
+                </p>
               </div>
               <p>This would be split into following pools</p>
               <NeedForPegInfo peg={peg} />
@@ -67,7 +70,7 @@ function Content(): JSX.Element {
         <div className="card-body items-center justify-center w-full">
           {result ? (
             <>
-              <h3>dUSD prices</h3>
+              <h3>DUSD prices</h3>
               <div className="flex flex-row gap-2">
                 <p className="flex-grow-0">after a sell of</p>
                 <div className="flex flex-row gap-2">
@@ -81,7 +84,7 @@ function Content(): JSX.Element {
           ) : (
             <ol>
               <li className="list-decimal">Please select which gateway pools should be analyzed</li>
-              <li className="list-decimal">Enter an amount of dUSD which should be sold</li>
+              <li className="list-decimal">Enter an amount of DUSD which should be sold</li>
               <li className="list-decimal">Press the button and see the results</li>
             </ol>
           )}
@@ -146,8 +149,8 @@ function Content(): JSX.Element {
   }
 
   return (
-    <Layout page="dUSD swaps" full maxWidth withoutSupport>
-      <h1>dUSD swaps</h1>
+    <Layout page="DUSD swaps simulator" full maxWidth withoutSupport>
+      <h1>DUSD swaps simulator</h1>
       <div className="w-full flex flex-col gap-4 pt-8 items-center">
         {renderBody()}
         {renderPeg()}
