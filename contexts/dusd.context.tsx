@@ -5,6 +5,7 @@ import { PoolPairData } from '@defichain/whale-api-client/dist/api/poolpairs'
 import { PriceTicker } from '@defichain/whale-api-client/dist/api/prices'
 import { DUSDResult } from '../dtos/dusd-result.dto'
 import { DUSDPeg } from '../dtos/dusd-peg.dto'
+import { formatNumber } from '../lib/chart.lib'
 
 interface DUSDContextInterface {
   isLoading: boolean
@@ -78,11 +79,14 @@ export function DUSDContextProvider(props: PropsWithChildren): JSX.Element {
       const part = new BigNumber(DUSDToken.reserve).div(totalLiquidity)
       const K = new BigNumber(p.tokenA.reserve).times(p.tokenB.reserve)
       const dusdReserve = new BigNumber(DUSDToken.reserve)
-      const feeFac = new BigNumber(1).minus(DUSDToken.fee?.inPct ?? 0)
+      const fee = (soldAmount.gt(0) ? DUSDToken.fee?.inPct : 0) ?? 0
+      const feeFac = new BigNumber(1).minus(fee)
       const dusdIn = soldAmount.times(part).times(feeFac)
 
       // newPrice= newOther / newDUSD = (K/newDUSD)/newDUSD
-      const newRatio = K.div(dusdReserve.plus(dusdIn)).div(dusdReserve.plus(dusdIn))
+      const newRatio = dusdReserve.plus(dusdIn).gte(0)
+        ? K.div(dusdReserve.plus(dusdIn)).div(dusdReserve.plus(dusdIn))
+        : new BigNumber(999999999)
       newdusdPricePerToken[otherToken.symbol] = newRatio.times(tokenPrices[otherToken.symbol])
     })
     return newdusdPricePerToken
@@ -139,7 +143,13 @@ export function DUSDContextProvider(props: PropsWithChildren): JSX.Element {
 
     const newPrice = dusdPriceAfterSell(amountSold, poolPairs)
 
-    return { amountSold, dUSDAfterSell: newPrice }
+    return {
+      amountSold,
+      dUSDAfterSell: newPrice,
+      wording: amountSold.gte(0)
+        ? `after a sell of ${formatNumber(amountSold.decimalPlaces(0).toNumber())}`
+        : `after a buy of ${formatNumber(amountSold.negated().decimalPlaces(0).toNumber())}`,
+    }
   }
 
   const context = useMemo(
