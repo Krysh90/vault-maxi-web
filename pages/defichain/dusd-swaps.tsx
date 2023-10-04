@@ -9,6 +9,7 @@ import { DUSDResult } from '../../dtos/dusd-result.dto'
 import { formatNumber } from '../../lib/chart.lib'
 import BigNumber from 'bignumber.js'
 import { DUSDPeg } from '../../dtos/dusd-peg.dto'
+import Selection from '../../components/base/selection'
 
 const dUSDSwaps: NextPage = () => {
   return (
@@ -20,22 +21,30 @@ const dUSDSwaps: NextPage = () => {
 
 const rangeValues = {
   min: 0,
-  max: new BigNumber(100_000_000),
-  defaultValue: new BigNumber(50_000_000),
+  sellMax: new BigNumber(100_000_000),
+  buyMax: new BigNumber(20_000_000),
+  defaultValueBuy: new BigNumber(10_000_000),
+  defaultValueSell: new BigNumber(50_000_000),
   step: new BigNumber(1_000_000),
 }
 
 function Content(): JSX.Element {
   const { isLoading, gatewayPools, disabledPoolIds, calculatePeg, analyze, changePool } = useDUSDContext()
-  const [amount, setAmount] = useState<BigNumber>(rangeValues.defaultValue)
+  const [amount, setAmount] = useState<number>(rangeValues.defaultValueSell.toNumber())
   const [peg, setPeg] = useState<DUSDPeg>()
   const [result, setResult] = useState<DUSDResult>()
+  const [tab, setTab] = useState<string>('Sell')
   const DUSD = getAssetIcon('DUSD')({ height: 24, width: 24 })
+  const isBuy = tab === 'Buy'
 
   useEffect(() => {
     if (isLoading) return
     setPeg(calculatePeg())
   }, [isLoading, disabledPoolIds])
+
+  useEffect(() => {
+    isBuy ? setAmount(rangeValues.defaultValueBuy.toNumber()) : setAmount(rangeValues.defaultValueSell.toNumber())
+  }, [isBuy])
 
   function renderPeg() {
     return (
@@ -72,10 +81,8 @@ function Content(): JSX.Element {
             <>
               <h3>DUSD prices</h3>
               <div className="flex flex-row gap-2">
-                <p className="flex-grow-0">after a sell of</p>
-                <div className="flex flex-row gap-2">
-                  {formatNumber(result.amountSold.decimalPlaces(0).toNumber())} {DUSD}
-                </div>
+                <p className="flex-grow-0">{result.wording}</p>
+                {DUSD}
               </div>
               {Object.entries(result.dUSDAfterSell).map(([coin, price]) => (
                 <DUSDAfterSellInfo key={coin} coin={coin} price={price} />
@@ -113,34 +120,45 @@ function Content(): JSX.Element {
               ))}
             </div>
           )}
+          <div className="flex flex-row justify-evenly">
+            <button className={`btn ${isBuy ? 'btn-success' : 'btn-neutral'} w-half`} onClick={() => setTab('Buy')}>
+              Buy
+            </button>
+            <button className={`btn ${!isBuy ? 'btn-error' : 'btn-neutral'} w-half`} onClick={() => setTab('Sell')}>
+              Sell
+            </button>
+          </div>
           <div className="flex flex-row gap-2">
             <p>{rangeValues.min}</p>
             <input
               type="range"
               min={rangeValues.min}
-              max={rangeValues.max.toNumber()}
-              defaultValue={amount.toNumber()}
+              max={isBuy ? rangeValues.buyMax.toNumber() : rangeValues.sellMax.toNumber()}
+              defaultValue={amount}
               step={rangeValues.step.toNumber()}
-              onChange={(e) => setAmount(new BigNumber(e.target.value))}
+              onChange={(e) => setAmount(Number(e.target.value))}
               className="range range-primary"
             />
-            <p>{formatNumber(rangeValues.max.toNumber())}</p>
+            <p>{formatNumber(isBuy ? rangeValues.buyMax.toNumber() : rangeValues.sellMax.toNumber())}</p>
           </div>
           <div className="flex flex-row gap-2 items-center justify-between">
             <div className="flex flex-row gap-2">
               <p className="flex-grow-0">Selected amount</p>
               <div className="flex flex-row gap-2">
-                {formatNumber(amount.decimalPlaces(0).toNumber())} {DUSD}
+                {formatNumber(new BigNumber(amount).decimalPlaces(0).toNumber())} {DUSD}
               </div>
             </div>
             <input
               type="number"
-              defaultValue={amount.toNumber()}
-              onChange={(e) => setAmount(new BigNumber(e.target.value))}
+              defaultValue={amount}
+              onChange={(e) => setAmount(Number(e.target.value))}
               className="input input-bordered text-end"
             />
           </div>
-          <button className="btn btn-primary" onClick={() => setResult(analyze(amount))}>
+          <button
+            className="btn btn-primary"
+            onClick={() => setResult(analyze(isBuy ? new BigNumber(amount).negated() : new BigNumber(amount)))}
+          >
             Analyze
           </button>
         </div>
