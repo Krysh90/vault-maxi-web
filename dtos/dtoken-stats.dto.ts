@@ -5,6 +5,13 @@ export interface DTokenStats {
     bots: DUSDVolume
     organic: DUSDVolume
   }
+  dusdDistribution: {
+    collateral: string
+    gatewayPools: string
+    dTokenPools: string
+    yieldVault: string
+    free: string
+  }
 }
 
 export interface DUSDVolume {
