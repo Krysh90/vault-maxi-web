@@ -170,7 +170,7 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
         color: colorBasedOn('dToken'),
       })
       entries.push({
-        label: 'YieldVault',
+        label: 'YieldVault addresses',
         data: new BigNumber(stats.dusdDistribution.yieldVault).toNumber(),
         color: Color.yieldVault,
       })
@@ -465,7 +465,7 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         color: colorBasedOn('dToken'),
       })
       entries.push({
-        label: 'YieldVault',
+        label: 'YieldVault addresses',
         data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.yieldVault).toNumber()) ?? [],
         color: Color.yieldVault,
       })
