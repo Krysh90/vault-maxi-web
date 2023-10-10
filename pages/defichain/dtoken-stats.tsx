@@ -95,7 +95,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
       title: 'dUSD distribution',
       type: DUSDStatsChartDataType.DISTRIBUTION,
       inDollar: false,
-      sort: false,
+      sort: true,
       customAlgo: false,
       showOverlay: false,
       showTotal: true,
