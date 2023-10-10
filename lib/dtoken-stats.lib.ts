@@ -24,6 +24,7 @@ export enum DTokenStatsChartDataType {
 export enum DUSDStatsChartDataType {
   VOLUME = 'VOLUME',
   CIRCULATING_SUPPLY = 'CIRCULATING SUPPLY',
+  DISTRIBUTION = 'DUSD DISTRIBUTION',
 }
 
 export function historyDaysToLoad(): string[] {
@@ -150,6 +151,35 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
         data: algoDUSD,
         color: colorBasedOn('dToken'),
       })
+      break
+    }
+    case DUSDStatsChartDataType.DISTRIBUTION: {
+      entries.push({
+        label: 'Collateral',
+        data: new BigNumber(stats.dusdDistribution.collateral).toNumber(),
+        color: Color.collateral,
+      })
+      entries.push({
+        label: 'Gateway pools',
+        data: new BigNumber(stats.dusdDistribution.gatewayPools).toNumber(),
+        color: Color.gatewayPools,
+      })
+      entries.push({
+        label: 'dToken pools',
+        data: new BigNumber(stats.dusdDistribution.dTokenPools).toNumber(),
+        color: colorBasedOn('dToken'),
+      })
+      entries.push({
+        label: 'YieldVault addresses',
+        data: new BigNumber(stats.dusdDistribution.yieldVault).toNumber(),
+        color: Color.yieldVault,
+      })
+      entries.push({
+        label: 'Free (approx.)',
+        data: new BigNumber(stats.dusdDistribution.free).toNumber(),
+        color: colorBasedOn('DUSD'),
+      })
+      break
     }
   }
   if (sort) entries = entries.sort((a, b) => b.data - a.data)
@@ -168,11 +198,19 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
 const Color = {
   light: { mint: '#00eeee', burn: '#ff2e22' },
   dark: { mint: '#00aaaa', burn: '#cc241b' },
+  collateral: '#0dacde',
+  gatewayPools: '#cd0c60',
+  yieldVault: '#6a5df2',
+}
+
+function getHistoryToCheck(history: DTokenStats[], type: string): DTokenStats[] {
+  if (type === DUSDStatsChartDataType.VOLUME) return history
+  else if (type === DUSDStatsChartDataType.DISTRIBUTION) return history.slice((getDates('2023-10-04').length - 1) * -1)
+  else return history.slice((getDates('2023-05-24').length - 1) * -1)
 }
 
 export function toLineChartData(history: DTokenStats[], { type, timeFrame }: LineChartInfo): ChartData {
-  const historyToCheck =
-    type === DUSDStatsChartDataType.VOLUME ? history : history.slice((getDates('2023-05-24').length - 1) * -1)
+  const historyToCheck = getHistoryToCheck(history, type)
   const entries: LineChartEntry[] = []
   switch (type) {
     case DUSDStatsChartDataType.CIRCULATING_SUPPLY:
@@ -408,6 +446,33 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
               .toNumber(),
           ) ?? [],
         color: '#999',
+      })
+      break
+    case DUSDStatsChartDataType.DISTRIBUTION:
+      entries.push({
+        label: 'Collateral',
+        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.collateral).toNumber()) ?? [],
+        color: Color.collateral,
+      })
+      entries.push({
+        label: 'Gateway pools',
+        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.gatewayPools).toNumber()) ?? [],
+        color: Color.gatewayPools,
+      })
+      entries.push({
+        label: 'dToken pools',
+        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.dTokenPools).toNumber()) ?? [],
+        color: colorBasedOn('dToken'),
+      })
+      entries.push({
+        label: 'YieldVault addresses',
+        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.yieldVault).toNumber()) ?? [],
+        color: Color.yieldVault,
+      })
+      entries.push({
+        label: 'Free (approx.)',
+        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.free).toNumber()) ?? [],
+        color: colorBasedOn('DUSD'),
       })
       break
   }
