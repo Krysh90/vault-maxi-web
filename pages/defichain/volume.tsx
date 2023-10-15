@@ -73,8 +73,8 @@ const Volume: NextPage<StatisticsProps> = ({ statistics, history }: StatisticsPr
   ]
 
   const historyItems = [
-    { label: 'Volume', type: VolumeChartDataType.VOLUME },
-    { label: 'Volume delta per pool', type: VolumeChartDataType.POOL_DELTA },
+    { label: 'Volume', type: VolumeChartDataType.VOLUME, showZeroLine: true },
+    { label: 'Volume delta per pool', type: VolumeChartDataType.POOL_DELTA, showZeroLine: true },
     { label: 'Total volume per pool', type: VolumeChartDataType.TOTAL_POOL },
   ]
 

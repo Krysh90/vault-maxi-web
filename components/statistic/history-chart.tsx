@@ -12,6 +12,7 @@ interface HistoryChartProps {
   toLineChartData: (history: any[], { type, timeFrame }: LineChartInfo, additionalHistory?: any[]) => ChartData
   toScales: (type: string) => any
   additionalHistory?: any[]
+  showZeroLine?: boolean
 }
 
 export default function HistoryChart({
@@ -20,6 +21,7 @@ export default function HistoryChart({
   toLineChartData,
   toScales,
   additionalHistory,
+  showZeroLine,
 }: HistoryChartProps): JSX.Element {
   const [currentChartData, setCurrentChartData] = useState<HistoryChartItem>(items[0])
   const [currentTimeFrame, setCurrentTimeFrame] = useState<LineChartTimeFrame>(LineChartTimeFrame.ALL)
@@ -42,16 +44,7 @@ export default function HistoryChart({
             { type: currentChartData.type, timeFrame: currentTimeFrame },
             additionalHistory,
           )}
-          options={{
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'bottom' as const,
-                labels: { usePointStyle: true, color: '#fff' },
-              },
-            },
-            scales: toScales(currentChartData.type),
-          }}
+          options={getOptions(toScales(currentChartData.type), currentChartData.showZeroLine)}
         />
         <div className="flex flex-col gap-2 pl-10">
           <h3 className="text-white">History of</h3>
@@ -60,4 +53,38 @@ export default function HistoryChart({
       </div>
     </div>
   )
+}
+
+function getOptions(scales: any, showZeroLine?: boolean) {
+  var options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom' as const,
+        labels: { usePointStyle: true, color: '#fff' },
+      },
+      annotation: {},
+    },
+    scales,
+  }
+  if (showZeroLine) {
+    options = {
+      ...options,
+      plugins: {
+        ...options.plugins,
+        annotation: {
+          annotations: {
+            zeroLine: {
+              type: 'line',
+              yMin: 0,
+              yMax: 0,
+              borderColor: 'rgb(255, 255, 255)',
+              borderWidth: 1,
+            },
+          },
+        },
+      },
+    }
+  }
+  return options
 }

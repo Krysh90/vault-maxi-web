@@ -143,6 +143,7 @@ export function filterDates(dates: Date[]): Date[] {
 export interface HistoryChartItem {
   label: string
   type: string
+  showZeroLine?: boolean
 }
 
 export interface LineChartEntry {
