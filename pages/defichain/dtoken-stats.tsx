@@ -110,7 +110,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
     { label: 'Backed', type: DTokenStatsChartDataType.BACKED },
     { label: 'Algo Ratio', type: DTokenStatsChartDataType.RATIO },
     { label: 'FutureSwap', type: DTokenStatsChartDataType.FUTURESWAP },
-    { label: 'dUSD Volume', type: DUSDStatsChartDataType.VOLUME },
+    { label: 'dUSD Volume', type: DUSDStatsChartDataType.VOLUME, showZeroLine: true },
     { label: 'dUSD Supply', type: DUSDStatsChartDataType.CIRCULATING_SUPPLY },
     { label: 'dUSD Distribution', type: DUSDStatsChartDataType.DISTRIBUTION },
   ]
