@@ -76,7 +76,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
       showOverlay: false,
       showTotal: false,
       showLine: true,
-      calculateDelta: false,
+      calculateDelta: true,
       keywords: ['buys', 'sells'],
     },
     {
