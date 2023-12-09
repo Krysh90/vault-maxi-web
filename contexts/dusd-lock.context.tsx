@@ -27,6 +27,7 @@ interface DUSDLockContextInterface {
   coinAddress?: string
   earliestUnlock?: Unlock
   investments?: Investment[]
+  isExitCriteriaTriggered: boolean
   deposit: (amount: string) => Promise<void>
   claimRewards: () => Promise<void>
   withdraw: (index: number) => Promise<void>
@@ -68,6 +69,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   const [isDepositing, setIsDepositing] = useState(false)
   const [isClaiming, setIsClaiming] = useState(false)
   const [isWithdrawing, setIsWithdrawing] = useState(false)
+  const [isExitCriteriaTriggered, setIsExitCriteriaTriggered] = useState(false)
   const [tvl, setTvl] = useState<BigNumber>()
   const [numberOfAddresses, setNumberOfAddresses] = useState<BigNumber>()
   const [rewardsPerDeposit, setRewardsPerDeposit] = useState<BigNumber>()
@@ -118,6 +120,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
         if ((block ?? 0) <= (lastWithdrawBlock ?? 0)) return
         getInvestments().then(setInvestments).catch(console.error)
         getEarliestUnlock().then(setEarliestUnlock).catch(console.error)
+        getExitCriteriaTriggered().then(setIsExitCriteriaTriggered).catch(console.error)
         setLastWithdrawBlock(block)
         break
     }
@@ -171,6 +174,10 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
 
   async function getLockupPeriod(): Promise<BigNumber> {
     return new BigNumber(await createContract().methods.lockupPeriod().call())
+  }
+
+  async function getExitCriteriaTriggered(): Promise<boolean> {
+    return await createContract().methods.lockupPeriod().call()
   }
 
   async function getCoinAddress(): Promise<string> {
@@ -270,6 +277,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       withdraw,
       earliestUnlock,
       investments,
+      isExitCriteriaTriggered,
     }),
     [
       tab,
@@ -291,6 +299,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       coinAddress,
       earliestUnlock,
       investments,
+      isExitCriteriaTriggered,
     ],
   )
 

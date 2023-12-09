@@ -175,15 +175,21 @@ function DepositDisplay({
   handleOpen: (value: boolean, index: number) => void
   withdrawable?: boolean
 }): JSX.Element {
-  const { isWithdrawing, withdraw } = useDUSDLockContext()
+  const { isWithdrawing, withdraw, isExitCriteriaTriggered } = useDUSDLockContext()
   const diff = investment.lockedUntil - Math.floor(Date.now() / 1000)
   const timeObj = diff > 0 ? secondsToTime(diff) : undefined
+  const isWithdrawn = investment.amount.isEqualTo(0)
 
   return (
     <div key={index} className="collapse collapse-arrow bg-transparent border deposit-border-color rounded-lg">
       <input type="checkbox" defaultChecked={isOpen(index)} onChange={(e) => handleOpen(e.target.checked, index)} />
       <div className="collapse-title flex flex-row items-center gap-2">
-        Deposit #{index + 1} <p className="text-xs">({formatNumber(investment.amount.toNumber(), 2)} DUSD)</p>
+        Deposit #{index + 1}{' '}
+        {isWithdrawn ? (
+          <p className="text-xs text-success">withdrawn</p>
+        ) : (
+          <p className="text-xs">({formatNumber(investment.amount.toNumber(), 2)} DUSD)</p>
+        )}
       </div>
       <div className="collapse-content text-xs">
         <div className="flex flex-row w-full justify-between">
@@ -196,13 +202,21 @@ function DepositDisplay({
         </div>
         <div className="flex flex-row w-full justify-between">
           <p>Unlock status:</p>
-          <p className="text-end">{timeObj ? `in ${getTimeString(timeObj)}` : 'withdrawable'}</p>
+          <p className="text-end">
+            {isExitCriteriaTriggered
+              ? 'unlocked'
+              : isWithdrawn
+              ? 'withdrawn'
+              : timeObj
+              ? `in ${getTimeString(timeObj)}`
+              : 'withdrawable'}
+          </p>
         </div>
-        {withdrawable && (
+        {withdrawable && !isWithdrawn && (
           <button
             className="btn btn-block btn-primary mt-2"
             onClick={() => withdraw(index)}
-            disabled={isWithdrawing || !!timeObj}
+            disabled={isWithdrawing || (!!timeObj && !isExitCriteriaTriggered)}
           >
             {isWithdrawing ? <span className="loading loading-spinner loading-sm"></span> : 'Withdraw'}
           </button>
@@ -247,7 +261,7 @@ function Claim(): JSX.Element {
 }
 
 function Withdraw(): JSX.Element {
-  const { earliestUnlock, investments } = useDUSDLockContext()
+  const { earliestUnlock, investments, isExitCriteriaTriggered } = useDUSDLockContext()
 
   const diff = earliestUnlock?.timestamp ? earliestUnlock.timestamp - Math.floor(Date.now() / 1000) : 0
   const timeObj = diff > 0 ? secondsToTime(diff) : undefined
@@ -268,10 +282,12 @@ function Withdraw(): JSX.Element {
   return (
     <div className="card-body items-center w-full gap-4">
       <div className="flex flex-row w-full justify-between">
-        <p>Earliest unlock:</p>
-        <p className="text-end">
-          {earliestUnlock ? (timeObj ? `in ${getTimeString(timeObj)}` : 'now available') : 'loading ...'}
-        </p>
+        <p>{isExitCriteriaTriggered ? 'Exit criteria got triggered, you can withdraw' : 'Earliest unlock:'}</p>
+        {!isExitCriteriaTriggered && (
+          <p className="text-end">
+            {earliestUnlock ? (timeObj ? `in ${getTimeString(timeObj)}` : 'now available') : 'loading ...'}
+          </p>
+        )}
       </div>
       {investments?.map((i, index) => (
         <DepositDisplay key={index} investment={i} index={index} isOpen={isOpen} handleOpen={handleOpen} withdrawable />
