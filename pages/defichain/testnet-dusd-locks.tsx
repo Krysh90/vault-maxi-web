@@ -336,6 +336,10 @@ function TestNetDusdLocksCard(): JSX.Element {
 function TestNetDusdLocksContent(): JSX.Element {
   const { chain, isConnected, connect, requestChangeToChain } = useWalletContext()
 
+  function reportIssue() {
+    window.open('https://github.com/kuegi/dusd-lock-bot/issues/new', '_blank')
+  }
+
   return (
     <Layout page="TestNet DUSD locks" full maxWidth withoutSupport>
       <h1>TestNet DUSD locks</h1>
@@ -359,6 +363,9 @@ function TestNetDusdLocksContent(): JSX.Element {
         </p>
         <p> Testing is very appreciated, if you find anything please reach out to us. Happy testing.</p>
         <p>Note: rewards are not indicative for real DUSD lock pools.</p>
+        <button className="btn btn-block btn-primary" onClick={() => reportIssue()}>
+          Report an issue
+        </button>
       </div>
     </Layout>
   )
