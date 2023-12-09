@@ -212,7 +212,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
           reload()
         })
     } finally {
-      setIsDepositing(false)
+      setIsClaiming(false)
       reload()
     }
   }
