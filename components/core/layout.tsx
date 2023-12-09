@@ -32,7 +32,7 @@ export default function Layout({
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
       <Navigation />
-      <div className="flex justify-center px-8">
+      <div className="flex justify-center px-2 md:px-8">
         <main
           className={`flex flex-col justify-center items-center py-8 ${full ? 'max-w-screen-2xl' : 'max-w-screen-md'} ${
             maxWidth ? 'w-full' : ''

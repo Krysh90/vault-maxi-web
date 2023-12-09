@@ -1,7 +1,6 @@
 import {
   faMoneyBillTransfer,
   faBridge,
-  faGlobe,
   faChartSimple,
   faChartLine,
   faRightLeft,
@@ -10,7 +9,7 @@ import { CardItemDto } from '../dtos/card-item.dto'
 
 export class DefichainRepository {
   static all(): CardItemDto[] {
-    return [realYield, quantum, metaChain, dTokenStats, volumeStats, dUSDSwaps]
+    return [realYield, quantum, dTokenStats, volumeStats, dUSDSwaps]
   }
 }
 
@@ -26,16 +25,6 @@ const quantum: CardItemDto = {
   description: 'Display of statistics about quantum bridge',
   icon: { definition: faBridge, color: '#666', size: '4x' },
   links: [{ url: '/defichain/quantum', display: 'Open statistics' }],
-}
-
-const metaChain: CardItemDto = {
-  name: 'MetaChain',
-  description: 'Connect to MetaChain networks',
-  icon: { definition: faGlobe, color: '#666', size: '4x' },
-  links: [
-    { url: '/defichain/meta-chain', display: 'Open page' },
-    { url: 'https://defichain.com/de/metachain', display: 'About' },
-  ],
 }
 
 const dTokenStats: CardItemDto = {

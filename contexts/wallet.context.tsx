@@ -12,6 +12,7 @@ interface WalletInterface {
   isConnected: boolean
   connect: () => Promise<string>
   signMessage: (message: string, address: string) => Promise<string>
+  requestChangeToChain: (chain?: number) => Promise<void>
 }
 
 const WalletContext = createContext<WalletInterface>(undefined as any)
@@ -25,7 +26,8 @@ export function WalletContextProvider(props: PropsWithChildren): JSX.Element {
   const [chain, setChain] = useState<number>()
   const [block, setBlock] = useState<number>()
   const [balance, setBalance] = useState<BigNumber>()
-  const { isInstalled, verifyAccount, requestAccount, requestChain, requestBalance, sign } = useMetaMask()
+  const { isInstalled, verifyAccount, requestAccount, requestChain, requestBalance, requestChangeToChain, sign } =
+    useMetaMask()
   const web3 = new Web3(Web3.givenProvider)
   const { ethereum } = window as any
 
@@ -53,7 +55,7 @@ export function WalletContextProvider(props: PropsWithChildren): JSX.Element {
       // window.location.reload();
     })
     web3.eth.subscribe('newBlockHeaders', (_err, blockHeader) => {
-      setBlock(blockHeader.number)
+      blockHeader && setBlock(blockHeader.number)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -102,6 +104,7 @@ export function WalletContextProvider(props: PropsWithChildren): JSX.Element {
       isConnected,
       connect,
       signMessage,
+      requestChangeToChain,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [address, balance, chain, block, isInstalled, isConnected],

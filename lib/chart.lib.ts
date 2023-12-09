@@ -107,17 +107,17 @@ export function generateTableContent(
   return { content, labels, percentages, colors }
 }
 
-export function formatNumber(value: number): string {
+export function formatNumber(value: number, forceFixed?: number): string {
   let postfix = ''
-  let fixed = 0
+  let fixed = forceFixed ?? 0
   if (Math.abs(value) > 1e6) {
     value = value / 1e6
     postfix = 'M'
-    fixed = 2
+    fixed = forceFixed ?? 2
   } else if (Math.abs(value) > 1e3) {
     value = value / 1e3
     postfix = 'k'
-    fixed = 2
+    fixed = forceFixed ?? 2
   }
   return value
     .toFixed(fixed)

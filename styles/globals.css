@@ -63,6 +63,35 @@ em {
   padding: 1rem 1.5rem;
 }
 
+.tabs {
+  background-color: #333;
+}
+
+.card-body {
+  padding: 0.5rem;
+}
+
+.btn-bordered,
+.btn[disabled] {
+  border-color: hsl(var(--bc) / var(--tw-border-opacity));
+  --tw-border-opacity: 0.2;
+}
+
+.deposit-border-color {
+  border-color: hsl(var(--bc) / var(--tw-border-opacity));
+  --tw-border-opacity: 0.2;
+}
+
+.collapse-title,
+:where(.collapse > input[type='checkbox']),
+:where(.collapse > input[type='radio']) {
+  width: 100%;
+  padding: 1rem /* 16px */;
+  padding-right: 3rem /* 48px */;
+  min-height: 1.75rem /* 60px */;
+  transition: background-color 0.2s ease-out;
+}
+
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
