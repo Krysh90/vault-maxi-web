@@ -292,6 +292,7 @@ function Withdraw(): JSX.Element {
       {investments?.map((i, index) => (
         <DepositDisplay key={index} investment={i} index={index} isOpen={isOpen} handleOpen={handleOpen} withdrawable />
       ))}
+      {investments?.length === 0 && <p className="text-sm text-start w-full">Deposit DUSD to see your deposits</p>}
     </div>
   )
 }

@@ -65,7 +65,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   const [tab, setTab] = useState<Tab>(Tab.withdraw)
   const tabs = [Tab.deposit, Tab.claim, Tab.withdraw, Tab.stats]
 
-  const contractAddress = '0xeF0Bf6df74e15981FB182bE3914C14958aa409bb'
+  const contractAddress = '0x03812a485f2acCafbF1E57b050ed85Ca5D3277a0'
   const [isDepositing, setIsDepositing] = useState(false)
   const [isClaiming, setIsClaiming] = useState(false)
   const [isWithdrawing, setIsWithdrawing] = useState(false)
@@ -177,7 +177,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   }
 
   async function getExitCriteriaTriggered(): Promise<boolean> {
-    return await createContract().methods.lockupPeriod().call()
+    return await createContract().methods.exitCriteriaTriggered().call()
   }
 
   async function getCoinAddress(): Promise<string> {

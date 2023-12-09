@@ -101,7 +101,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "currentTVL",
+        "name": "newRewardsClaimable",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "currentTvl",
         "type": "uint256"
       }
     ],
@@ -121,6 +127,12 @@
         "indexed": false,
         "internalType": "uint256",
         "name": "claimedRewards",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newRewardsClaimable",
         "type": "uint256"
       }
     ],
@@ -163,6 +175,38 @@
     "name": "addRewards",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "allAddresses",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "availableOwnRewards",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -255,6 +299,32 @@
   },
   {
     "inputs": [],
+    "name": "currentOwnTvl",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "currentRewardsClaimable",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "currentTvl",
     "outputs": [
       {
@@ -304,19 +374,13 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "index",
-        "type": "uint256"
-      }
-    ],
-    "name": "getAddress",
+    "inputs": [],
+    "name": "getAllAddress",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "address[]",
         "name": "",
-        "type": "address"
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",
