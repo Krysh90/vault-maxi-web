@@ -169,7 +169,9 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   }
 
   async function getAvailableRewards(): Promise<BigNumber> {
-    return new BigNumber(web3.utils.fromWei(await createContract().methods.availableOwnRewards().call(), 'ether'))
+    return new BigNumber(
+      web3.utils.fromWei(await createContract().methods.availableOwnRewards().call({ from: address }), 'ether'),
+    )
   }
 
   async function getLockupPeriod(): Promise<BigNumber> {
