@@ -62,7 +62,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   const { address, isConnected, block, chain } = useWalletContext()
   const web3 = new Web3(Web3.givenProvider)
 
-  const [tab, setTab] = useState<Tab>(Tab.withdraw)
+  const [tab, setTab] = useState<Tab>(Tab.deposit)
   const tabs = [Tab.deposit, Tab.claim, Tab.withdraw, Tab.stats]
 
   const contractAddress = '0x03812a485f2acCafbF1E57b050ed85Ca5D3277a0'
