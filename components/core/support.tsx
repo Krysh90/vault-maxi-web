@@ -1,6 +1,10 @@
 import styles from './support.module.css'
 
-export default function Support(): JSX.Element {
+interface SupportProps {
+  openDonation: () => void
+}
+
+export default function Support({ openDonation }: SupportProps): JSX.Element {
   return (
     <div className={styles.container}>
       <h3>Need support or have questions?</h3>
@@ -31,6 +35,11 @@ export default function Support(): JSX.Element {
         <li>
           <a target="_blank" href="https://github.com/kuegi/defichain_maxi/issues/new" rel="noopener noreferrer">
             Report a bug &rarr;
+          </a>
+        </li>
+        <li>
+          <a className="cursor-pointer" onClick={() => openDonation()}>
+            Support us by donating
           </a>
         </li>
       </ul>

@@ -46,7 +46,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
     {
       title: 'Distribution',
       type: DTokenStatsChartDataType.DISTRIBUTION,
-      inDollar: true,
+      inDollar: false,
       sort: false,
       customAlgo: true,
       showOverlay: true,
@@ -58,7 +58,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
     {
       title: 'FutureSwap',
       type: DTokenStatsChartDataType.FUTURESWAP,
-      inDollar: true,
+      inDollar: false,
       sort: false,
       customAlgo: false,
       showOverlay: false,
