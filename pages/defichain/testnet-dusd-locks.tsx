@@ -49,8 +49,7 @@ function getTimeString(timeObj: { d: number; h: number; m: number }): string {
 }
 
 function Stats(): JSX.Element {
-  const { tvl, rewardsPerDeposit, totalClaimed, totalRewards, totalSupply, totalWithdrawn, lockupPeriod } =
-    useDUSDLockContext()
+  const { tvl, rewardsPerDeposit, totalClaimed, totalRewards, totalWithdrawn, lockupPeriod } = useDUSDLockContext()
 
   const timeObj = secondsToTime(lockupPeriod?.toNumber() ?? 0)
 
@@ -77,10 +76,6 @@ function Stats(): JSX.Element {
       <div className="flex flex-row w-full justify-between">
         <p>Total rewards:</p>
         <p className="text-end">{formatNumber(totalRewards?.toNumber() ?? 0, 2)} DUSD</p>
-      </div>
-      <div className="flex flex-row w-full justify-between">
-        <p>Total supply:</p>
-        <p className="text-end">{formatNumber(totalSupply?.toNumber() ?? 0, 2)} DUSD</p>
       </div>
       <div className="flex flex-row w-full justify-between">
         <p>Total withdrawn:</p>
@@ -228,7 +223,6 @@ function DepositDisplay({
 
 function Claim(): JSX.Element {
   const { investments, availableRewards, claimRewards, isClaiming, isClaimable } = useDUSDLockContext()
-  console.log('isClaimable', isClaimable, isClaiming || !isClaimable)
 
   const [accordions, setAccordions] = useState<boolean[]>(investments?.map(() => false) ?? [])
 

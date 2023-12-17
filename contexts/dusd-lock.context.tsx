@@ -21,7 +21,6 @@ interface DUSDLockContextInterface {
   totalInvest?: BigNumber
   totalInvestCap?: BigNumber
   totalRewards?: BigNumber
-  totalSupply?: BigNumber
   totalWithdrawn?: BigNumber
   availableRewards?: BigNumber
   contractAddress: string
@@ -78,7 +77,6 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   const [totalInvest, setTotalInvest] = useState<BigNumber>()
   const [totalInvestCap, setTotalInvestCap] = useState<BigNumber>()
   const [totalRewards, setTotalRewards] = useState<BigNumber>()
-  const [totalSupply, setTotalSupply] = useState<BigNumber>()
   const [totalWithdrawn, setTotalWithdrawn] = useState<BigNumber>()
   const [lockupPeriod, setLockupPeriod] = useState<BigNumber>()
   const [availableRewards, setAvailableRewards] = useState<BigNumber>()
@@ -103,7 +101,6 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
         getRewardsPerDeposit().then(setRewardsPerDeposit).catch(console.error)
         getTotalClaimed().then(setTotalClaimed).catch(console.error)
         getTotalRewards().then(setTotalRewards).catch(console.error)
-        getTotalSupply().then(setTotalSupply).catch(console.error)
         getTotalWithdrawn().then(setTotalWithdrawn).catch(console.error)
         setLastStatsBlock(block)
         break
@@ -162,10 +159,6 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
 
   async function getTotalRewards(): Promise<BigNumber> {
     return new BigNumber(web3.utils.fromWei(await createContract().methods.totalRewards().call(), 'ether'))
-  }
-
-  async function getTotalSupply(): Promise<BigNumber> {
-    return new BigNumber(web3.utils.fromWei(await createContract().methods.totalSupply().call(), 'ether'))
   }
 
   async function getTotalWithdrawn(): Promise<BigNumber> {
@@ -279,7 +272,6 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       totalInvest,
       totalInvestCap,
       totalRewards,
-      totalSupply,
       totalWithdrawn,
       availableRewards,
       lockupPeriod,
@@ -305,7 +297,6 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       totalInvest,
       totalInvestCap,
       totalRewards,
-      totalSupply,
       totalWithdrawn,
       availableRewards,
       lockupPeriod,

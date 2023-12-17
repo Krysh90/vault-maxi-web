@@ -48,7 +48,7 @@ export function useDUSD(contractAddress?: string, dusdLocksAddress?: string): DU
   async function approve(amount: string) {
     setIsApproving(true)
     try {
-      return createContract()
+      return await createContract()
         .methods.approve(dusdLocksAddress, web3.utils.toWei(amount, 'ether'))
         .send({
           from: address,
