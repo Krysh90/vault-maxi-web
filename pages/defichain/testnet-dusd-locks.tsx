@@ -184,7 +184,7 @@ function DepositDisplay({
     <div key={index} className="collapse collapse-arrow bg-transparent border deposit-border-color rounded-lg">
       <input type="checkbox" defaultChecked={isOpen(index)} onChange={(e) => handleOpen(e.target.checked, index)} />
       <div className="collapse-title flex flex-row items-center gap-2">
-        Deposit #{index + 1}{' '}
+        Deposit #{investment.batchId}{' '}
         {isWithdrawn ? (
           <p className="text-xs text-success">withdrawn</p>
         ) : (
@@ -215,7 +215,7 @@ function DepositDisplay({
         {withdrawable && !isWithdrawn && (
           <button
             className="btn btn-block btn-primary mt-2"
-            onClick={() => withdraw(index)}
+            onClick={() => withdraw(investment.batchId)}
             disabled={isWithdrawing || (!!timeObj && !isExitCriteriaTriggered)}
           >
             {isWithdrawing ? <span className="loading loading-spinner loading-sm"></span> : 'Withdraw'}

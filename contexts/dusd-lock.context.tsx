@@ -51,6 +51,7 @@ export interface Investment {
   lockedUntil: number
   initialRewardsPerDeposit: BigNumber
   claimedRewards: BigNumber
+  batchId: number
 }
 
 const DUSDLockContext = createContext<DUSDLockContextInterface>(undefined as any)
@@ -226,11 +227,11 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
     }
   }
 
-  async function withdraw(index: number) {
+  async function withdraw(batchId: number) {
     setIsWithdrawing(true)
     try {
       return await createContract()
-        .methods.withdraw(index)
+        .methods.withdraw(batchId)
         .send({ from: address })
         .finally(() => {
           setIsWithdrawing(false)
@@ -251,12 +252,14 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
     const numberOfBatches = await contract.methods.balanceOf(address).call()
     const investments: Investment[] = []
     for (let i = 0; i < numberOfBatches; i++) {
-      const inv = await contract.methods.investments(i).call({ from: address })
+      const batchId = await contract.methods.tokenOfOwnerByIndex(address, i).call()
+      const inv = await contract.methods.investments(batchId).call({ from: address })
       investments.push({
         amount: new BigNumber(web3.utils.fromWei(inv.amount, 'ether')),
         lockedUntil: inv.lockedUntil,
         initialRewardsPerDeposit: new BigNumber(web3.utils.fromWei(inv.initialRewardsPerDeposit, 'ether')),
         claimedRewards: new BigNumber(web3.utils.fromWei(inv.claimedRewards, 'ether')),
+        batchId,
       })
     }
     return investments
