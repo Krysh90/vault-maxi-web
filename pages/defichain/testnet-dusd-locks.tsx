@@ -49,7 +49,7 @@ function getTimeString(timeObj: { d: number; h: number; m: number }): string {
 }
 
 function Stats(): JSX.Element {
-  const { tvl, numberOfAddresses, rewardsPerDeposit, totalClaimed, totalRewards, totalWithdrawn, lockupPeriod } =
+  const { tvl, rewardsPerDeposit, totalClaimed, totalRewards, totalSupply, totalWithdrawn, lockupPeriod } =
     useDUSDLockContext()
 
   const timeObj = secondsToTime(lockupPeriod?.toNumber() ?? 0)
@@ -59,10 +59,6 @@ function Stats(): JSX.Element {
       <div className="flex flex-row w-full justify-between">
         <p>TVL:</p>
         <p className="text-end">{formatNumber(tvl?.toNumber() ?? 0, 2)} DUSD</p>
-      </div>
-      <div className="flex flex-row w-full justify-between">
-        <p># of accounts:</p>
-        <p className="text-end">{numberOfAddresses?.toNumber() ?? 0}</p>
       </div>
       <div className="flex flex-row w-full justify-between">
         <p>Lockup period:</p>
@@ -81,6 +77,10 @@ function Stats(): JSX.Element {
       <div className="flex flex-row w-full justify-between">
         <p>Total rewards:</p>
         <p className="text-end">{formatNumber(totalRewards?.toNumber() ?? 0, 2)} DUSD</p>
+      </div>
+      <div className="flex flex-row w-full justify-between">
+        <p>Total supply:</p>
+        <p className="text-end">{formatNumber(totalSupply?.toNumber() ?? 0, 2)} DUSD</p>
       </div>
       <div className="flex flex-row w-full justify-between">
         <p>Total withdrawn:</p>
@@ -227,7 +227,8 @@ function DepositDisplay({
 }
 
 function Claim(): JSX.Element {
-  const { investments, availableRewards, claimRewards, isClaiming } = useDUSDLockContext()
+  const { investments, availableRewards, claimRewards, isClaiming, isClaimable } = useDUSDLockContext()
+  console.log('isClaimable', isClaimable, isClaiming || !isClaimable)
 
   const [accordions, setAccordions] = useState<boolean[]>(investments?.map(() => false) ?? [])
 
@@ -249,7 +250,11 @@ function Claim(): JSX.Element {
           <p>Rewards:</p>
           <p className="text-end">{formatNumber(availableRewards?.toNumber() ?? 0, 2)} DUSD</p>
         </div>
-        <button className="btn btn-block btn-primary" onClick={() => claimRewards()} disabled={isClaiming}>
+        <button
+          className="btn btn-block btn-primary"
+          onClick={() => claimRewards()}
+          disabled={isClaiming || !isClaimable}
+        >
           {isClaiming ? <span className="loading loading-spinner loading-sm"></span> : 'Claim'}
         </button>
       </div>
