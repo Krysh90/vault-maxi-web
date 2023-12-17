@@ -11,11 +11,11 @@ interface DUSDLockContextInterface {
   setTab: (t: Tab) => void
   tabs: Tab[]
   isDepositing: boolean
+  isClaimable: boolean
   isClaiming: boolean
   isWithdrawing: boolean
   tvl?: BigNumber
   lockupPeriod?: BigNumber
-  numberOfAddresses?: BigNumber
   rewardsPerDeposit?: BigNumber
   totalClaimed?: BigNumber
   totalInvest?: BigNumber
@@ -50,6 +50,7 @@ export interface Investment {
   lockedUntil: number
   initialRewardsPerDeposit: BigNumber
   claimedRewards: BigNumber
+  batchId: number
 }
 
 const DUSDLockContext = createContext<DUSDLockContextInterface>(undefined as any)
@@ -65,13 +66,12 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   const [tab, setTab] = useState<Tab>(Tab.deposit)
   const tabs = [Tab.deposit, Tab.claim, Tab.withdraw, Tab.stats]
 
-  const contractAddress = '0x03812a485f2acCafbF1E57b050ed85Ca5D3277a0'
+  const contractAddress = '0x19721a7676c2DDD226B5573a4a8AebD262f3A7b6'
   const [isDepositing, setIsDepositing] = useState(false)
   const [isClaiming, setIsClaiming] = useState(false)
   const [isWithdrawing, setIsWithdrawing] = useState(false)
   const [isExitCriteriaTriggered, setIsExitCriteriaTriggered] = useState(false)
   const [tvl, setTvl] = useState<BigNumber>()
-  const [numberOfAddresses, setNumberOfAddresses] = useState<BigNumber>()
   const [rewardsPerDeposit, setRewardsPerDeposit] = useState<BigNumber>()
   const [totalClaimed, setTotalClaimed] = useState<BigNumber>()
   const [totalInvest, setTotalInvest] = useState<BigNumber>()
@@ -83,6 +83,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   const [earliestUnlock, setEarliestUnlock] = useState<Unlock>()
   const [investments, setInvestments] = useState<Investment[]>()
   const [coinAddress, setCoinAddress] = useState<string>()
+  const [isClaimable, setIsClaimable] = useState(false)
   const [lastDepositBlock, setLastDepositBlock] = useState<number>()
   const [lastClaimBlock, setLastClaimBlock] = useState<number>()
   const [lastWithdrawBlock, setLastWithdrawBlock] = useState<number>()
@@ -97,7 +98,6 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       case Tab.stats:
         if ((block ?? 0) <= (lastStatsBlock ?? 0)) return
         getTvl().then(setTvl).catch(console.error)
-        getNumberOfAddresses().then(setNumberOfAddresses).catch(console.error)
         getRewardsPerDeposit().then(setRewardsPerDeposit).catch(console.error)
         getTotalClaimed().then(setTotalClaimed).catch(console.error)
         getTotalRewards().then(setTotalRewards).catch(console.error)
@@ -114,6 +114,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
         if ((block ?? 0) <= (lastClaimBlock ?? 0)) return
         getInvestments().then(setInvestments).catch(console.error)
         getAvailableRewards().then(setAvailableRewards).catch(console.error)
+        getClaimable().then(setIsClaimable).catch(console.error)
         setLastClaimBlock(block)
         break
       case Tab.withdraw:
@@ -138,10 +139,6 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
 
   async function getTvl(): Promise<BigNumber> {
     return new BigNumber(web3.utils.fromWei(await createContract().methods.currentTvl().call(), 'ether'))
-  }
-
-  async function getNumberOfAddresses(): Promise<BigNumber> {
-    return new BigNumber(await createContract().methods.nrOfAddresses().call())
   }
 
   async function getRewardsPerDeposit(): Promise<BigNumber> {
@@ -170,8 +167,12 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
 
   async function getAvailableRewards(): Promise<BigNumber> {
     return new BigNumber(
-      web3.utils.fromWei(await createContract().methods.availableOwnRewards().call({ from: address }), 'ether'),
+      web3.utils.fromWei(await createContract().methods.allAvailableRewards(address).call(), 'ether'),
     )
+  }
+
+  async function getClaimable(): Promise<boolean> {
+    return (await createContract().methods.currentRewardsClaimable().call()) !== '0'
   }
 
   async function getLockupPeriod(): Promise<BigNumber> {
@@ -219,11 +220,11 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
     }
   }
 
-  async function withdraw(index: number) {
+  async function withdraw(batchId: number) {
     setIsWithdrawing(true)
     try {
       return await createContract()
-        .methods.withdraw(index)
+        .methods.withdraw(batchId)
         .send({ from: address })
         .finally(() => {
           setIsWithdrawing(false)
@@ -241,15 +242,17 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
 
   async function getInvestments(): Promise<Investment[]> {
     const contract = createContract()
-    const numberOfBatches = await contract.methods.batchesInAddress(address).call()
+    const numberOfBatches = await contract.methods.balanceOf(address).call()
     const investments: Investment[] = []
     for (let i = 0; i < numberOfBatches; i++) {
-      const inv = await contract.methods.investments(address, i).call()
+      const batchId = await contract.methods.tokenOfOwnerByIndex(address, i).call()
+      const inv = await contract.methods.investments(batchId).call({ from: address })
       investments.push({
         amount: new BigNumber(web3.utils.fromWei(inv.amount, 'ether')),
         lockedUntil: inv.lockedUntil,
         initialRewardsPerDeposit: new BigNumber(web3.utils.fromWei(inv.initialRewardsPerDeposit, 'ether')),
         claimedRewards: new BigNumber(web3.utils.fromWei(inv.claimedRewards, 'ether')),
+        batchId,
       })
     }
     return investments
@@ -260,10 +263,10 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       tabs,
       setTab,
       isDepositing,
+      isClaimable,
       isClaiming,
       isWithdrawing,
       tvl,
-      numberOfAddresses,
       rewardsPerDeposit,
       totalClaimed,
       totalInvest,
@@ -285,10 +288,10 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       tab,
       tabs,
       isDepositing,
+      isClaimable,
       isClaiming,
       isWithdrawing,
       tvl,
-      numberOfAddresses,
       rewardsPerDeposit,
       totalClaimed,
       totalInvest,

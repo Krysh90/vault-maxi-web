@@ -49,8 +49,7 @@ function getTimeString(timeObj: { d: number; h: number; m: number }): string {
 }
 
 function Stats(): JSX.Element {
-  const { tvl, numberOfAddresses, rewardsPerDeposit, totalClaimed, totalRewards, totalWithdrawn, lockupPeriod } =
-    useDUSDLockContext()
+  const { tvl, rewardsPerDeposit, totalClaimed, totalRewards, totalWithdrawn, lockupPeriod } = useDUSDLockContext()
 
   const timeObj = secondsToTime(lockupPeriod?.toNumber() ?? 0)
 
@@ -59,10 +58,6 @@ function Stats(): JSX.Element {
       <div className="flex flex-row w-full justify-between">
         <p>TVL:</p>
         <p className="text-end">{formatNumber(tvl?.toNumber() ?? 0, 2)} DUSD</p>
-      </div>
-      <div className="flex flex-row w-full justify-between">
-        <p># of accounts:</p>
-        <p className="text-end">{numberOfAddresses?.toNumber() ?? 0}</p>
       </div>
       <div className="flex flex-row w-full justify-between">
         <p>Lockup period:</p>
@@ -184,7 +179,7 @@ function DepositDisplay({
     <div key={index} className="collapse collapse-arrow bg-transparent border deposit-border-color rounded-lg">
       <input type="checkbox" defaultChecked={isOpen(index)} onChange={(e) => handleOpen(e.target.checked, index)} />
       <div className="collapse-title flex flex-row items-center gap-2">
-        Deposit #{index + 1}{' '}
+        Deposit #{investment.batchId}{' '}
         {isWithdrawn ? (
           <p className="text-xs text-success">withdrawn</p>
         ) : (
@@ -215,7 +210,7 @@ function DepositDisplay({
         {withdrawable && !isWithdrawn && (
           <button
             className="btn btn-block btn-primary mt-2"
-            onClick={() => withdraw(index)}
+            onClick={() => withdraw(investment.batchId)}
             disabled={isWithdrawing || (!!timeObj && !isExitCriteriaTriggered)}
           >
             {isWithdrawing ? <span className="loading loading-spinner loading-sm"></span> : 'Withdraw'}
@@ -227,7 +222,7 @@ function DepositDisplay({
 }
 
 function Claim(): JSX.Element {
-  const { investments, availableRewards, claimRewards, isClaiming } = useDUSDLockContext()
+  const { investments, availableRewards, claimRewards, isClaiming, isClaimable } = useDUSDLockContext()
 
   const [accordions, setAccordions] = useState<boolean[]>(investments?.map(() => false) ?? [])
 
@@ -249,7 +244,11 @@ function Claim(): JSX.Element {
           <p>Rewards:</p>
           <p className="text-end">{formatNumber(availableRewards?.toNumber() ?? 0, 2)} DUSD</p>
         </div>
-        <button className="btn btn-block btn-primary" onClick={() => claimRewards()} disabled={isClaiming}>
+        <button
+          className="btn btn-block btn-primary"
+          onClick={() => claimRewards()}
+          disabled={isClaiming || !isClaimable}
+        >
           {isClaiming ? <span className="loading loading-spinner loading-sm"></span> : 'Claim'}
         </button>
       </div>
