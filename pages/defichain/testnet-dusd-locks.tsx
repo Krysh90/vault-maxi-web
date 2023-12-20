@@ -66,7 +66,7 @@ function Stats(): JSX.Element {
         </p>
       </div>
       <div className="flex flex-row w-full justify-between">
-        <p>Rewards per deposit:</p>
+        <p>Rewards per bond:</p>
         <p className="text-end">{formatNumber(rewardsPerDeposit?.toNumber() ?? 0, 2)} DUSD</p>
       </div>
       <div className="flex flex-row w-full justify-between">
@@ -150,7 +150,7 @@ function Deposit(): JSX.Element {
           disabled={!hasEnteredAmount() || needsApproval() || isDepositing}
           onClick={() => deposit(amount)}
         >
-          {isDepositing ? <span className="loading loading-spinner loading-sm"></span> : 'Deposit'}
+          {isDepositing ? <span className="loading loading-spinner loading-sm"></span> : 'Mint bond'}
         </button>
       </div>
     </div>
@@ -179,7 +179,7 @@ function DepositDisplay({
     <div key={index} className="collapse collapse-arrow bg-transparent border deposit-border-color rounded-lg">
       <input type="checkbox" defaultChecked={isOpen(index)} onChange={(e) => handleOpen(e.target.checked, index)} />
       <div className="collapse-title flex flex-row items-center gap-2">
-        Deposit #{investment.batchId}{' '}
+        Bond #{investment.batchId}{' '}
         {isWithdrawn ? (
           <p className="text-xs text-success">withdrawn</p>
         ) : (
@@ -291,7 +291,7 @@ function Withdraw(): JSX.Element {
       {investments?.map((i, index) => (
         <DepositDisplay key={index} investment={i} index={index} isOpen={isOpen} handleOpen={handleOpen} withdrawable />
       ))}
-      {investments?.length === 0 && <p className="text-sm text-start w-full">Deposit DUSD to see your deposits</p>}
+      {investments?.length === 0 && <p className="text-sm text-start w-full">Deposit DUSD to see your bonds</p>}
     </div>
   )
 }
