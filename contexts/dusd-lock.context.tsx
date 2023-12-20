@@ -1,5 +1,6 @@
 import Web3 from 'web3'
 import ABI from '../lib/DUSDLock.abi.json'
+import TOKEN_ABI from '../lib/DUSDBondToken.abi.json'
 import { Contract } from 'web3-eth-contract'
 import BigNumber from 'bignumber.js'
 import { PropsWithChildren, createContext, useContext, useEffect, useMemo, useState } from 'react'
@@ -66,7 +67,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   const [tab, setTab] = useState<Tab>(Tab.deposit)
   const tabs = [Tab.deposit, Tab.claim, Tab.withdraw, Tab.stats]
 
-  const contractAddress = '0x19721a7676c2DDD226B5573a4a8AebD262f3A7b6'
+  const contractAddress = '0xEbC26f8c4c066A697064FFD42a3b04708910e0d5'
   const [isDepositing, setIsDepositing] = useState(false)
   const [isClaiming, setIsClaiming] = useState(false)
   const [isWithdrawing, setIsWithdrawing] = useState(false)
@@ -93,41 +94,81 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
     return new web3.eth.Contract(ABI as any, contractAddress)
   }
 
+  function createBondTokenContract(address: string): Contract {
+    return new web3.eth.Contract(TOKEN_ABI as any, address)
+  }
+
+  function handleError(e: any, method: string) {
+    console.error(method, e)
+  }
+
   function reload() {
     switch (tab) {
       case Tab.stats:
         if ((block ?? 0) <= (lastStatsBlock ?? 0)) return
-        getTvl().then(setTvl).catch(console.error)
-        getRewardsPerDeposit().then(setRewardsPerDeposit).catch(console.error)
-        getTotalClaimed().then(setTotalClaimed).catch(console.error)
-        getTotalRewards().then(setTotalRewards).catch(console.error)
-        getTotalWithdrawn().then(setTotalWithdrawn).catch(console.error)
+        getTvl()
+          .then(setTvl)
+          .catch((e) => handleError(e, 'tvl'))
+        getRewardsPerDeposit()
+          .then(setRewardsPerDeposit)
+          .catch((e) => handleError(e, 'rewardsPerDeposit'))
+        getTotalClaimed()
+          .then(setTotalClaimed)
+          .catch((e) => handleError(e, 'totalClaimed'))
+        getTotalRewards()
+          .then(setTotalRewards)
+          .catch((e) => handleError(e, 'totalRewards'))
+        getTotalWithdrawn()
+          .then(setTotalWithdrawn)
+          .catch((e) => handleError(e, 'totalWithdrawn'))
         setLastStatsBlock(block)
         break
       case Tab.deposit:
         if ((block ?? 0) <= (lastDepositBlock ?? 0)) return
-        getTotalInvest().then(setTotalInvest).catch(console.error)
-        getTotalInvestCap().then(setTotalInvestCap).catch(console.error)
+        getTotalInvest()
+          .then(setTotalInvest)
+          .catch((e) => handleError(e, 'totalInvest'))
+        getTotalInvestCap()
+          .then(setTotalInvestCap)
+          .catch((e) => handleError(e, 'totalInvestCap'))
         setLastDepositBlock(block)
         break
       case Tab.claim:
         if ((block ?? 0) <= (lastClaimBlock ?? 0)) return
-        getInvestments().then(setInvestments).catch(console.error)
-        getAvailableRewards().then(setAvailableRewards).catch(console.error)
-        getClaimable().then(setIsClaimable).catch(console.error)
+        getInvestments()
+          .then(setInvestments)
+          .catch((e) => handleError(e, 'investments'))
+        getAvailableRewards()
+          .then(setAvailableRewards)
+          .catch((e) => handleError(e, 'availableRewards'))
+        getClaimable()
+          .then(setIsClaimable)
+          .catch((e) => handleError(e, 'isClaimable'))
         setLastClaimBlock(block)
         break
       case Tab.withdraw:
         if ((block ?? 0) <= (lastWithdrawBlock ?? 0)) return
-        getInvestments().then(setInvestments).catch(console.error)
-        getEarliestUnlock().then(setEarliestUnlock).catch(console.error)
-        getExitCriteriaTriggered().then(setIsExitCriteriaTriggered).catch(console.error)
+        getInvestments()
+          .then(setInvestments)
+          .catch((e) => handleError(e, 'investments'))
+        getEarliestUnlock()
+          .then(setEarliestUnlock)
+          .catch((e) => handleError(e, 'earliestUnlock'))
+        getExitCriteriaTriggered()
+          .then(setIsExitCriteriaTriggered)
+          .catch((e) => handleError(e, 'exitCriteriaTriggered'))
         setLastWithdrawBlock(block)
         break
     }
 
-    if (!coinAddress) getCoinAddress().then(setCoinAddress).catch(console.error)
-    if (!lockupPeriod) getLockupPeriod().then(setLockupPeriod).catch(console.error)
+    if (!coinAddress)
+      getCoinAddress()
+        .then(setCoinAddress)
+        .catch((e) => handleError(e, 'coinAddress'))
+    if (!lockupPeriod)
+      getLockupPeriod()
+        .then(setLockupPeriod)
+        .catch((e) => handleError(e, 'lockupPeriod'))
   }
 
   useEffect(() => {
@@ -210,6 +251,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       return await createContract()
         .methods.claimAllRewards()
         .send({ from: address })
+        .catch(console.error)
         .finally(() => {
           setIsClaiming(false)
           reload()
@@ -226,6 +268,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       return await createContract()
         .methods.withdraw(batchId)
         .send({ from: address })
+        .catch(console.error)
         .finally(() => {
           setIsWithdrawing(false)
           reload()
@@ -242,10 +285,12 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
 
   async function getInvestments(): Promise<Investment[]> {
     const contract = createContract()
-    const numberOfBatches = await contract.methods.balanceOf(address).call()
+    const bondTokenAddress = await contract.methods.bondToken().call()
+    const bondTokenContract = createBondTokenContract(bondTokenAddress)
+    const numberOfBatches = await bondTokenContract.methods.balanceOf(address).call()
     const investments: Investment[] = []
     for (let i = 0; i < numberOfBatches; i++) {
-      const batchId = await contract.methods.tokenOfOwnerByIndex(address, i).call()
+      const batchId = await bondTokenContract.methods.tokenOfOwnerByIndex(address, i).call()
       const inv = await contract.methods.investments(batchId).call({ from: address })
       investments.push({
         amount: new BigNumber(web3.utils.fromWei(inv.amount, 'ether')),
