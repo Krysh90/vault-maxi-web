@@ -15,6 +15,7 @@ interface DUSDLockContextInterface {
   isClaimable: boolean
   isClaiming: boolean
   isWithdrawing: boolean
+  isChecking: boolean
   tvl?: BigNumber
   lockupPeriod?: BigNumber
   rewardsPerDeposit?: BigNumber
@@ -32,6 +33,7 @@ interface DUSDLockContextInterface {
   deposit: (amount: string) => Promise<void>
   claimRewards: () => Promise<void>
   withdraw: (index: number) => Promise<void>
+  check: (batchId: string) => Promise<Investment | undefined>
 }
 
 export enum Tab {
@@ -39,6 +41,7 @@ export enum Tab {
   claim,
   withdraw,
   stats,
+  check,
 }
 
 export interface Unlock {
@@ -64,13 +67,14 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   const { address, isConnected, block, chain } = useWalletContext()
   const web3 = new Web3(Web3.givenProvider)
 
-  const [tab, setTab] = useState<Tab>(Tab.deposit)
-  const tabs = [Tab.deposit, Tab.claim, Tab.withdraw, Tab.stats]
+  const [tab, setTab] = useState<Tab>(Tab.check)
+  const tabs = [Tab.deposit, Tab.claim, Tab.withdraw, Tab.check, Tab.stats]
 
   const contractAddress = '0xEbC26f8c4c066A697064FFD42a3b04708910e0d5'
   const [isDepositing, setIsDepositing] = useState(false)
   const [isClaiming, setIsClaiming] = useState(false)
   const [isWithdrawing, setIsWithdrawing] = useState(false)
+  const [isChecking, setIsChecking] = useState(false)
   const [isExitCriteriaTriggered, setIsExitCriteriaTriggered] = useState(false)
   const [tvl, setTvl] = useState<BigNumber>()
   const [rewardsPerDeposit, setRewardsPerDeposit] = useState<BigNumber>()
@@ -279,6 +283,26 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
     }
   }
 
+  function toInvestment(inv: any, batchId: number): Investment {
+    return {
+      amount: new BigNumber(web3.utils.fromWei(inv.amount, 'ether')),
+      lockedUntil: inv.lockedUntil,
+      initialRewardsPerDeposit: new BigNumber(web3.utils.fromWei(inv.initialRewardsPerDeposit, 'ether')),
+      claimedRewards: new BigNumber(web3.utils.fromWei(inv.claimedRewards, 'ether')),
+      batchId,
+    }
+  }
+
+  async function check(batchId: string): Promise<Investment | undefined> {
+    if (isNaN(+batchId)) return undefined
+    setIsChecking(true)
+    return await createContract()
+      .methods.getBatchData(batchId)
+      .call()
+      .then((inv: any) => toInvestment(inv, +batchId))
+      .finally(() => setIsChecking(false))
+  }
+
   async function getEarliestUnlock(): Promise<Unlock> {
     return await createContract().methods.earliestUnlock(address).call()
   }
@@ -292,13 +316,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
     for (let i = 0; i < numberOfBatches; i++) {
       const batchId = await bondTokenContract.methods.tokenOfOwnerByIndex(address, i).call()
       const inv = await contract.methods.investments(batchId).call({ from: address })
-      investments.push({
-        amount: new BigNumber(web3.utils.fromWei(inv.amount, 'ether')),
-        lockedUntil: inv.lockedUntil,
-        initialRewardsPerDeposit: new BigNumber(web3.utils.fromWei(inv.initialRewardsPerDeposit, 'ether')),
-        claimedRewards: new BigNumber(web3.utils.fromWei(inv.claimedRewards, 'ether')),
-        batchId,
-      })
+      investments.push(toInvestment(inv, batchId))
     }
     return investments
   }
@@ -311,6 +329,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       isClaimable,
       isClaiming,
       isWithdrawing,
+      isChecking,
       tvl,
       rewardsPerDeposit,
       totalClaimed,
@@ -325,6 +344,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       deposit,
       claimRewards,
       withdraw,
+      check,
       earliestUnlock,
       investments,
       isExitCriteriaTriggered,
@@ -336,6 +356,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       isClaimable,
       isClaiming,
       isWithdrawing,
+      isChecking,
       tvl,
       rewardsPerDeposit,
       totalClaimed,
