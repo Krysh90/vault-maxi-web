@@ -198,8 +198,8 @@ function DepositDisplay({
           <p className="text-end">{formatNumber(investment.amount.toNumber(), 2)} DUSD</p>
         </div>
         <div className="flex flex-row w-full justify-between">
-          <p>Claimed rewards:</p>
-          <p className="text-end">{formatNumber(investment.claimedRewards.toNumber(), 2)} DUSD</p>
+          <p>Available rewards:</p>
+          <p className="text-end">{formatNumber(investment.claimableRewards.toNumber(), 2)} DUSD</p>
         </div>
         <div className="flex flex-row w-full justify-between">
           <p>Unlock status:</p>
