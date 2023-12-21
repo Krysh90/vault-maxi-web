@@ -15,6 +15,7 @@ interface DUSDLockContextInterface {
   isClaimable: boolean
   isClaiming: boolean
   isWithdrawing: boolean
+  isChecking: boolean
   tvl?: BigNumber
   lockupPeriod?: BigNumber
   rewardsPerDeposit?: BigNumber
@@ -32,6 +33,7 @@ interface DUSDLockContextInterface {
   deposit: (amount: string) => Promise<void>
   claimRewards: () => Promise<void>
   withdraw: (index: number) => Promise<void>
+  check: (batchId: string) => Promise<Investment | undefined>
 }
 
 export enum Tab {
@@ -39,6 +41,7 @@ export enum Tab {
   claim,
   withdraw,
   stats,
+  check,
 }
 
 export interface Unlock {
@@ -51,6 +54,7 @@ export interface Investment {
   lockedUntil: number
   initialRewardsPerDeposit: BigNumber
   claimedRewards: BigNumber
+  claimableRewards: BigNumber
   batchId: number
 }
 
@@ -65,12 +69,13 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   const web3 = new Web3(Web3.givenProvider)
 
   const [tab, setTab] = useState<Tab>(Tab.deposit)
-  const tabs = [Tab.deposit, Tab.claim, Tab.withdraw, Tab.stats]
+  const tabs = [Tab.deposit, Tab.claim, Tab.withdraw, Tab.check, Tab.stats]
 
   const contractAddress = '0xEbC26f8c4c066A697064FFD42a3b04708910e0d5'
   const [isDepositing, setIsDepositing] = useState(false)
   const [isClaiming, setIsClaiming] = useState(false)
   const [isWithdrawing, setIsWithdrawing] = useState(false)
+  const [isChecking, setIsChecking] = useState(false)
   const [isExitCriteriaTriggered, setIsExitCriteriaTriggered] = useState(false)
   const [tvl, setTvl] = useState<BigNumber>()
   const [rewardsPerDeposit, setRewardsPerDeposit] = useState<BigNumber>()
@@ -90,9 +95,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   const [lastWithdrawBlock, setLastWithdrawBlock] = useState<number>()
   const [lastStatsBlock, setLastStatsBlock] = useState<number>()
 
-  function createContract(): Contract {
-    return new web3.eth.Contract(ABI as any, contractAddress)
-  }
+  const contract = new web3.eth.Contract(ABI as any, contractAddress)
 
   function createBondTokenContract(address: string): Contract {
     return new web3.eth.Contract(TOKEN_ABI as any, address)
@@ -179,60 +182,58 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   }, [isConnected, tab, block, chain])
 
   async function getTvl(): Promise<BigNumber> {
-    return new BigNumber(web3.utils.fromWei(await createContract().methods.currentTvl().call(), 'ether'))
+    return new BigNumber(web3.utils.fromWei(await contract.methods.currentTvl().call(), 'ether'))
   }
 
   async function getRewardsPerDeposit(): Promise<BigNumber> {
-    return new BigNumber(web3.utils.fromWei(await createContract().methods.rewardsPerDeposit().call(), 'ether'))
+    return new BigNumber(web3.utils.fromWei(await contract.methods.rewardsPerDeposit().call(), 'ether'))
   }
 
   async function getTotalClaimed(): Promise<BigNumber> {
-    return new BigNumber(web3.utils.fromWei(await createContract().methods.totalClaimed().call(), 'ether'))
+    return new BigNumber(web3.utils.fromWei(await contract.methods.totalClaimed().call(), 'ether'))
   }
 
   async function getTotalInvest(): Promise<BigNumber> {
-    return new BigNumber(web3.utils.fromWei(await createContract().methods.totalInvest().call(), 'ether'))
+    return new BigNumber(web3.utils.fromWei(await contract.methods.totalInvest().call(), 'ether'))
   }
 
   async function getTotalInvestCap(): Promise<BigNumber> {
-    return new BigNumber(web3.utils.fromWei(await createContract().methods.totalInvestCap().call(), 'ether'))
+    return new BigNumber(web3.utils.fromWei(await contract.methods.totalInvestCap().call(), 'ether'))
   }
 
   async function getTotalRewards(): Promise<BigNumber> {
-    return new BigNumber(web3.utils.fromWei(await createContract().methods.totalRewards().call(), 'ether'))
+    return new BigNumber(web3.utils.fromWei(await contract.methods.totalRewards().call(), 'ether'))
   }
 
   async function getTotalWithdrawn(): Promise<BigNumber> {
-    return new BigNumber(web3.utils.fromWei(await createContract().methods.totalWithdrawn().call(), 'ether'))
+    return new BigNumber(web3.utils.fromWei(await contract.methods.totalWithdrawn().call(), 'ether'))
   }
 
   async function getAvailableRewards(): Promise<BigNumber> {
-    return new BigNumber(
-      web3.utils.fromWei(await createContract().methods.allAvailableRewards(address).call(), 'ether'),
-    )
+    return new BigNumber(web3.utils.fromWei(await contract.methods.allAvailableRewards(address).call(), 'ether'))
   }
 
   async function getClaimable(): Promise<boolean> {
-    return (await createContract().methods.currentRewardsClaimable().call()) !== '0'
+    return (await contract.methods.currentRewardsClaimable().call()) !== '0'
   }
 
   async function getLockupPeriod(): Promise<BigNumber> {
-    return new BigNumber(await createContract().methods.lockupPeriod().call())
+    return new BigNumber(await contract.methods.lockupPeriod().call())
   }
 
   async function getExitCriteriaTriggered(): Promise<boolean> {
-    return await createContract().methods.exitCriteriaTriggered().call()
+    return await contract.methods.exitCriteriaTriggered().call()
   }
 
   async function getCoinAddress(): Promise<string> {
-    return await createContract().methods.coin().call()
+    return await contract.methods.coin().call()
   }
 
   async function deposit(amount: string) {
     setIsDepositing(true)
     try {
-      return await createContract()
-        .methods.lockup(web3.utils.toWei(amount, 'ether'))
+      return await contract.methods
+        .lockup(web3.utils.toWei(amount, 'ether'))
         .send({ from: address })
         .catch(console.error)
         .finally(() => {
@@ -248,8 +249,8 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   async function claimRewards() {
     setIsClaiming(true)
     try {
-      return await createContract()
-        .methods.claimAllRewards()
+      return await contract.methods
+        .claimAllRewards()
         .send({ from: address })
         .catch(console.error)
         .finally(() => {
@@ -265,8 +266,8 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
   async function withdraw(batchId: number) {
     setIsWithdrawing(true)
     try {
-      return await createContract()
-        .methods.withdraw(batchId)
+      return await contract.methods
+        .withdraw(batchId)
         .send({ from: address })
         .catch(console.error)
         .finally(() => {
@@ -279,12 +280,33 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
     }
   }
 
+  function toInvestment(inv: any, batchId: number, claimableRewards: string): Investment {
+    return {
+      amount: new BigNumber(web3.utils.fromWei(inv.amount, 'ether')),
+      lockedUntil: inv.lockedUntil,
+      initialRewardsPerDeposit: new BigNumber(web3.utils.fromWei(inv.initialRewardsPerDeposit, 'ether')),
+      claimedRewards: new BigNumber(web3.utils.fromWei(inv.claimedRewards, 'ether')),
+      claimableRewards: new BigNumber(web3.utils.fromWei(claimableRewards, 'ether')),
+      batchId,
+    }
+  }
+
+  async function check(batchId: string): Promise<Investment | undefined> {
+    if (isNaN(+batchId)) return undefined
+    setIsChecking(true)
+    const inv: any = await contract.methods.getBatchData(batchId).call()
+    return await contract.methods
+      .availableRewards(batchId)
+      .call()
+      .then((claimableRewards: any) => toInvestment(inv, +batchId, claimableRewards))
+      .finally(() => setIsChecking(false))
+  }
+
   async function getEarliestUnlock(): Promise<Unlock> {
-    return await createContract().methods.earliestUnlock(address).call()
+    return await contract.methods.earliestUnlock(address).call()
   }
 
   async function getInvestments(): Promise<Investment[]> {
-    const contract = createContract()
     const bondTokenAddress = await contract.methods.bondToken().call()
     const bondTokenContract = createBondTokenContract(bondTokenAddress)
     const numberOfBatches = await bondTokenContract.methods.balanceOf(address).call()
@@ -292,13 +314,8 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
     for (let i = 0; i < numberOfBatches; i++) {
       const batchId = await bondTokenContract.methods.tokenOfOwnerByIndex(address, i).call()
       const inv = await contract.methods.investments(batchId).call({ from: address })
-      investments.push({
-        amount: new BigNumber(web3.utils.fromWei(inv.amount, 'ether')),
-        lockedUntil: inv.lockedUntil,
-        initialRewardsPerDeposit: new BigNumber(web3.utils.fromWei(inv.initialRewardsPerDeposit, 'ether')),
-        claimedRewards: new BigNumber(web3.utils.fromWei(inv.claimedRewards, 'ether')),
-        batchId,
-      })
+      const claimableRewards = await contract.methods.availableRewards(batchId).call()
+      investments.push(toInvestment(inv, batchId, claimableRewards))
     }
     return investments
   }
@@ -311,6 +328,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       isClaimable,
       isClaiming,
       isWithdrawing,
+      isChecking,
       tvl,
       rewardsPerDeposit,
       totalClaimed,
@@ -325,6 +343,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       deposit,
       claimRewards,
       withdraw,
+      check,
       earliestUnlock,
       investments,
       isExitCriteriaTriggered,
@@ -336,6 +355,7 @@ export function DUSDLockContextProvider(props: PropsWithChildren): JSX.Element {
       isClaimable,
       isClaiming,
       isWithdrawing,
+      isChecking,
       tvl,
       rewardsPerDeposit,
       totalClaimed,

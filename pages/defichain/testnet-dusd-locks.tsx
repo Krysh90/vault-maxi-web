@@ -163,12 +163,14 @@ function DepositDisplay({
   isOpen,
   handleOpen,
   withdrawable,
+  opened,
 }: {
   investment: Investment
-  index: number
-  isOpen: (index: number) => boolean
-  handleOpen: (value: boolean, index: number) => void
+  index?: number
+  isOpen?: (index: number) => boolean
+  handleOpen?: (value: boolean, index: number) => void
   withdrawable?: boolean
+  opened?: boolean
 }): JSX.Element {
   const { isWithdrawing, withdraw, isExitCriteriaTriggered } = useDUSDLockContext()
   const diff = investment.lockedUntil - Math.floor(Date.now() / 1000)
@@ -177,7 +179,11 @@ function DepositDisplay({
 
   return (
     <div key={index} className="collapse collapse-arrow bg-transparent border deposit-border-color rounded-lg">
-      <input type="checkbox" defaultChecked={isOpen(index)} onChange={(e) => handleOpen(e.target.checked, index)} />
+      <input
+        type="checkbox"
+        defaultChecked={opened ?? isOpen?.(index ?? -1)}
+        onChange={(e) => handleOpen?.(e.target.checked, index ?? -1)}
+      />
       <div className="collapse-title flex flex-row items-center gap-2">
         Bond #{investment.batchId}{' '}
         {isWithdrawn ? (
@@ -192,8 +198,8 @@ function DepositDisplay({
           <p className="text-end">{formatNumber(investment.amount.toNumber(), 2)} DUSD</p>
         </div>
         <div className="flex flex-row w-full justify-between">
-          <p>Claimed rewards:</p>
-          <p className="text-end">{formatNumber(investment.claimedRewards.toNumber(), 2)} DUSD</p>
+          <p>Available rewards:</p>
+          <p className="text-end">{formatNumber(investment.claimableRewards.toNumber(), 2)} DUSD</p>
         </div>
         <div className="flex flex-row w-full justify-between">
           <p>Unlock status:</p>
@@ -296,6 +302,36 @@ function Withdraw(): JSX.Element {
   )
 }
 
+function Check(): JSX.Element {
+  const { isChecking, check } = useDUSDLockContext()
+  const [batchId, setBatchId] = useState<string>('')
+  const [bond, setBond] = useState<Investment>()
+
+  return (
+    <div className="card-body items-center w-full gap-4">
+      <div className="flex flex-row gap-2 items-center w-full">
+        Bond
+        <input
+          type="number"
+          placeholder="enter your number"
+          className="input input-bordered w-full mr-4"
+          onWheel={(e) => e.currentTarget.blur()}
+          value={batchId}
+          onChange={(e) => setBatchId(e.target.value)}
+        />
+      </div>
+      <button
+        className="btn btn-primary btn-block flex-1 btn-bordered"
+        disabled={batchId.length === 0 || isChecking}
+        onClick={() => check(batchId).then(setBond).catch(console.error)}
+      >
+        {isChecking ? <span className="loading loading-spinner loading-sm"></span> : 'Check'}
+      </button>
+      {bond && <DepositDisplay investment={bond} opened />}
+    </div>
+  )
+}
+
 function TestNetDusdLocksCard(): JSX.Element {
   const { tab, tabs, setTab } = useDUSDLockContext()
 
@@ -303,6 +339,7 @@ function TestNetDusdLocksCard(): JSX.Element {
     [Tab.deposit]: 'Deposit',
     [Tab.claim]: 'Claim',
     [Tab.withdraw]: 'Withdraw',
+    [Tab.check]: 'Check',
     [Tab.stats]: 'Info',
   }
 
@@ -310,11 +347,12 @@ function TestNetDusdLocksCard(): JSX.Element {
     [Tab.deposit]: <Deposit />,
     [Tab.claim]: <Claim />,
     [Tab.withdraw]: <Withdraw />,
+    [Tab.check]: <Check />,
     [Tab.stats]: <Stats />,
   }
 
   return (
-    <div className="flex flex-col gap-8 md:w-96">
+    <div className="flex flex-col gap-8 md:w-128">
       <div role="tablist" className="tabs tabs-boxed bg-neutral text-neutral-content justify-evenly">
         {tabs.map((t) => (
           <a
