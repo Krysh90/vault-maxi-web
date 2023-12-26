@@ -12,7 +12,7 @@ export function createClient(): WhaleApiClient {
   return new WhaleApiClient({
     version: 'v0',
     network: 'mainnet',
-    url: 'https://ocean.defichain.com',
+    url: 'https://ocean.mydefichain.com',
   })
 }
 
