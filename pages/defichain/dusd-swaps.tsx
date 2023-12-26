@@ -9,7 +9,6 @@ import { DUSDResult } from '../../dtos/dusd-result.dto'
 import { formatNumber } from '../../lib/chart.lib'
 import BigNumber from 'bignumber.js'
 import { DUSDPeg } from '../../dtos/dusd-peg.dto'
-import Selection from '../../components/base/selection'
 
 const dUSDSwaps: NextPage = () => {
   return (
