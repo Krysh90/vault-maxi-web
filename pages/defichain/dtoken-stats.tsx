@@ -54,6 +54,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
       showLine: false,
       calculateDelta: false,
       keywords: ['algo', 'backed'],
+      customDeltaLabel: undefined,
     },
     {
       title: 'FutureSwap',
@@ -66,6 +67,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
       showLine: true,
       calculateDelta: true,
       keywords: ['Mint', 'Burn'],
+      customDeltaLabel: undefined,
     },
     {
       title: 'dUSD Volume',
@@ -77,7 +79,8 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
       showTotal: false,
       showLine: true,
       calculateDelta: true,
-      keywords: ['buys', 'sells'],
+      keywords: ['Buys', 'Sells'],
+      customDeltaLabel: 'Effective delta',
     },
     {
       title: 'dUSD circulating supply',
@@ -90,6 +93,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
       showLine: false,
       calculateDelta: false,
       keywords: [],
+      customDeltaLabel: undefined,
     },
     {
       title: 'dUSD distribution',
@@ -102,6 +106,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
       showLine: false,
       calculateDelta: false,
       keywords: [],
+      customDeltaLabel: undefined,
     },
   ]
 
@@ -156,6 +161,8 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
             info.customAlgo,
             info.calculateDelta,
             info.keywords,
+            undefined,
+            info.customDeltaLabel,
           )
           return (
             <div key={index} className="flex flex-col items-center gap-4">

@@ -106,14 +106,12 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
       break
     case DUSDStatsChartDataType.VOLUME:
       entries.push({
-        label: 'Organic buys',
-        data: new BigNumber(stats.dusdVolume.organic.buying).decimalPlaces(2).toNumber(),
+        label: 'Buys',
+        data: new BigNumber(stats.dusdVolume.organic.buying)
+          .plus(stats.dusdVolume.bots.buying)
+          .decimalPlaces(2)
+          .toNumber(),
         color: Color.light.mint,
-      })
-      entries.push({
-        label: 'Automated buys',
-        data: new BigNumber(stats.dusdVolume.bots.buying).decimalPlaces(2).toNumber(),
-        color: Color.dark.mint,
       })
       entries.push({
         label: '',
@@ -127,13 +125,21 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
         color: '#111',
       })
       entries.push({
-        label: 'Automated sells',
-        data: new BigNumber(stats.dusdVolume.bots.selling).decimalPlaces(2).toNumber(),
+        label: 'DEX fee',
+        data: new BigNumber(stats.dusdVolume.organic.selling)
+          .plus(stats.dusdVolume.bots.selling)
+          .multipliedBy(0.3)
+          .decimalPlaces(2)
+          .toNumber(),
         color: Color.dark.burn,
       })
       entries.push({
-        label: 'Organic sells',
-        data: new BigNumber(stats.dusdVolume.organic.selling).decimalPlaces(2).toNumber(),
+        label: 'Sells (effective)',
+        data: new BigNumber(stats.dusdVolume.organic.selling)
+          .plus(stats.dusdVolume.bots.selling)
+          .multipliedBy(0.7)
+          .decimalPlaces(2)
+          .toNumber(),
         color: Color.light.burn,
       })
       break
@@ -404,55 +410,50 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
       break
     case DUSDStatsChartDataType.VOLUME:
       entries.push({
-        label: 'Organic buys',
+        label: 'Buys',
         data:
-          historyToCheck?.map((day) => new BigNumber(day.dusdVolume.organic.buying).decimalPlaces(2).toNumber()) ?? [],
+          historyToCheck?.map((day) =>
+            new BigNumber(day.dusdVolume.organic.buying).plus(day.dusdVolume.bots.buying).decimalPlaces(2).toNumber(),
+          ) ?? [],
         color: Color.light.mint,
       })
       entries.push({
-        label: 'Automated buys',
-        data: historyToCheck?.map((day) => new BigNumber(day.dusdVolume.bots.buying).decimalPlaces(2).toNumber()) ?? [],
-        color: Color.dark.mint,
-      })
-      entries.push({
-        label: 'Organic sells',
+        label: 'Sells (effective)',
         data:
           historyToCheck?.map((day) =>
-            new BigNumber(day.dusdVolume.organic.selling).negated().decimalPlaces(2).toNumber(),
+            new BigNumber(day.dusdVolume.organic.selling)
+              .plus(day.dusdVolume.bots.selling)
+              .multipliedBy(0.7)
+              .negated()
+              .decimalPlaces(2)
+              .toNumber(),
           ) ?? [],
         color: Color.light.burn,
       })
       entries.push({
-        label: 'Automated sells',
+        label: 'DEX fee',
         data:
           historyToCheck?.map((day) =>
-            new BigNumber(day.dusdVolume.bots.selling).negated().decimalPlaces(2).toNumber(),
+            new BigNumber(day.dusdVolume.organic.selling)
+              .plus(day.dusdVolume.bots.selling)
+              .multipliedBy(0.3)
+              .negated()
+              .decimalPlaces(2)
+              .toNumber(),
           ) ?? [],
         color: Color.dark.burn,
       })
       entries.push({
-        label: 'Delta',
+        label: 'Effective delta',
         data:
           historyToCheck?.map((day) =>
             new BigNumber(day.dusdVolume.organic.buying)
               .plus(day.dusdVolume.bots.buying)
-              .minus(day.dusdVolume.organic.selling)
-              .minus(day.dusdVolume.bots.selling)
+              .minus(new BigNumber(day.dusdVolume.organic.selling).plus(day.dusdVolume.bots.selling).multipliedBy(0.7))
               .decimalPlaces(2)
               .toNumber(),
           ) ?? [],
         color: '#fff',
-      })
-      entries.push({
-        label: 'Delta organic',
-        data:
-          historyToCheck?.map((day) =>
-            new BigNumber(day.dusdVolume.organic.buying)
-              .minus(day.dusdVolume.organic.selling)
-              .decimalPlaces(2)
-              .toNumber(),
-          ) ?? [],
-        color: '#999',
       })
       break
     case DUSDStatsChartDataType.DISTRIBUTION:
@@ -460,7 +461,7 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         label: 'Collateral',
         data:
           historyToCheck?.map((day) =>
-            new BigNumber(day.dusdDistribution?.collateral).plus(day.dusdDistribution?.stakeXLoop).toNumber(),
+            new BigNumber(day.dusdDistribution?.collateral).plus(day.dusdDistribution?.stakeXLoop ?? 0).toNumber(),
           ) ?? [],
         color: Color.collateral,
       })
