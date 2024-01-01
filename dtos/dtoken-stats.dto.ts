@@ -11,6 +11,8 @@ export interface DTokenStats {
     dTokenPools: string
     yieldVault: string
     free: string
+    stakeXTVL: string
+    stakeXLoop: string
   }
 }
 

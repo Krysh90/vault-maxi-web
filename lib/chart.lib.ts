@@ -28,6 +28,7 @@ export function generateTableContent(
   calculateDelta = false,
   keywords = ['Mint', 'Burn'],
   customColors?: string[],
+  customDeltaLabel?: string,
 ): TableData {
   if (buildCustom) {
     const oneIndex = chartData.labels
@@ -66,7 +67,7 @@ export function generateTableContent(
 
     if (calculateDelta) {
       content.push(formatNumber(new BigNumber(one).minus(two).toNumber()).concat(inDollar ? '$' : ''))
-      labels.push('Delta')
+      labels.push(customDeltaLabel ?? 'Delta')
       percentages.push('')
       colors.push('')
     }
@@ -101,7 +102,7 @@ export function generateTableContent(
     const burned = burnedIndex.map((index) => chartData.datasets[0].data[index]).reduce((prev, curr) => prev + curr, 0)
     content.push(formatNumber(minted - burned).concat(inDollar ? '$' : ''))
     percentages.push('')
-    labels.push('Delta')
+    labels.push(customDeltaLabel ?? 'Delta')
   }
 
   return { content, labels, percentages, colors }
