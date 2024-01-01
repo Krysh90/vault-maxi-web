@@ -156,8 +156,13 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
     case DUSDStatsChartDataType.DISTRIBUTION: {
       entries.push({
         label: 'Collateral',
-        data: new BigNumber(stats.dusdDistribution.collateral).toNumber(),
+        data: new BigNumber(stats.dusdDistribution.collateral).plus(stats.dusdDistribution.stakeXLoop).toNumber(),
         color: Color.collateral,
+      })
+      entries.push({
+        label: 'StakeX TVL',
+        data: new BigNumber(stats.dusdDistribution.stakeXTVL).toNumber(),
+        color: Color.stakeX,
       })
       entries.push({
         label: 'Gateway pools',
@@ -201,6 +206,8 @@ const Color = {
   collateral: '#0dacde',
   gatewayPools: '#cd0c60',
   yieldVault: '#6a5df2',
+  stakeX: '#76ff03',
+  stakeXLoop: '#00d0e8',
 }
 
 function getHistoryToCheck(history: DTokenStats[], type: string): DTokenStats[] {
@@ -451,8 +458,16 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
     case DUSDStatsChartDataType.DISTRIBUTION:
       entries.push({
         label: 'Collateral',
-        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.collateral).toNumber()) ?? [],
+        data:
+          historyToCheck?.map((day) =>
+            new BigNumber(day.dusdDistribution?.collateral).plus(day.dusdDistribution?.stakeXLoop).toNumber(),
+          ) ?? [],
         color: Color.collateral,
+      })
+      entries.push({
+        label: 'StakeX TVL',
+        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.stakeXTVL).toNumber()) ?? [],
+        color: Color.stakeX,
       })
       entries.push({
         label: 'Gateway pools',
