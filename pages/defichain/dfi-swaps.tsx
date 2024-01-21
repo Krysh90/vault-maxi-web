@@ -89,9 +89,12 @@ function Content(): JSX.Element {
           {peg ? (
             <>
               <div className="flex flex-row gap-2">
+                <div className="flex flex-row gap-2">
+                  {formatNumber(peg.totalDFINeeded.decimalPlaces(0).toNumber())} {DFI}
+                </div>
                 <p>
-                  a buy of {formatNumber(peg.totalUSDNeeded.decimalPlaces(0).toNumber())}$ across all of the following
-                  pools is needed
+                  in total need to be bought, which takes about{' '}
+                  {formatNumber(peg.totalUSDNeeded.decimalPlaces(0).toNumber())}$
                 </p>
               </div>
               <NeedForPegInfo peg={peg} />
@@ -112,8 +115,9 @@ function Content(): JSX.Element {
             <>
               <h3>DFI prices</h3>
               <div className="flex flex-row gap-2">
-                <p className="flex-grow-0">{result.wording}</p>
+                <p className="flex-grow-0">{result.wordingBefore}</p>
                 {DFI}
+                <p className="flex-grow-0">{result.wordingAfter}</p>
               </div>
               {Object.entries(result.dfiAfterSell).map(([coin, price]) => (
                 <DFIAfterSellInfo key={coin} coin={coin} price={price} />

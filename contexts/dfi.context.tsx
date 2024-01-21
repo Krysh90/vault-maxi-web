@@ -142,9 +142,10 @@ export function DFIContextProvider(props: PropsWithChildren): JSX.Element {
     return {
       amountSold,
       dfiAfterSell: newPrice,
-      wording: amountSold.gte(0)
+      wordingBefore: amountSold.gte(0)
         ? `after a sell of ${formatNumber(amountSold.decimalPlaces(0).toNumber())}`
         : `after a buy of ${formatNumber(amountSold.negated().decimalPlaces(0).toNumber())}`,
+      wordingAfter: 'across all those pools:',
     }
   }
 
