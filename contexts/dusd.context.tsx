@@ -84,7 +84,7 @@ export function DUSDContextProvider(props: PropsWithChildren): JSX.Element {
       const dusdIn = soldAmount.times(part).times(feeFac)
 
       // newPrice= newOther / newDUSD = (K/newDUSD)/newDUSD
-      const newRatio = dusdReserve.plus(dusdIn).gte(0)
+      const newRatio = dusdReserve.plus(dusdIn).gt(0)
         ? K.div(dusdReserve.plus(dusdIn)).div(dusdReserve.plus(dusdIn))
         : new BigNumber(999999999)
       newdusdPricePerToken[otherToken.symbol] = newRatio.times(tokenPrices[otherToken.symbol])

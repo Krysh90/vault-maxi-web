@@ -1,45 +1,60 @@
 import dynamic from 'next/dynamic'
 import Layout from '../../components/core/layout'
 import { NextPage } from 'next'
-import { DUSDContextProvider, useDUSDContext } from '../../contexts/dusd.context'
 import { PoolPairData } from '@defichain/whale-api-client/dist/api/poolpairs'
 import { getAssetIcon } from '../../defiscan'
 import { useEffect, useState } from 'react'
-import { DUSDResult } from '../../dtos/dusd-result.dto'
+import { DFIResult } from '../../dtos/dfi-result.dto'
 import { formatNumber } from '../../lib/chart.lib'
 import BigNumber from 'bignumber.js'
-import { DUSDPeg } from '../../dtos/dusd-peg.dto'
+import { DFIPeg } from '../../dtos/dfi-peg.dto'
+import { DFIContextProvider, useDFIContext } from '../../contexts/dfi.context'
 
 const dUSDSwaps: NextPage = () => {
   return (
-    <DUSDContextProvider>
+    <DFIContextProvider>
       <Content />
-    </DUSDContextProvider>
+    </DFIContextProvider>
   )
 }
 
 const rangeValues = {
   min: 0,
   sellMax: new BigNumber(100_000_000),
-  buyMax: new BigNumber(20_000_000),
-  defaultValueBuy: new BigNumber(10_000_000),
+  buyMax: new BigNumber(100_000_000),
+  defaultValueBuy: new BigNumber(50_000_000),
   defaultValueSell: new BigNumber(50_000_000),
   step: new BigNumber(1_000_000),
+  percentage: {
+    min: 0,
+    max: 100,
+    default: 10,
+    step: 1,
+  },
 }
 
 function Content(): JSX.Element {
-  const { isLoading, gatewayPools, disabledPoolIds, calculatePeg, analyze, changePool } = useDUSDContext()
-  const [amount, setAmount] = useState<number>(rangeValues.defaultValueSell.toNumber())
-  const [peg, setPeg] = useState<DUSDPeg>()
-  const [result, setResult] = useState<DUSDResult>()
-  const [tab, setTab] = useState<string>('Sell')
-  const DUSD = getAssetIcon('DUSD')({ height: 24, width: 24 })
+  const {
+    isLoading,
+    pools,
+    disabledPoolIds,
+    calculateIncrease: calculateIncrease,
+    analyze,
+    changePool,
+    dfiPrice,
+  } = useDFIContext()
+  const [amount, setAmount] = useState<number>(rangeValues.defaultValueBuy.toNumber())
+  const [percentage, setPercentage] = useState<number>(rangeValues.percentage.default)
+  const [peg, setPeg] = useState<DFIPeg>()
+  const [result, setResult] = useState<DFIResult>()
+  const [tab, setTab] = useState<string>('Buy')
+  const DFI = getAssetIcon('DFI')({ height: 24, width: 24 })
   const isBuy = tab === 'Buy'
 
   useEffect(() => {
     if (isLoading) return
-    setPeg(calculatePeg())
-  }, [isLoading, disabledPoolIds])
+    setPeg(calculateIncrease(percentage / 100))
+  }, [isLoading, disabledPoolIds, percentage])
 
   useEffect(() => {
     if (isLoading) return
@@ -50,23 +65,38 @@ function Content(): JSX.Element {
     isBuy ? setAmount(rangeValues.defaultValueBuy.toNumber()) : setAmount(rangeValues.defaultValueSell.toNumber())
   }, [isBuy])
 
-  function renderPeg() {
+  function renderIncrease() {
     return (
       <div className="card w-full lg:w-half bg-neutral text-neutral-content">
         <div className="card-body items-center justify-center w-full">
-          <h3>to reach PEG (1 DUSD = 1$)</h3>
+          <h3>
+            to increase price by {percentage}% to{' '}
+            {formatNumber(new BigNumber(dfiPrice ?? 0).times(1 + percentage / 100).toNumber(), 3)}$
+          </h3>
+          <div className="flex flex-row gap-2 w-full">
+            <p>{rangeValues.percentage.min}%</p>
+            <input
+              type="range"
+              min={rangeValues.percentage.min}
+              max={rangeValues.percentage.max}
+              defaultValue={percentage}
+              step={rangeValues.percentage.step}
+              onChange={(e) => setPercentage(+Number(e.target.value).toFixed(0))}
+              className="range range-primary"
+            />
+            <p>{rangeValues.percentage.max}%</p>
+          </div>
           {peg ? (
             <>
               <div className="flex flex-row gap-2">
                 <div className="flex flex-row gap-2">
-                  {formatNumber(peg.totalDUSDNeeded.decimalPlaces(0).toNumber())} {DUSD}
+                  {formatNumber(peg.totalDFINeeded.decimalPlaces(0).toNumber())} {DFI}
                 </div>
                 <p>
                   in total need to be bought, which takes about{' '}
                   {formatNumber(peg.totalUSDNeeded.decimalPlaces(0).toNumber())}$
                 </p>
               </div>
-              <p>This would be split into following pools</p>
               <NeedForPegInfo peg={peg} />
             </>
           ) : (
@@ -83,19 +113,20 @@ function Content(): JSX.Element {
         <div className="card-body items-center justify-center w-full">
           {result ? (
             <>
-              <h3>DUSD prices</h3>
+              <h3>DFI prices</h3>
               <div className="flex flex-row gap-2">
-                <p className="flex-grow-0">{result.wording}</p>
-                {DUSD}
+                <p className="flex-grow-0">{result.wordingBefore}</p>
+                {DFI}
+                <p className="flex-grow-0">{result.wordingAfter}</p>
               </div>
-              {Object.entries(result.dUSDAfterSell).map(([coin, price]) => (
-                <DUSDAfterSellInfo key={coin} coin={coin} price={price} />
+              {Object.entries(result.dfiAfterSell).map(([coin, price]) => (
+                <DFIAfterSellInfo key={coin} coin={coin} price={price} />
               ))}
             </>
           ) : (
             <ol>
               <li className="list-decimal">Please select which gateway pools should be analyzed</li>
-              <li className="list-decimal">Enter an amount of DUSD which should be sold</li>
+              <li className="list-decimal">Enter an amount of DFI which should be sold</li>
               <li className="list-decimal">Press the button and see the results</li>
             </ol>
           )}
@@ -113,7 +144,7 @@ function Content(): JSX.Element {
             <span className="loading loading-spinner loading-lg text-primary" />
           ) : (
             <div className="flex flex-row flex-wrap gap-4">
-              {gatewayPools.map((pp) => (
+              {pools.map((pp) => (
                 <GatewayPoolSelection
                   key={pp.id}
                   poolPair={pp}
@@ -149,7 +180,7 @@ function Content(): JSX.Element {
             <div className="flex flex-row gap-2">
               <p className="flex-grow-0">Selected amount</p>
               <div className="flex flex-row gap-2">
-                {formatNumber(new BigNumber(amount).decimalPlaces(0).toNumber())} {DUSD}
+                {formatNumber(new BigNumber(amount).decimalPlaces(0).toNumber())} {DFI}
               </div>
             </div>
             <input
@@ -165,30 +196,30 @@ function Content(): JSX.Element {
   }
 
   return (
-    <Layout page="DUSD swaps simulator" full maxWidth withoutSupport>
-      <h1>DUSD swaps simulator</h1>
+    <Layout page="DFI swaps simulator" full maxWidth withoutSupport>
+      <h1>DFI swaps simulator</h1>
       <div className="w-full flex flex-col gap-4 pt-8 items-center">
         {renderBody()}
-        {renderPeg()}
+        {renderIncrease()}
       </div>
     </Layout>
   )
 }
 
-interface DUSDAfterSellInfoProps {
+interface DFIAfterSellInfoProps {
   coin: string
   price: BigNumber
 }
 
-function DUSDAfterSellInfo({ coin, price }: DUSDAfterSellInfoProps) {
-  const Pool = getAssetIcon(coin === 'DFI' ? `DUSD-${coin}` : `${coin}-DUSD`)({ height: 24, width: 24 })
-  const DUSD = getAssetIcon('DUSD')({ height: 24, width: 24 })
+function DFIAfterSellInfo({ coin, price }: DFIAfterSellInfoProps) {
+  const Pool = getAssetIcon(coin)({ height: 24, width: 24 })
+  const DFI = getAssetIcon('DFI')({ height: 24, width: 24 })
   return (
     <div className="flex flex-row gap-2">
       <p className="flex-grow-0">inside</p>
       {Pool}
       <p className="flex-grow-0">there would be a</p>
-      {DUSD}
+      {DFI}
       <p className="flex-grow-0">price of</p>
       {price.decimalPlaces(3).toString()}$
     </div>
@@ -196,13 +227,13 @@ function DUSDAfterSellInfo({ coin, price }: DUSDAfterSellInfoProps) {
 }
 
 interface NeedForPegInfoProps {
-  peg: DUSDPeg
+  peg: DFIPeg
 }
 
 function NeedForPegInfo({ peg }: NeedForPegInfoProps) {
   return (
     <>
-      {Object.entries(peg.neededDUSDForPeg).map(([coin, info]) => (
+      {Object.entries(peg.neededDFIForPeg).map(([coin, info]) => (
         <NeededForPegInfoEntry key={coin} coin={coin} info={info} />
       ))}
     </>
@@ -211,21 +242,23 @@ function NeedForPegInfo({ peg }: NeedForPegInfoProps) {
 
 interface NeededForPegInfoEntryProps {
   coin: string
-  info: { coin: BigNumber; dusd: BigNumber }
+  info: { coin: BigNumber; dfi: BigNumber }
 }
 
 function NeededForPegInfoEntry({ coin, info }: NeededForPegInfoEntryProps) {
   const Coin = getAssetIcon(coin)({ height: 24, width: 24 })
-  const DUSD = getAssetIcon('DUSD')({ height: 24, width: 24 })
+  const DFI = getAssetIcon('DFI')({ height: 24, width: 24 })
+  const coinDecimalPlaces = info.coin.gte(1000) ? 0 : 3
+
   return (
     <div className="flex flex-row gap-2">
       <p className="flex-grow-0">swap</p>
       <div className="flex flex-row gap-2">
-        {formatNumber(info.coin.decimalPlaces(0).toNumber())} {Coin}
+        {formatNumber(info.coin.decimalPlaces(coinDecimalPlaces).toNumber(), coinDecimalPlaces)} {Coin}
       </div>
       <p className="flex-grow-0">to</p>
       <div className="flex flex-row gap-2">
-        {formatNumber(info.dusd.decimalPlaces(0).toNumber())} {DUSD}
+        {formatNumber(info.dfi.decimalPlaces(0).toNumber())} {DFI}
       </div>
     </div>
   )
