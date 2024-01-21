@@ -42,6 +42,11 @@ function Content(): JSX.Element {
   }, [isLoading, disabledPoolIds])
 
   useEffect(() => {
+    if (isLoading) return
+    setResult(analyze(isBuy ? new BigNumber(amount).negated() : new BigNumber(amount)))
+  }, [isLoading, disabledPoolIds, amount])
+
+  useEffect(() => {
     isBuy ? setAmount(rangeValues.defaultValueBuy.toNumber()) : setAmount(rangeValues.defaultValueSell.toNumber())
   }, [isBuy])
 
@@ -154,12 +159,6 @@ function Content(): JSX.Element {
               className="input input-bordered text-end"
             />
           </div>
-          <button
-            className="btn btn-primary"
-            onClick={() => setResult(analyze(isBuy ? new BigNumber(amount).negated() : new BigNumber(amount)))}
-          >
-            Analyze
-          </button>
         </div>
       </div>
     )

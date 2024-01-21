@@ -57,6 +57,11 @@ function Content(): JSX.Element {
   }, [isLoading, disabledPoolIds, percentage])
 
   useEffect(() => {
+    if (isLoading) return
+    setResult(analyze(isBuy ? new BigNumber(amount).negated() : new BigNumber(amount)))
+  }, [isLoading, disabledPoolIds, amount])
+
+  useEffect(() => {
     isBuy ? setAmount(rangeValues.defaultValueBuy.toNumber()) : setAmount(rangeValues.defaultValueSell.toNumber())
   }, [isBuy])
 
@@ -185,12 +190,6 @@ function Content(): JSX.Element {
               className="input input-bordered text-end"
             />
           </div>
-          <button
-            className="btn btn-primary"
-            onClick={() => setResult(analyze(isBuy ? new BigNumber(amount).negated() : new BigNumber(amount)))}
-          >
-            Analyze
-          </button>
         </div>
       </div>
     )
@@ -249,11 +248,13 @@ interface NeededForPegInfoEntryProps {
 function NeededForPegInfoEntry({ coin, info }: NeededForPegInfoEntryProps) {
   const Coin = getAssetIcon(coin)({ height: 24, width: 24 })
   const DFI = getAssetIcon('DFI')({ height: 24, width: 24 })
+  const coinDecimalPlaces = info.coin.gte(1000) ? 0 : 3
+
   return (
     <div className="flex flex-row gap-2">
       <p className="flex-grow-0">swap</p>
       <div className="flex flex-row gap-2">
-        {formatNumber(info.coin.decimalPlaces(0).toNumber())} {Coin}
+        {formatNumber(info.coin.decimalPlaces(coinDecimalPlaces).toNumber(), coinDecimalPlaces)} {Coin}
       </div>
       <p className="flex-grow-0">to</p>
       <div className="flex flex-row gap-2">
