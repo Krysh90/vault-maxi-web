@@ -89,15 +89,11 @@ function Content(): JSX.Element {
           {peg ? (
             <>
               <div className="flex flex-row gap-2">
-                <div className="flex flex-row gap-2">
-                  {formatNumber(peg.totalDFINeeded.decimalPlaces(0).toNumber())} {DFI}
-                </div>
                 <p>
-                  in total need to be bought, which takes about{' '}
-                  {formatNumber(peg.totalUSDNeeded.decimalPlaces(0).toNumber())}$
+                  a buy of {formatNumber(peg.totalUSDNeeded.decimalPlaces(0).toNumber())}$ across all of the following
+                  pools is needed
                 </p>
               </div>
-              <p>This would be split into following pools</p>
               <NeedForPegInfo peg={peg} />
             </>
           ) : (
