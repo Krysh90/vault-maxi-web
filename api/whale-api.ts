@@ -17,19 +17,19 @@ export function createClient(): WhaleApiClient {
 }
 
 export async function getPoolPairs(client: WhaleApiClient): Promise<PoolPairData[]> {
-  return getAll(() => client.poolpairs.list(200), client)
+  return getAll(() => client.poolpairs.list(), client)
 }
 
 export async function getCollateralTokens(client: WhaleApiClient): Promise<CollateralToken[]> {
-  return getAll(() => client.loan.listCollateralToken(200), client)
+  return getAll(() => client.loan.listCollateralToken(), client)
 }
 
 export async function getLoanTokens(client: WhaleApiClient): Promise<LoanToken[]> {
-  return getAll(() => client.loan.listLoanToken(200), client)
+  return getAll(() => client.loan.listLoanToken(), client)
 }
 
 export async function getPrices(client: WhaleApiClient): Promise<PriceTicker[]> {
-  return getAll(() => client.prices.list(200), client)
+  return getAll(() => client.prices.list(), client)
 }
 
 export async function getVault(client: WhaleApiClient, id: string): Promise<LoanVaultActive | LoanVaultLiquidated> {
