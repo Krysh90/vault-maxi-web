@@ -78,7 +78,7 @@ export function DFIContextProvider(props: PropsWithChildren): JSX.Element {
       const dfiIn = soldAmount.times(part).times(feeFac)
 
       // newPrice= newOther / newDFI = (K/newDFI)/newDFI
-      const newRatio = dfiReserve.plus(dfiIn).gte(0)
+      const newRatio = dfiReserve.plus(dfiIn).gt(0)
         ? K.div(dfiReserve.plus(dfiIn)).div(dfiReserve.plus(dfiIn))
         : new BigNumber(999999999)
       newdfiPricePerToken[otherToken.symbol] = newRatio.times(tokenPrices[otherToken.symbol])
