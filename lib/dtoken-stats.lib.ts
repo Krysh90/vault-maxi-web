@@ -171,6 +171,16 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
         color: Color.stakeX,
       })
       entries.push({
+        label: 'Bond 1Y TVL',
+        data: new BigNumber(stats.dusdDistribution.tvlBond1).toNumber(),
+        color: Color.bond1Y,
+      })
+      entries.push({
+        label: 'Bond 2Y TVL',
+        data: new BigNumber(stats.dusdDistribution.tvlBond2).toNumber(),
+        color: Color.bond2Y,
+      })
+      entries.push({
         label: 'Gateway pools',
         data: new BigNumber(stats.dusdDistribution.gatewayPools).toNumber(),
         color: Color.gatewayPools,
@@ -214,6 +224,8 @@ const Color = {
   yieldVault: '#6a5df2',
   stakeX: '#76ff03',
   stakeXLoop: '#00d0e8',
+  bond1Y: '#FDDC5C',
+  bond2Y: '#f5bf03',
 }
 
 function getHistoryToCheck(history: DTokenStats[], type: string): DTokenStats[] {
@@ -469,6 +481,16 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         label: 'StakeX TVL',
         data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.stakeXTVL).toNumber()) ?? [],
         color: Color.stakeX,
+      })
+      entries.push({
+        label: 'Bond 1Y TVL',
+        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.tvlBond1).toNumber()) ?? [],
+        color: Color.bond1Y,
+      })
+      entries.push({
+        label: 'Bond 2Y TVL',
+        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.tvlBond2).toNumber()) ?? [],
+        color: Color.bond2Y,
       })
       entries.push({
         label: 'Gateway pools',

@@ -13,6 +13,8 @@ export interface DTokenStats {
     free: string
     stakeXTVL: string
     stakeXLoop: string
+    tvlBond1: string
+    tvlBond2: string
   }
 }
 
