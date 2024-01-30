@@ -9,7 +9,7 @@ import { CardItemDto } from '../dtos/card-item.dto'
 
 export class DefichainRepository {
   static all(): CardItemDto[] {
-    return [realYield, quantum, dTokenStats, volumeStats, dUSDSwaps]
+    return [realYield, quantum, dTokenStats, volumeStats, dUSDSwaps, dfiSwaps]
   }
 }
 
@@ -43,7 +43,14 @@ const volumeStats: CardItemDto = {
 
 const dUSDSwaps: CardItemDto = {
   name: 'DUSD swaps simulator',
-  description: 'Analyze what happens to gateway pools if an amount of DUSD is being sold',
+  description: 'Analyze what happens to gateway pools if an amount of DUSD is being bought or sold',
   icon: { definition: faRightLeft, color: '#666', size: '4x' },
   links: [{ url: '/defichain/dusd-swaps', display: 'Open page' }],
+}
+
+const dfiSwaps: CardItemDto = {
+  name: 'DFI swaps simulator',
+  description: 'Analyze what happens to crypto pools if an amount of DFI is being bought or sold',
+  icon: { definition: faRightLeft, color: '#666', size: '4x' },
+  links: [{ url: '/defichain/dfi-swaps', display: 'Open page' }],
 }
