@@ -128,7 +128,7 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
         label: 'DEX fee',
         data: new BigNumber(stats.dusdVolume.organic.selling)
           .plus(stats.dusdVolume.bots.selling)
-          .multipliedBy(0.3)
+          .multipliedBy(stats.dusdVolume.fee ?? 0.3)
           .decimalPlaces(2)
           .toNumber(),
         color: Color.dark.burn,
@@ -448,7 +448,7 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
           historyToCheck?.map((day) =>
             new BigNumber(day.dusdVolume.organic.selling)
               .plus(day.dusdVolume.bots.selling)
-              .multipliedBy(0.3)
+              .multipliedBy(day.dusdVolume.fee ?? 0.3)
               .negated()
               .decimalPlaces(2)
               .toNumber(),
