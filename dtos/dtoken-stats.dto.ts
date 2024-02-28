@@ -4,6 +4,7 @@ export interface DTokenStats {
   dusdVolume: {
     bots: DUSDVolume
     organic: DUSDVolume
+    fee?: string
   }
   dusdDistribution: {
     collateral: string
