@@ -137,7 +137,7 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
         label: 'Sells (effective)',
         data: new BigNumber(stats.dusdVolume.organic.selling)
           .plus(stats.dusdVolume.bots.selling)
-          .multipliedBy(0.7)
+          .multipliedBy(new BigNumber(1).minus(stats.dusdVolume.fee ?? 0.3))
           .decimalPlaces(2)
           .toNumber(),
         color: Color.light.burn,
@@ -435,7 +435,7 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
           historyToCheck?.map((day) =>
             new BigNumber(day.dusdVolume.organic.selling)
               .plus(day.dusdVolume.bots.selling)
-              .multipliedBy(0.7)
+              .multipliedBy(new BigNumber(1).minus(day.dusdVolume.fee ?? 0.3))
               .negated()
               .decimalPlaces(2)
               .toNumber(),
@@ -461,7 +461,11 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
           historyToCheck?.map((day) =>
             new BigNumber(day.dusdVolume.organic.buying)
               .plus(day.dusdVolume.bots.buying)
-              .minus(new BigNumber(day.dusdVolume.organic.selling).plus(day.dusdVolume.bots.selling).multipliedBy(0.7))
+              .minus(
+                new BigNumber(day.dusdVolume.organic.selling)
+                  .plus(day.dusdVolume.bots.selling)
+                  .multipliedBy(new BigNumber(1).minus(day.dusdVolume.fee ?? 0.3)),
+              )
               .decimalPlaces(2)
               .toNumber(),
           ) ?? [],
