@@ -120,7 +120,7 @@ const DTokenStatsPage: NextPage<DTokenStatsProps> = ({ statistics, history }: DT
     { label: 'dUSD Distribution', type: DUSDStatsChartDataType.DISTRIBUTION },
   ]
 
-  const infoText = `Displayed values were taken at block ${statistics.meta.analysedAt}. Shown values are measured in respective oracles prices (1 DUSD = 1$). Displayed future swap prices are current oracle prices and not at the time where the mint or burn occurred. If delta is positive for FutureSwap it means that it created (minted) additional tokens. If delta is negative it means that it destroyed (burned) additional tokens. Additional the dUSD volume was  gathered between blocks ${statistics.meta.startHeight} and ${statistics.meta.endHeight}. Automated buys are performed by Buy and Burn Bot (BBB) and automated sells are performed by CAKEs' Yield Vault, everything else is counted as organic, means that a user bought or sold dUSD.`
+  const infoText = `Displayed values were taken at block ${statistics.meta.analysedAt}. Shown values are measured in respective oracles prices (1 DUSD = 1$). Displayed future swap prices are current oracle prices and not at the time where the mint or burn occurred. If delta is positive for FutureSwap it means that it created (minted) additional tokens. If delta is negative it means that it destroyed (burned) additional tokens. Additional the dUSD volume was gathered between blocks ${statistics.meta.startHeight} and ${statistics.meta.endHeight}. Disclaimer: No warranty of displayed data.`
 
   return (
     <Layout page="dToken stats" full maxWidth withoutSupport>
