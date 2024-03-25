@@ -16,6 +16,7 @@ export interface DTokenStats {
     stakeXLoop: string
     tvlBond1: string
     tvlBond2: string
+    otherOnDMC: string
   }
 }
 

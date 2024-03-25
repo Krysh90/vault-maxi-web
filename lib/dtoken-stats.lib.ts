@@ -171,6 +171,11 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
         color: Color.stakeX,
       })
       entries.push({
+        label: 'DMC',
+        data: new BigNumber(stats.dusdDistribution.otherOnDMC).toNumber(),
+        color: Color.dmc,
+      })
+      entries.push({
         label: 'Bond 1Y TVL',
         data: new BigNumber(stats.dusdDistribution.tvlBond1).toNumber(),
         color: Color.bond1Y,
@@ -226,6 +231,7 @@ const Color = {
   stakeXLoop: '#00d0e8',
   bond1Y: '#FDDC5C',
   bond2Y: '#f5bf03',
+  dmc: '#0964F4',
 }
 
 function getHistoryToCheck(history: DTokenStats[], type: string): DTokenStats[] {
@@ -485,6 +491,11 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         label: 'StakeX TVL',
         data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.stakeXTVL).toNumber()) ?? [],
         color: Color.stakeX,
+      })
+      entries.push({
+        label: 'DMC',
+        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.otherOnDMC).toNumber()) ?? [],
+        color: Color.dmc,
       })
       entries.push({
         label: 'Bond 1Y TVL',
