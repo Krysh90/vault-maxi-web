@@ -19,6 +19,8 @@ export enum DTokenStatsChartDataType {
   ALGO = 'ALGO',
   BACKED = 'BACKED',
   RATIO = 'RATIO',
+  ALGO_NUMBER = 'ALGO NUMBER',
+  ALGO_NUMBER_TO_VALUE = 'ALGO NUMBER TO VALUE',
 }
 
 export enum DUSDStatsChartDataType {
@@ -235,9 +237,11 @@ const Color = {
 }
 
 function getHistoryToCheck(history: DTokenStats[], type: string): DTokenStats[] {
-  if (type === DUSDStatsChartDataType.VOLUME) return history
-  else if (type === DUSDStatsChartDataType.DISTRIBUTION) return history.slice((getDates('2023-10-04').length - 1) * -1)
-  else return history.slice((getDates('2023-05-24').length - 1) * -1)
+  return history
+  // due to changes on how many history data we will load - this
+  // if (type === DUSDStatsChartDataType.VOLUME) return history
+  // else if (type === DUSDStatsChartDataType.DISTRIBUTION) return history.slice((getDates('2023-10-04').length - 1) * -1)
+  // else return history.slice((getDates('2023-05-24').length - 1) * -1)
 }
 
 export function toLineChartData(history: DTokenStats[], { type, timeFrame }: LineChartInfo): ChartData {
@@ -426,6 +430,38 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         color: '#fff',
       })
       break
+    case DTokenStatsChartDataType.ALGO_NUMBER:
+      entries.push({
+        label: '# Algo dToken',
+        data: historyToCheck.map((day) =>
+          day.dTokens
+            .filter((entry) => entry.key !== 'DUSD')
+            .map((entry) => calculateAlgoTokens(entry))
+            .reduce((prev, curr) => prev + curr, 0),
+        ),
+        color: colorBasedOn('dToken'),
+      })
+      break
+    case DTokenStatsChartDataType.ALGO_NUMBER_TO_VALUE:
+      entries.push({
+        label: 'Ratio',
+        data: historyToCheck.map((day) => {
+          const dUSD = calculateAlgoTokens(day.dTokens.find((entry) => entry.key === 'DUSD'))
+          const dToken = day.dTokens
+            .filter((entry) => entry.key !== 'DUSD')
+            .map((entry) => calculateAlgoTokens(entry))
+            .reduce((prev, curr) => prev + curr, 0)
+          const dTokenValue = day.dTokens
+            .filter((entry) => entry.key !== 'DUSD')
+            .map((entry) => calculateAlgoTokens(entry) * entry.price)
+            .reduce((prev, curr) => prev + curr, 0)
+          const numberOfTokens = new BigNumber(dUSD).plus(dToken)
+          const valueOfTokens = new BigNumber(dUSD).plus(dTokenValue)
+          return numberOfTokens.dividedBy(valueOfTokens).toNumber()
+        }),
+        color: '#fff',
+      })
+      break
     case DUSDStatsChartDataType.VOLUME:
       entries.push({
         label: 'Buys',
@@ -536,12 +572,16 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
       .slice(valueOfTimeFrame[timeFrame]),
     datasets: entries.map((entry) => ({
       label: entry.label,
-      data: entry.data.slice(valueOfTimeFrame[timeFrame]),
+      data: entry.data.slice(valueOfTimeFrame[timeFrame]).map((d) => filterData(d)),
       borderColor: [entry.color],
       backgroundColor: [entry.color],
       hoverOffset: 4,
     })),
   }
+}
+
+function filterData(data: number): number {
+  return data !== 0 ? data : NaN
 }
 
 export function toScales(type: string): any {
