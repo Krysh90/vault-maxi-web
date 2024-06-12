@@ -9,7 +9,7 @@ import {
   getDates,
   LineChartEntry,
   LineChartInfo,
-  valueOfTimeFrame,
+  scanByTimeFrame,
 } from './chart.lib'
 import { colorBasedOn } from './colors.lib'
 
@@ -166,12 +166,13 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
   const ethereumTokens = Object.keys(history.slice(-1)[0].liquidity.ethereum)
   const quantumDfcTokens = Object.keys(history.slice(-1)[0].quantumData.liqDfc)
   const quantumEthTokens = Object.keys(history.slice(-1)[0].quantumData.liqEth)
+  const historyToCheck = scanByTimeFrame(history, timeFrame)
   switch (type) {
     case QuantumChartDataType.LIQUIDITY_DFC:
       entries.push(
         ...defichainTokens.map((token) => ({
           label: token,
-          data: history
+          data: historyToCheck
             .filter((entry) => entry.liquidity.defichain !== undefined && entry.liquidity.defichain[token])
             .map((entry) =>
               new BigNumber(entry.liquidity.defichain[token]).multipliedBy(getPriceOf(token, entry)).toNumber(),
@@ -184,7 +185,7 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
       entries.push(
         ...ethereumTokens.map((token) => ({
           label: token,
-          data: history
+          data: historyToCheck
             .filter((entry) => entry.liquidity.ethereum !== undefined && entry.liquidity.ethereum[token])
             .map((entry) =>
               new BigNumber(entry.liquidity.ethereum[token]).multipliedBy(getPriceOf(token, entry)).toNumber(),
@@ -197,7 +198,7 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
       entries.push(
         ...defichainTokens.map((token) => ({
           label: token,
-          data: history.map((entry) => {
+          data: historyToCheck.map((entry) => {
             const tokenTxs = entry.txs.find(
               (quantumTx) => quantumTx.tokenName === token && quantumTx.txsToDefichain > 0,
             )
@@ -213,7 +214,7 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
       entries.push(
         ...ethereumTokens.map((token) => ({
           label: token,
-          data: history.map((entry) => {
+          data: historyToCheck.map((entry) => {
             const tokenTxs = entry.txs.find((quantumTx) => quantumTx.tokenName === token && quantumTx.txsToEthereum > 0)
             return tokenTxs
               ? new BigNumber(tokenTxs?.coinsToEthereum).multipliedBy(getPriceOf(token, entry)).toNumber()
@@ -227,7 +228,7 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
       entries.push(
         ...quantumDfcTokens.map((token) => ({
           label: token,
-          data: history
+          data: historyToCheck
             .filter((entry) => entry.quantumData.liqDfc !== undefined && entry.quantumData.liqDfc[token])
             .map((entry) =>
               new BigNumber(entry.quantumData.liqDfc[token]).multipliedBy(getPriceOf(token, entry)).toNumber(),
@@ -240,7 +241,7 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
       entries.push(
         ...quantumEthTokens.map((token) => ({
           label: token,
-          data: history
+          data: historyToCheck
             .filter((entry) => entry.quantumData.liqEth !== undefined && entry.quantumData.liqEth[token])
             .map((entry) =>
               new BigNumber(entry.quantumData.liqEth[token]).multipliedBy(getPriceOf(token, entry)).toNumber(),
@@ -253,7 +254,7 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
       entries.push(
         ...quantumDfcTokens.map((token) => ({
           label: token,
-          data: history
+          data: historyToCheck
             .filter(
               (entry) =>
                 entry.quantumData.txsToDfc.amountBridged !== undefined &&
@@ -272,7 +273,7 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
       entries.push(
         ...quantumEthTokens.map((token) => ({
           label: token,
-          data: history
+          data: historyToCheck
             .filter(
               (entry) =>
                 entry.quantumData.txsToEth.amountBridged !== undefined &&
@@ -291,7 +292,7 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
       entries.push(
         ...quantumDfcTokens.map((token) => ({
           label: token,
-          data: history
+          data: historyToCheck
             .filter(
               (entry) =>
                 entry.quantumData.txsToDfc.totalBridgedAmount !== undefined &&
@@ -310,7 +311,7 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
       entries.push(
         ...quantumEthTokens.map((token) => ({
           label: token,
-          data: history
+          data: historyToCheck
             .filter(
               (entry) =>
                 entry.quantumData.txsToEth.totalBridgedAmount !== undefined &&
@@ -328,12 +329,10 @@ export function toLineChartData(history: QuantumStats[], { type, timeFrame }: Li
   }
 
   return {
-    labels: history
-      .map((entry) => moment(entry.meta.tstamp).utc().format('DD-MM-YYYY'))
-      .slice(valueOfTimeFrame[timeFrame]),
+    labels: historyToCheck.map((entry) => moment(entry.meta.tstamp).utc().format('DD-MM-YYYY')),
     datasets: entries.map((entry) => ({
       label: entry.label,
-      data: entry.data.slice(valueOfTimeFrame[timeFrame]),
+      data: entry.data,
       borderColor: [entry.color],
       backgroundColor: [entry.color],
       hoverOffset: 4,

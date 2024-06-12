@@ -8,7 +8,7 @@ import {
   getDates,
   LineChartEntry,
   LineChartInfo,
-  valueOfTimeFrame,
+  scanByTimeFrame,
 } from './chart.lib'
 import { adjustColor, colorBasedOn } from './colors.lib'
 
@@ -95,16 +95,17 @@ const Color = {
 export function toLineChartData(history: RealYieldStats[], { type, timeFrame }: LineChartInfo): ChartData {
   const entries: LineChartEntry[] = []
   const symbols = getAllSymbols(history.slice(-1)[0])
+  const historyToCheck = scanByTimeFrame(history, timeFrame)
   switch (type) {
     case RealYieldChartDataType.OVERALL:
       entries.push({
         label: 'Fee',
-        data: history.map((entry) => entry.totalUSD.fee),
+        data: historyToCheck.map((entry) => entry.totalUSD.fee),
         color: Color.fee,
       })
       entries.push({
         label: 'Commission',
-        data: history.map((entry) => entry.totalUSD.commission),
+        data: historyToCheck.map((entry) => entry.totalUSD.commission),
         color: Color.commission,
       })
       break
@@ -112,7 +113,7 @@ export function toLineChartData(history: RealYieldStats[], { type, timeFrame }: 
       entries.push(
         ...symbols.map((symbol) => ({
           label: symbol,
-          data: history.map((h) => h.tokens[symbol]?.feeInUSD ?? 0),
+          data: historyToCheck.map((h) => h.tokens[symbol]?.feeInUSD ?? 0),
           color: colorBasedOn(symbol),
         })),
       )
@@ -121,21 +122,19 @@ export function toLineChartData(history: RealYieldStats[], { type, timeFrame }: 
       entries.push(
         ...symbols.map((symbol) => ({
           label: symbol,
-          data: history.map((h) => h.tokens[symbol]?.commissionInUSD ?? 0),
+          data: historyToCheck.map((h) => h.tokens[symbol]?.commissionInUSD ?? 0),
           color: colorBasedOn(symbol),
         })),
       )
   }
 
   return {
-    labels: history
-      .map((entry) => moment(entry.meta.tstamp).utc().format('DD-MM-YYYY'))
-      .slice(valueOfTimeFrame[timeFrame]),
+    labels: historyToCheck.map((entry) => moment(entry.meta.tstamp).utc().format('DD-MM-YYYY')),
     datasets: entries
       .filter((entry) => !entry.data.slice(-30).every((value) => value < 100))
       .map((entry) => ({
         label: entry.label,
-        data: entry.data.slice(valueOfTimeFrame[timeFrame]),
+        data: entry.data,
         borderColor: [entry.color],
         backgroundColor: [entry.color],
         hoverOffset: 4,

@@ -127,7 +127,7 @@ export function formatNumber(value: number, forceFixed?: number): string {
 }
 
 export function getDates(start: string) {
-  for (var arr = [], dt = new Date(start); dt <= new Date(); dt.setDate(dt.getDate() + 1)) {
+  for (var arr = [], dt = new Date(start); dt <= new Date(); dt.setUTCDate(dt.getUTCDate() + 1)) {
     arr.push(new Date(dt))
   }
   return arr
@@ -142,6 +142,28 @@ export function filterDates(dates: Date[]): Date[] {
   //     (index - 365 > 0 && index % 30 === 0),
   // )
   return dates.filter((_date, index) => index >= dates.length - 28 || index % 7 === 0)
+}
+
+export function scanByTimeFrame<T>(x: T[], timeFrame: LineChartTimeFrame): T[] {
+  switch (timeFrame) {
+    case LineChartTimeFrame.ALL:
+      return x
+        .slice()
+        .reverse()
+        .filter((_, index) => index >= 28 || (index < 28 && index % 7 === 0))
+        .reverse()
+    case LineChartTimeFrame.THREE_MONTHS:
+      return x
+        .slice()
+        .reverse()
+        .filter((_, index) => index >= 28 || (index < 28 && index % 7 === 0))
+        .reverse()
+        .slice(-14)
+    case LineChartTimeFrame.MONTH:
+      return x.slice(-28)
+    case LineChartTimeFrame.WEEK:
+      return x.slice(-7)
+  }
 }
 
 export interface HistoryChartItem {
@@ -161,13 +183,6 @@ export enum LineChartTimeFrame {
   THREE_MONTHS = 'Last 3 months',
   MONTH = 'Last month',
   WEEK = 'Last week',
-}
-
-export const valueOfTimeFrame: Record<LineChartTimeFrame, number> = {
-  [LineChartTimeFrame.ALL]: 0,
-  [LineChartTimeFrame.THREE_MONTHS]: -38,
-  [LineChartTimeFrame.MONTH]: -29,
-  [LineChartTimeFrame.WEEK]: -7,
 }
 
 export interface LineChartInfo {

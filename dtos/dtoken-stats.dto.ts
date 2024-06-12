@@ -18,6 +18,26 @@ export interface DTokenStats {
     tvlBond2: string
     otherOnDMC: string
   }
+  avg7days?: {
+    dTokens: DTokenStatsEntry[]
+    dusdVolume: {
+      bots: DUSDVolume
+      organic: DUSDVolume
+      fee?: string
+    }
+    dusdDistribution: {
+      collateral: string
+      gatewayPools: string
+      dTokenPools: string
+      yieldVault: string
+      free: string
+      stakeXTVL: string
+      stakeXLoop: string
+      tvlBond1: string
+      tvlBond2: string
+      otherOnDMC: string
+    }
+  }
 }
 
 export interface DUSDVolume {

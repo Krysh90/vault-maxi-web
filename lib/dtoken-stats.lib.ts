@@ -7,8 +7,9 @@ import {
   LineChartInfo,
   getDates,
   LineChartEntry,
-  valueOfTimeFrame,
   filterDates,
+  scanByTimeFrame,
+  LineChartTimeFrame,
 } from './chart.lib'
 import { colorBasedOn } from './colors.lib'
 import moment from 'moment'
@@ -245,21 +246,25 @@ function getHistoryToCheck(history: DTokenStats[], type: string): DTokenStats[] 
 }
 
 export function toLineChartData(history: DTokenStats[], { type, timeFrame }: LineChartInfo): ChartData {
-  const historyToCheck = getHistoryToCheck(history, type)
+  const historyToCheck = scanByTimeFrame(getHistoryToCheck(history, type), timeFrame)
   const entries: LineChartEntry[] = []
   switch (type) {
     case DUSDStatsChartDataType.CIRCULATING_SUPPLY:
       entries.push({
         label: 'Algo DUSD',
-        data: historyToCheck.map((day) => calculateAlgoTokens(day.dTokens.find((entry) => entry.key === 'DUSD'))),
+        data: historyToCheck.map((day) =>
+          calculateAlgoTokens(dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')),
+        ),
         color: colorBasedOn('dToken'),
       })
       entries.push({
         label: 'Backed DUSD',
         data: historyToCheck.map(
           (day) =>
-            (day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0) +
-            (day.dTokens.find((entry) => entry.key === 'DUSD')?.openinterest ?? 0),
+            (dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')?.minted.loans ??
+              0) +
+            (dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')?.openinterest ??
+              0),
         ),
         color: colorBasedOn('DUSD'),
       })
@@ -267,9 +272,13 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         label: 'Total DUSD',
         data: historyToCheck.map(
           (day) =>
-            calculateAlgoTokens(day.dTokens.find((entry) => entry.key === 'DUSD')) +
-            (day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0) +
-            (day.dTokens.find((entry) => entry.key === 'DUSD')?.openinterest ?? 0),
+            calculateAlgoTokens(
+              dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD'),
+            ) +
+            (dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')?.minted.loans ??
+              0) +
+            (dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')?.openinterest ??
+              0),
         ),
         color: '#fff',
       })
@@ -277,23 +286,27 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
     case DTokenStatsChartDataType.ALGO:
       entries.push({
         label: 'Algo DUSD',
-        data: historyToCheck.map((day) => calculateAlgoTokens(day.dTokens.find((entry) => entry.key === 'DUSD'))),
+        data: historyToCheck.map((day) =>
+          calculateAlgoTokens(dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')),
+        ),
         color: colorBasedOn('DUSD'),
       })
       entries.push({
         label: 'Algo dToken',
         data: historyToCheck.map((day) =>
-          day.dTokens
-            .filter((entry) => entry.key !== 'DUSD')
-            .map((entry) => calculateAlgoTokens(entry) * entry.price)
-            .reduce((prev, curr) => prev + curr, 0),
+          dayOrAvg(day, timeFrame)
+            .dTokens.filter((entry: DTokenStatsEntry) => entry.key !== 'DUSD')
+            .map((entry: DTokenStatsEntry) => calculateAlgoTokens(entry) * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0),
         ),
         color: colorBasedOn('dToken'),
       })
       entries.push({
         label: 'Algo combined',
         data: historyToCheck.map((day) =>
-          day.dTokens.map((entry) => calculateAlgoTokens(entry) * entry.price).reduce((prev, curr) => prev + curr, 0),
+          dayOrAvg(day, timeFrame)
+            .dTokens.map((entry: DTokenStatsEntry) => calculateAlgoTokens(entry) * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0),
         ),
         color: '#fff',
       })
@@ -303,27 +316,29 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         label: 'Backed DUSD',
         data: historyToCheck.map(
           (day) =>
-            (day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.loans ?? 0) +
-            (day.dTokens.find((entry) => entry.key === 'DUSD')?.openinterest ?? 0),
+            (dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')?.minted.loans ??
+              0) +
+            (dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')?.openinterest ??
+              0),
         ),
         color: colorBasedOn('DUSD'),
       })
       entries.push({
         label: 'Backed dToken',
         data: historyToCheck.map((day) =>
-          day.dTokens
-            .filter((entry) => entry.key !== 'DUSD')
-            .map((entry) => (entry.minted.loans + entry.openinterest) * entry.price)
-            .reduce((prev, curr) => prev + curr, 0),
+          dayOrAvg(day, timeFrame)
+            .dTokens.filter((entry: DTokenStatsEntry) => entry.key !== 'DUSD')
+            .map((entry: DTokenStatsEntry) => (entry.minted.loans + entry.openinterest) * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0),
         ),
         color: colorBasedOn('dToken'),
       })
       entries.push({
         label: 'Backed combined',
         data: historyToCheck.map((day) =>
-          day.dTokens
-            .map((entry) => (entry.minted.loans + entry.openinterest) * entry.price)
-            .reduce((prev, curr) => prev + curr, 0),
+          dayOrAvg(day, timeFrame)
+            .dTokens.map((entry: DTokenStatsEntry) => (entry.minted.loans + entry.openinterest) * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0),
         ),
         color: '#fff',
       })
@@ -332,7 +347,7 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
       entries.push({
         label: 'DUSD',
         data: historyToCheck.map((day) => {
-          const dUSD = day.dTokens.find((entry) => entry.key === 'DUSD')
+          const dUSD = dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')
           const algo = calculateAlgoTokens(dUSD)
           const backed = (dUSD?.minted.loans ?? 0) + (dUSD?.openinterest ?? 0)
           return new BigNumber(algo)
@@ -346,13 +361,13 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
       entries.push({
         label: 'dToken',
         data: historyToCheck.map((day) => {
-          const tokens = day.dTokens.filter((entry) => entry.key !== 'DUSD')
+          const tokens = dayOrAvg(day, timeFrame).dTokens.filter((entry: DTokenStatsEntry) => entry.key !== 'DUSD')
           const algo = tokens
-            .map((entry) => calculateAlgoTokens(entry) * entry.price)
-            .reduce((prev, curr) => prev + curr, 0)
+            .map((entry: DTokenStatsEntry) => calculateAlgoTokens(entry) * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0)
           const backed = tokens
-            .map((entry) => (entry.minted.loans + entry.openinterest) * entry.price)
-            .reduce((prev, curr) => prev + curr, 0)
+            .map((entry: DTokenStatsEntry) => (entry.minted.loans + entry.openinterest) * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0)
           return new BigNumber(algo)
             .dividedBy(algo + backed)
             .multipliedBy(100)
@@ -365,12 +380,12 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
       entries.push({
         label: 'Combined',
         data: historyToCheck.map((day) => {
-          const algo = day.dTokens
-            .map((entry) => calculateAlgoTokens(entry) * entry.price)
-            .reduce((prev, curr) => prev + curr, 0)
-          const backed = day.dTokens
-            .map((entry) => (entry.minted.loans + entry.openinterest) * entry.price)
-            .reduce((prev, curr) => prev + curr, 0)
+          const algo = dayOrAvg(day, timeFrame)
+            .dTokens.map((entry: DTokenStatsEntry) => calculateAlgoTokens(entry) * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0)
+          const backed = dayOrAvg(day, timeFrame)
+            .dTokens.map((entry: DTokenStatsEntry) => (entry.minted.loans + entry.openinterest) * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0)
           return new BigNumber(algo)
             .dividedBy(algo + backed)
             .multipliedBy(100)
@@ -383,46 +398,54 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
     case DTokenStatsChartDataType.FUTURESWAP:
       entries.push({
         label: 'Minted DUSD',
-        data: historyToCheck.map((day) => day.dTokens.find((entry) => entry.key === 'DUSD')?.minted.futureswap ?? 0),
+        data: historyToCheck.map(
+          (day) =>
+            dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')?.minted
+              .futureswap ?? 0,
+        ),
         color: Color.light.mint,
       })
       entries.push({
         label: 'Minted dToken',
         data: historyToCheck.map((day) =>
-          day.dTokens
-            .filter((entry) => entry.key !== 'DUSD')
-            .map((entry) => entry.minted.futureswap * entry.price)
-            .reduce((prev, curr) => prev + curr, 0),
+          dayOrAvg(day, timeFrame)
+            .dTokens.filter((entry: DTokenStatsEntry) => entry.key !== 'DUSD')
+            .map((entry: DTokenStatsEntry) => entry.minted.futureswap * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0),
         ),
         color: Color.dark.mint,
       })
       entries.push({
         label: 'Burned DUSD',
-        data: historyToCheck.map((day) => day.dTokens.find((entry) => entry.key === 'DUSD')?.burn.futureswap ?? 0),
+        data: historyToCheck.map(
+          (day) =>
+            dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')?.burn.futureswap ??
+            0,
+        ),
         color: Color.light.burn,
       })
       entries.push({
         label: 'Burned dToken',
         data: historyToCheck.map((day) =>
-          day.dTokens
-            .filter((entry) => entry.key !== 'DUSD')
-            .map((entry) => entry.burn.futureswap * entry.price)
-            .reduce((prev, curr) => prev + curr, 0),
+          dayOrAvg(day, timeFrame)
+            .dTokens.filter((entry: DTokenStatsEntry) => entry.key !== 'DUSD')
+            .map((entry: DTokenStatsEntry) => entry.burn.futureswap * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0),
         ),
         color: Color.dark.burn,
       })
       entries.push({
         label: 'Delta',
         data: historyToCheck.map((day) => {
-          const dUSD = day.dTokens.find((entry) => entry.key === 'DUSD')
-          const everythingElseMinted = day.dTokens
-            .filter((entry) => entry.key !== 'DUSD')
-            .map((entry) => entry.minted.futureswap * entry.price)
-            .reduce((prev, curr) => prev + curr, 0)
-          const everythingElseBurned = day.dTokens
-            .filter((entry) => entry.key !== 'DUSD')
-            .map((entry) => entry.burn.futureswap * entry.price)
-            .reduce((prev, curr) => prev + curr, 0)
+          const dUSD = dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')
+          const everythingElseMinted = dayOrAvg(day, timeFrame)
+            .dTokens.filter((entry: DTokenStatsEntry) => entry.key !== 'DUSD')
+            .map((entry: DTokenStatsEntry) => entry.minted.futureswap * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0)
+          const everythingElseBurned = dayOrAvg(day, timeFrame)
+            .dTokens.filter((entry: DTokenStatsEntry) => entry.key !== 'DUSD')
+            .map((entry: DTokenStatsEntry) => entry.burn.futureswap * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0)
           return (
             (dUSD?.minted.futureswap ?? 0) + everythingElseMinted - (dUSD?.burn.futureswap ?? 0) - everythingElseBurned
           )
@@ -434,10 +457,10 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
       entries.push({
         label: '# Algo dToken',
         data: historyToCheck.map((day) =>
-          day.dTokens
-            .filter((entry) => entry.key !== 'DUSD')
-            .map((entry) => calculateAlgoTokens(entry))
-            .reduce((prev, curr) => prev + curr, 0),
+          dayOrAvg(day, timeFrame)
+            .dTokens.filter((entry: DTokenStatsEntry) => entry.key !== 'DUSD')
+            .map((entry: DTokenStatsEntry) => calculateAlgoTokens(entry))
+            .reduce((prev: number, curr: number) => prev + curr, 0),
         ),
         color: colorBasedOn('dToken'),
       })
@@ -446,15 +469,17 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
       entries.push({
         label: 'Ratio',
         data: historyToCheck.map((day) => {
-          const dUSD = calculateAlgoTokens(day.dTokens.find((entry) => entry.key === 'DUSD'))
-          const dToken = day.dTokens
-            .filter((entry) => entry.key !== 'DUSD')
-            .map((entry) => calculateAlgoTokens(entry))
-            .reduce((prev, curr) => prev + curr, 0)
-          const dTokenValue = day.dTokens
-            .filter((entry) => entry.key !== 'DUSD')
-            .map((entry) => calculateAlgoTokens(entry) * entry.price)
-            .reduce((prev, curr) => prev + curr, 0)
+          const dUSD = calculateAlgoTokens(
+            dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD'),
+          )
+          const dToken = dayOrAvg(day, timeFrame)
+            .dTokens.filter((entry: DTokenStatsEntry) => entry.key !== 'DUSD')
+            .map((entry: DTokenStatsEntry) => calculateAlgoTokens(entry))
+            .reduce((prev: number, curr: number) => prev + curr, 0)
+          const dTokenValue = dayOrAvg(day, timeFrame)
+            .dTokens.filter((entry: DTokenStatsEntry) => entry.key !== 'DUSD')
+            .map((entry: DTokenStatsEntry) => calculateAlgoTokens(entry) * entry.price)
+            .reduce((prev: number, curr: number) => prev + curr, 0)
           const numberOfTokens = new BigNumber(dUSD).plus(dToken)
           const valueOfTokens = new BigNumber(dUSD).plus(dTokenValue)
           return numberOfTokens.dividedBy(valueOfTokens).toNumber()
@@ -467,7 +492,10 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         label: 'Buys',
         data:
           historyToCheck?.map((day) =>
-            new BigNumber(day.dusdVolume.organic.buying).plus(day.dusdVolume.bots.buying).decimalPlaces(2).toNumber(),
+            new BigNumber(dayOrAvg(day, timeFrame).dusdVolume.organic.buying)
+              .plus(dayOrAvg(day, timeFrame).dusdVolume.bots.buying)
+              .decimalPlaces(2)
+              .toNumber(),
           ) ?? [],
         color: Color.light.mint,
       })
@@ -475,9 +503,9 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         label: 'Sells (effective)',
         data:
           historyToCheck?.map((day) =>
-            new BigNumber(day.dusdVolume.organic.selling)
-              .plus(day.dusdVolume.bots.selling)
-              .multipliedBy(new BigNumber(1).minus(day.dusdVolume.fee ?? 0.3))
+            new BigNumber(dayOrAvg(day, timeFrame).dusdVolume.organic.selling)
+              .plus(dayOrAvg(day, timeFrame).dusdVolume.bots.selling)
+              .multipliedBy(new BigNumber(1).minus(dayOrAvg(day, timeFrame).dusdVolume.fee ?? 0.3))
               .negated()
               .decimalPlaces(2)
               .toNumber(),
@@ -488,9 +516,9 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         label: 'DEX fee',
         data:
           historyToCheck?.map((day) =>
-            new BigNumber(day.dusdVolume.organic.selling)
-              .plus(day.dusdVolume.bots.selling)
-              .multipliedBy(day.dusdVolume.fee ?? 0.3)
+            new BigNumber(dayOrAvg(day, timeFrame).dusdVolume.organic.selling)
+              .plus(dayOrAvg(day, timeFrame).dusdVolume.bots.selling)
+              .multipliedBy(dayOrAvg(day, timeFrame).dusdVolume.fee ?? 0.3)
               .negated()
               .decimalPlaces(2)
               .toNumber(),
@@ -501,12 +529,12 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         label: 'Effective delta',
         data:
           historyToCheck?.map((day) =>
-            new BigNumber(day.dusdVolume.organic.buying)
-              .plus(day.dusdVolume.bots.buying)
+            new BigNumber(dayOrAvg(day, timeFrame).dusdVolume.organic.buying)
+              .plus(dayOrAvg(day, timeFrame).dusdVolume.bots.buying)
               .minus(
-                new BigNumber(day.dusdVolume.organic.selling)
-                  .plus(day.dusdVolume.bots.selling)
-                  .multipliedBy(new BigNumber(1).minus(day.dusdVolume.fee ?? 0.3)),
+                new BigNumber(dayOrAvg(day, timeFrame).dusdVolume.organic.selling)
+                  .plus(dayOrAvg(day, timeFrame).dusdVolume.bots.selling)
+                  .multipliedBy(new BigNumber(1).minus(dayOrAvg(day, timeFrame).dusdVolume.fee ?? 0.3)),
               )
               .decimalPlaces(2)
               .toNumber(),
@@ -519,65 +547,91 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         label: 'Collateral',
         data:
           historyToCheck?.map((day) =>
-            new BigNumber(day.dusdDistribution?.collateral).plus(day.dusdDistribution?.stakeXLoop ?? 0).toNumber(),
+            new BigNumber(dayOrAvg(day, timeFrame).dusdDistribution?.collateral)
+              .plus(dayOrAvg(day, timeFrame).dusdDistribution?.stakeXLoop ?? 0)
+              .toNumber(),
           ) ?? [],
         color: Color.collateral,
       })
       entries.push({
         label: 'StakeX TVL',
-        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.stakeXTVL).toNumber()) ?? [],
+        data:
+          historyToCheck?.map((day) =>
+            new BigNumber(dayOrAvg(day, timeFrame).dusdDistribution?.stakeXTVL).toNumber(),
+          ) ?? [],
         color: Color.stakeX,
       })
       entries.push({
         label: 'DMC',
-        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.otherOnDMC).toNumber()) ?? [],
+        data:
+          historyToCheck?.map((day) =>
+            new BigNumber(dayOrAvg(day, timeFrame).dusdDistribution?.otherOnDMC).toNumber(),
+          ) ?? [],
         color: Color.dmc,
       })
       entries.push({
         label: 'Bond 1Y TVL',
-        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.tvlBond1).toNumber()) ?? [],
+        data:
+          historyToCheck?.map((day) => new BigNumber(dayOrAvg(day, timeFrame).dusdDistribution?.tvlBond1).toNumber()) ??
+          [],
         color: Color.bond1Y,
       })
       entries.push({
         label: 'Bond 2Y TVL',
-        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.tvlBond2).toNumber()) ?? [],
+        data:
+          historyToCheck?.map((day) => new BigNumber(dayOrAvg(day, timeFrame).dusdDistribution?.tvlBond2).toNumber()) ??
+          [],
         color: Color.bond2Y,
       })
       entries.push({
         label: 'Gateway pools',
-        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.gatewayPools).toNumber()) ?? [],
+        data:
+          historyToCheck?.map((day) =>
+            new BigNumber(dayOrAvg(day, timeFrame).dusdDistribution?.gatewayPools).toNumber(),
+          ) ?? [],
         color: Color.gatewayPools,
       })
       entries.push({
         label: 'dToken pools',
-        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.dTokenPools).toNumber()) ?? [],
+        data:
+          historyToCheck?.map((day) =>
+            new BigNumber(dayOrAvg(day, timeFrame).dusdDistribution?.dTokenPools).toNumber(),
+          ) ?? [],
         color: colorBasedOn('dToken'),
       })
       entries.push({
         label: 'YieldVault addresses',
-        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.yieldVault).toNumber()) ?? [],
+        data:
+          historyToCheck?.map((day) =>
+            new BigNumber(dayOrAvg(day, timeFrame).dusdDistribution?.yieldVault).toNumber(),
+          ) ?? [],
         color: Color.yieldVault,
       })
       entries.push({
         label: 'Free (approx.)',
-        data: historyToCheck?.map((day) => new BigNumber(day.dusdDistribution?.free).toNumber()) ?? [],
+        data:
+          historyToCheck?.map((day) => new BigNumber(dayOrAvg(day, timeFrame).dusdDistribution?.free).toNumber()) ?? [],
         color: colorBasedOn('DUSD'),
       })
       break
   }
 
   return {
-    labels: historyToCheck
-      .map((entry) => moment(entry.meta.tstamp).utc().format('DD-MM-YYYY'))
-      .slice(valueOfTimeFrame[timeFrame]),
+    labels: historyToCheck.map((entry) => moment(entry.meta.tstamp).utc().format('DD-MM-YYYY')),
     datasets: entries.map((entry) => ({
       label: entry.label,
-      data: entry.data.slice(valueOfTimeFrame[timeFrame]).map((d) => filterData(d)),
+      data: entry.data.map((d) => filterData(d)),
       borderColor: [entry.color],
       backgroundColor: [entry.color],
       hoverOffset: 4,
     })),
   }
+}
+
+function dayOrAvg(entry: DTokenStats, timeFrame: LineChartTimeFrame): any {
+  return entry.avg7days && (timeFrame === LineChartTimeFrame.ALL || timeFrame === LineChartTimeFrame.THREE_MONTHS)
+    ? entry.avg7days
+    : entry
 }
 
 function filterData(data: number): number {
