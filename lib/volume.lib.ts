@@ -8,7 +8,7 @@ import {
   getDates,
   LineChartEntry,
   LineChartInfo,
-  valueOfTimeFrame,
+  scanByTimeFrame,
 } from './chart.lib'
 import { VolumeStats } from '../dtos/volume.dto'
 import BigNumber from 'bignumber.js'
@@ -135,11 +135,12 @@ function getAllSymbols(stats: VolumeStats): string[] {
 export function toLineChartData(history: VolumeStats[], { type, timeFrame }: LineChartInfo): ChartData {
   const entries: LineChartEntry[] = []
   const symbols = getAllSymbols(history.slice(-1)[0])
+  const historyToCheck = scanByTimeFrame(history, timeFrame)
   switch (type) {
     case VolumeChartDataType.VOLUME:
       entries.push({
         label: 'Buys',
-        data: history.map((day) => {
+        data: historyToCheck.map((day) => {
           const totalBuys = day.dfiVolume
             .map((i) => new BigNumber(i.totalBuying))
             .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
@@ -149,7 +150,7 @@ export function toLineChartData(history: VolumeStats[], { type, timeFrame }: Lin
       })
       entries.push({
         label: 'Buys above 50k',
-        data: history.map((day) => {
+        data: historyToCheck.map((day) => {
           const totalBuys = day.dfiVolume
             .map((i) => new BigNumber(i.buyingFromBigSwaps))
             .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
@@ -159,7 +160,7 @@ export function toLineChartData(history: VolumeStats[], { type, timeFrame }: Lin
       })
       entries.push({
         label: 'Sells',
-        data: history.map((day) => {
+        data: historyToCheck.map((day) => {
           const totalSells = day.dfiVolume
             .map((i) => new BigNumber(-i.totalSelling))
             .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
@@ -169,7 +170,7 @@ export function toLineChartData(history: VolumeStats[], { type, timeFrame }: Lin
       })
       entries.push({
         label: 'Sells above 50k',
-        data: history.map((day) => {
+        data: historyToCheck.map((day) => {
           const totalSells = day.dfiVolume
             .map((i) => new BigNumber(-i.sellingFromBigSwaps))
             .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
@@ -179,7 +180,7 @@ export function toLineChartData(history: VolumeStats[], { type, timeFrame }: Lin
       })
       entries.push({
         label: 'Delta',
-        data: history.map((day) => {
+        data: historyToCheck.map((day) => {
           const totalBuys = day.dfiVolume
             .map((i) => new BigNumber(i.totalBuying))
             .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
@@ -192,7 +193,7 @@ export function toLineChartData(history: VolumeStats[], { type, timeFrame }: Lin
       })
       entries.push({
         label: 'Delta above 50k',
-        data: history.map((day) => {
+        data: historyToCheck.map((day) => {
           const totalBuys = day.dfiVolume
             .map((i) => new BigNumber(i.buyingFromBigSwaps))
             .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
@@ -208,7 +209,7 @@ export function toLineChartData(history: VolumeStats[], { type, timeFrame }: Lin
       entries.push(
         ...symbols.map((symbol) => ({
           label: symbol,
-          data: history.map((day) => {
+          data: historyToCheck.map((day) => {
             const value = day.dfiVolume
               .filter((i) => i.symbol === symbol)
               .map((i) => new BigNumber(i.totalBuying).plus(i.totalSelling))
@@ -220,7 +221,7 @@ export function toLineChartData(history: VolumeStats[], { type, timeFrame }: Lin
       )
       entries.push({
         label: 'Total',
-        data: history.map((day) =>
+        data: historyToCheck.map((day) =>
           day.dfiVolume
             .map((i) => new BigNumber(i.totalBuying).plus(i.totalSelling))
             .reduce((prev, curr) => prev.plus(curr), new BigNumber(0))
@@ -233,7 +234,7 @@ export function toLineChartData(history: VolumeStats[], { type, timeFrame }: Lin
       entries.push(
         ...symbols.map((symbol) => ({
           label: symbol,
-          data: history.map((day) => {
+          data: historyToCheck.map((day) => {
             const value = day.dfiVolume
               .filter((i) => i.symbol === symbol)
               .map((i) => new BigNumber(i.totalBuying).minus(i.totalSelling))
@@ -247,12 +248,10 @@ export function toLineChartData(history: VolumeStats[], { type, timeFrame }: Lin
   }
 
   return {
-    labels: history
-      .map((entry) => moment(entry.meta.tstamp).utc().format('DD-MM-YYYY'))
-      .slice(valueOfTimeFrame[timeFrame]),
+    labels: historyToCheck.map((entry) => moment(entry.meta.tstamp).utc().format('DD-MM-YYYY')),
     datasets: entries.map((entry) => ({
       label: entry.label,
-      data: entry.data.slice(valueOfTimeFrame[timeFrame]),
+      data: entry.data,
       borderColor: [entry.color],
       backgroundColor: [entry.color],
       hoverOffset: 4,
