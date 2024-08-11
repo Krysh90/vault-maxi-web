@@ -29,6 +29,7 @@ export function generateTableContent(
   keywords = ['Mint', 'Burn'],
   customColors?: string[],
   customDeltaLabel?: string,
+  specialDusdDelta = false,
 ): TableData {
   if (buildCustom) {
     const oneIndex = chartData.labels
@@ -103,6 +104,25 @@ export function generateTableContent(
     content.push(formatNumber(minted - burned).concat(inDollar ? '$' : ''))
     percentages.push('')
     labels.push(customDeltaLabel ?? 'Delta')
+  }
+
+  if (specialDusdDelta) {
+    const mintDusdIndex = chartData.labels
+      .filter((value) => value.includes('Minted dUSD'))
+      .map((needle) => chartData.labels.findIndex((value) => value === needle))
+    const burnedDusdIndex = chartData.labels
+      .filter((value) => value.includes('Burned dUSD'))
+      .map((needle) => chartData.labels.findIndex((value) => value === needle))
+    const mintDusd = mintDusdIndex
+      .map((index) => chartData.datasets[0].data[index])
+      .reduce((prev, curr) => prev + curr, 0)
+    const burnedDusd = burnedDusdIndex
+      .map((index) => chartData.datasets[0].data[index])
+      .reduce((prev, curr) => prev + curr, 0)
+    content.push(formatNumber(new BigNumber(mintDusd).minus(burnedDusd).toNumber()))
+    labels.push('dUSD delta')
+    percentages.push('')
+    colors.push('')
   }
 
   return { content, labels, percentages, colors }
