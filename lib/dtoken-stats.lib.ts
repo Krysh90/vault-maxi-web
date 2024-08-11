@@ -452,6 +452,14 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         }),
         color: '#fff',
       })
+      entries.push({
+        label: 'dUSD delta',
+        data: historyToCheck.map((day) => {
+          const dUSD = dayOrAvg(day, timeFrame).dTokens.find((entry: DTokenStatsEntry) => entry.key === 'DUSD')
+          return (dUSD?.minted.futureswap ?? 0) - (dUSD?.burn.futureswap ?? 0)
+        }),
+        color: '#999',
+      })
       break
     case DTokenStatsChartDataType.ALGO_NUMBER:
       entries.push({
