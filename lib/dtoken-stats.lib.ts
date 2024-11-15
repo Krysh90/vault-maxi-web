@@ -208,6 +208,11 @@ export function toChartData(stats: DTokenStats, { type, sort }: ChartInfo): Char
         data: new BigNumber(stats.dusdDistribution.free).toNumber(),
         color: colorBasedOn('DUSD'),
       })
+      entries.push({
+        label: 'Locked',
+        data: new BigNumber(stats.dusdDistribution.inLock).toNumber(),
+        color: Color.inLock,
+      })
       break
     }
   }
@@ -235,6 +240,7 @@ const Color = {
   bond1Y: '#FDDC5C',
   bond2Y: '#f5bf03',
   dmc: '#0964F4',
+  inLock: '#cc008c',
 }
 
 function getHistoryToCheck(history: DTokenStats[], type: string): DTokenStats[] {
@@ -620,6 +626,13 @@ export function toLineChartData(history: DTokenStats[], { type, timeFrame }: Lin
         data:
           historyToCheck?.map((day) => new BigNumber(dayOrAvg(day, timeFrame).dusdDistribution?.free).toNumber()) ?? [],
         color: colorBasedOn('DUSD'),
+      })
+      entries.push({
+        label: 'Locked',
+        data:
+          historyToCheck?.map((day) => new BigNumber(dayOrAvg(day, timeFrame).dusdDistribution?.inLock).toNumber()) ??
+          [],
+        color: Color.inLock,
       })
       break
   }
