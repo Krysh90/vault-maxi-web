@@ -17,6 +17,7 @@ export interface DTokenStats {
     tvlBond1: string
     tvlBond2: string
     otherOnDMC: string
+    inLock: string
   }
   avg7days?: {
     dTokens: DTokenStatsEntry[]
