@@ -7,6 +7,7 @@ import {
   LoanVaultLiquidated,
 } from '@defichain/whale-api-client/dist/api/loan'
 import { PriceTicker } from '@defichain/whale-api-client/dist/api/prices'
+import BigNumber from 'bignumber.js'
 
 export function createClient(): WhaleApiClient {
   return new WhaleApiClient({
