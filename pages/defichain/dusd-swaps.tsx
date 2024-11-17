@@ -20,11 +20,11 @@ const dUSDSwaps: NextPage = () => {
 
 const rangeValues = {
   min: 0,
-  sellMax: new BigNumber(100_000_000),
-  buyMax: new BigNumber(20_000_000),
+  sellMax: new BigNumber(10_000_000),
+  buyMax: new BigNumber(2_000_000),
   defaultValueBuy: new BigNumber(0),
   defaultValueSell: new BigNumber(0),
-  step: new BigNumber(1_000_000),
+  step: new BigNumber(100_000),
 }
 
 function Content(): JSX.Element {
