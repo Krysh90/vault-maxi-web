@@ -40,7 +40,6 @@ export async function getPrices(client: WhaleApiClient): Promise<PriceTicker[]> 
   dCryptos.forEach((key) => {
     const pool = pools.find((p) => p.symbol == key + '-DFI')
     const priceOnDefichain = new BigNumber(pool!.priceRatio.ba).times(dfiPrice!)
-    console.log(key, ':', priceOnDefichain.toFixed(2))
     let price = prices.find((p) => p.price.token == key)
     price!.price.aggregated.amount = priceOnDefichain.toFixed(8)
   })
