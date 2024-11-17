@@ -29,7 +29,21 @@ export async function getLoanTokens(client: WhaleApiClient): Promise<LoanToken[]
 }
 
 export async function getPrices(client: WhaleApiClient): Promise<PriceTicker[]> {
-  return getAll(() => client.prices.list(), client)
+  //dCryptos: can't use oracle prices, due to depeg
+  const pools = await getPoolPairs(client)
+  const prices = await getAll(() => client.prices.list(), client)
+  const dfiPrice = prices.find((p) => p.price.token == 'DFI')?.price.aggregated.amount
+
+  const dCryptos = ['USDT', 'USDC', 'EUROC', 'BTC', 'ETH']
+
+  dCryptos.forEach((key) => {
+    const pool = pools.find((p) => p.symbol == key + '-DFI')
+    const priceOnDefichain = new BigNumber(pool!.priceRatio.ba).times(dfiPrice!)
+    console.log(key, ':', priceOnDefichain.toFixed(2))
+    let price = prices.find((p) => p.price.token == key)
+    price!.price.aggregated.amount = priceOnDefichain.toFixed(8)
+  })
+  return prices
 }
 
 export async function getVault(client: WhaleApiClient, id: string): Promise<LoanVaultActive | LoanVaultLiquidated> {
